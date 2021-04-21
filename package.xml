@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tensor</name>
+  <version>0.0.0</version>
+  <description>The Tensor package</description>
+
+  <maintainer email="florian.fervers@gmail.com">Florian Fervers</maintainer>
+
+  <license>MIT</license>
+
+  <exec_depend>catkin</exec_depend>
+  <export>
+    <build_type>catkin</build_type>
+  </export>
+</package>
