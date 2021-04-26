@@ -58,9 +58,9 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
-  TENSOR_FORWARD_ELEMENT_ACCESS(detail::PclElementAccess<TOrganized>::getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::PclElementAccess<TOrganized>::getElement)
 
   template <size_t TIndex>
   __host__

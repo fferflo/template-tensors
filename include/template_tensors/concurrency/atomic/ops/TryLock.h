@@ -255,7 +255,7 @@ public:
   }
 };
 
-template <mem::MemoryType TMemoryType, bool TIsOnHost = IS_ON_HOST>
+template <mem::MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST>
 using default_try_for = typename std::conditional<
     mem::isOnDevice<TMemoryType, TIsOnHost>(),
     TryLock<cuda::Mutex>,

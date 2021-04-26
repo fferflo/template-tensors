@@ -1,6 +1,6 @@
 namespace template_tensors {
 
-#define INDEXSTRATEGY_TO_INDEX_2 \
+#define TT_INDEXSTRATEGY_TO_INDEX_2 \
   template <size_t... TDims, typename... TCoordArgTypes, ENABLE_IF(are_coord_args_v<TCoordArgTypes&&...>::value && sizeof...(TDims) != 0)> \
   __host__ __device__ \
   size_t toIndex(TCoordArgTypes&&... coords) const \
@@ -14,7 +14,7 @@ namespace template_tensors {
     return toIndex(DimSeq<TDims...>(), util::forward<TCoordArgTypes>(coords)...); \
   }
 
-#define INDEXSTRATEGY_FROM_INDEX_2 \
+#define TT_INDEXSTRATEGY_FROM_INDEX_2 \
   template <size_t... TDims> \
   __host__ __device__ \
   auto fromIndex(size_t index) const \

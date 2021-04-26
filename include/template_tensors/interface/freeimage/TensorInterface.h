@@ -176,7 +176,7 @@ __host__
 freeimage::FreeImage toFreeImage(TTensorType&& tensor)
 {
   uint32_t red_mask, blue_mask, green_mask;
-#if IS_LITTLE_ENDIAN
+#if TT_IS_LITTLE_ENDIAN
     red_mask = 0xFF0000;
     green_mask = 0x00FF00;
     blue_mask = 0x0000FF;
@@ -192,7 +192,7 @@ freeimage::FreeImage toFreeImage(TTensorType&& tensor)
   ASSERT(handle && FreeImage_HasPixels(handle) && FreeImage_GetBits(handle) != nullptr, "FreeImage_ConvertFromRawBits failed");
 
   freeimage::FreeImage freeimage(handle);
-  if (IS_LITTLE_ENDIAN)
+  if (TT_IS_LITTLE_ENDIAN)
   {
     freeimage.swapRedAndBlue();
   }

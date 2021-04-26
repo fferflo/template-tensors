@@ -59,7 +59,7 @@ struct SortGridCellEntry
                               >
 // TODO: make this multithreaded for cpu: modify ::atomic::op::Void and for_each calls
 template <typename TObjectVector, size_t TRank, typename TAllocator, typename TIndexStrategy = template_tensors::RowMajor,
-  typename TAtomicOpsIn = void, bool TIsOnHost = IS_ON_HOST>
+  typename TAtomicOpsIn = void, bool TIsOnHost = TT_IS_ON_HOST>
 class SortGrid : public SuperType
 {
 public:
@@ -191,7 +191,7 @@ public:
       INSTANTIATE_ARG(TGetCoordinates&&));
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -200,7 +200,7 @@ public:
   RETURN_AUTO(
     self.m_grid(util::forward<TCoordArgTypes>(coords)...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__

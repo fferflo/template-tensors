@@ -59,7 +59,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
@@ -68,7 +68,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((coords / util::constant<size_t, nth_dimension_v<TIndices, TRepetitionsSeq>::value>())...)
   ) // TODO: util::forward coords
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <size_t TIndex>
   __host__ __device__
@@ -130,7 +130,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
@@ -139,7 +139,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((coords / getNthDimension<TIndices>(self.m_repetitions))...)
   ) // TODO: util::forward coords
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <size_t TIndex>
   __host__ __device__

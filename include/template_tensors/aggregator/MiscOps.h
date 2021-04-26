@@ -67,7 +67,7 @@ RETURN_AUTO(assign<TResultType>(aggregator::detail::weighted_inc(), initial_valu
 } // end of ns weighted
 
 namespace atomic {
-template <typename TAtomicOps, typename TResultType = typename std::conditional<IS_ON_HOST, size_t, uint32_t>::type>
+template <typename TAtomicOps, typename TResultType = typename std::conditional<TT_IS_ON_HOST, size_t, uint32_t>::type>
 __host__ __device__
 auto count(TResultType initial_value = 0)
 RETURN_AUTO(assign<TResultType>(detail::atomic_inc<TAtomicOps>(), initial_value))

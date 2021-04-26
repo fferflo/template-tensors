@@ -120,7 +120,7 @@ public:
     return *this;
   }
 
-  TENSOR_ASSIGN(TThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(TThisType)
 
   template <typename TThisType2>
   __host__ __device__
@@ -128,7 +128,7 @@ public:
   RETURN_AUTO(static_cast<util::copy_qualifiers_t<TThisType, TThisType2&&>>(self).data())
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  TENSOR_FORWARD_ELEMENT_ACCESS(detail::IndexedStorageElementAccess<is_static_v<TDimSeq>::value>::getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::IndexedStorageElementAccess<is_static_v<TDimSeq>::value>::getElement)
 
   __host__ __device__
   TIndexStrategy& getIndexStrategy()
@@ -173,7 +173,7 @@ public:
   __host__
   static TResultTensor toHost(TTensorType&& tensor)
   {
-    TResultTensor result(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
+    TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
     result = util::forward<TTensorType>(tensor);
     return result;
   }
@@ -193,7 +193,7 @@ public:
   __host__
   static TResultTensor toDevice(TTensorType&& tensor)
   { // TODO: here and toHost -> copy with same memory layout and index strategy instead
-    TResultTensor result(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
+    TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
     result = util::forward<TTensorType>(tensor);
     return result;
   }

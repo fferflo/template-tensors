@@ -7,9 +7,8 @@
 #include <type_traits>
 #include <sstream>
 
-// TODO: all macros should have package prefix or be undefined at the end
-#define CONCAT1(X, Y) X##Y
-#define CONCAT(X, Y) CONCAT1(X, Y)
+#define TT_CONCAT1(X, Y) X##Y
+#define TT_CONCAT(X, Y) TT_CONCAT1(X, Y)
 
 #define DECLTYPE_AUTO(NAME, ...) decltype(__VA_ARGS__) NAME = __VA_ARGS__
 // TODO: DECLTYPE_AUTO added in c++14?
@@ -20,15 +19,14 @@
 
 #define ENABLE_IF1(UNIQUE_NAME, ...) typename UNIQUE_NAME = void, \
   typename = typename std::enable_if<std::is_same<void, UNIQUE_NAME>::value && (__VA_ARGS__), void>::type
-#define ENABLE_IF(...) ENABLE_IF1(CONCAT(TDummy__, __COUNTER__), __VA_ARGS__)
-#define EMPTY_ENABLE_IF typename, typename
-
+#define ENABLE_IF(...) ENABLE_IF1(TT_CONCAT(TDummy__, __COUNTER__), __VA_ARGS__)
+// TODO: TT_ type prefixes in this file
 #define LAZY_TYPE1(UNIQUE_NAME, NAME, ...) bool UNIQUE_NAME = true, \
   typename NAME = typename std::enable_if<UNIQUE_NAME, __VA_ARGS__>::type
-#define LAZY_TYPE(NAME, ...) LAZY_TYPE1(CONCAT(TDummy__, __COUNTER__), NAME, __VA_ARGS__)
+#define LAZY_TYPE(NAME, ...) LAZY_TYPE1(TT_CONCAT(TDummy__, __COUNTER__), NAME, __VA_ARGS__)
 
 namespace util {struct EmptyDefaultType {};}
-#define WITH_DEFAULT_TYPE(TYPE, ...) typename std::conditional<std::is_same<TYPE, util::EmptyDefaultType>::value, __VA_ARGS__, TYPE>::type
+#define TT_WITH_DEFAULT_TYPE(TYPE, ...) typename std::conditional<std::is_same<TYPE, util::EmptyDefaultType>::value, __VA_ARGS__, TYPE>::type
 #define FUNCTOR(NAME, NAME2) \
   namespace functor { \
   struct NAME \
@@ -45,7 +43,7 @@ namespace util {struct EmptyDefaultType {};}
 
 #define INSTANTIATE_ARG(...) static_cast<__VA_ARGS__>(*((typename std::remove_reference<__VA_ARGS__>::type*) 23))
 #define INSTANTIATE(ANNOTATION, FUNC, ...) \
-struct CONCAT(instantiator_helper_, __LINE__) \
+struct TT_CONCAT(instantiator_helper_, __LINE__) \
 { \
   HD_WARNING_DISABLE \
   ANNOTATION \
@@ -640,24 +638,24 @@ struct type_to_string_v
   static constexpr const char* const value = "Unknown type";
 };
 
-#define DEFINE_TYPE_STRING(TYPE, NAME) \
+#define TT_DEFINE_TYPE_STRING(TYPE, NAME) \
   template <> \
   struct type_to_string_v<TYPE> \
   { \
     static constexpr const char* const value = NAME; \
   }
 
-DEFINE_TYPE_STRING(bool, "bool");
-DEFINE_TYPE_STRING(float, "float");
-DEFINE_TYPE_STRING(double, "double");
-DEFINE_TYPE_STRING(char, "char");
-DEFINE_TYPE_STRING(int8_t, "int8_t");
-DEFINE_TYPE_STRING(int16_t, "int16_t");
-DEFINE_TYPE_STRING(int32_t, "int32_t");
-DEFINE_TYPE_STRING(int64_t, "int64_t");
-DEFINE_TYPE_STRING(uint8_t, "uint8_t");
-DEFINE_TYPE_STRING(uint16_t, "uint16_t");
-DEFINE_TYPE_STRING(uint32_t, "uint32_t");
-DEFINE_TYPE_STRING(uint64_t, "uint64_t");
+TT_DEFINE_TYPE_STRING(bool, "bool");
+TT_DEFINE_TYPE_STRING(float, "float");
+TT_DEFINE_TYPE_STRING(double, "double");
+TT_DEFINE_TYPE_STRING(char, "char");
+TT_DEFINE_TYPE_STRING(int8_t, "int8_t");
+TT_DEFINE_TYPE_STRING(int16_t, "int16_t");
+TT_DEFINE_TYPE_STRING(int32_t, "int32_t");
+TT_DEFINE_TYPE_STRING(int64_t, "int64_t");
+TT_DEFINE_TYPE_STRING(uint8_t, "uint8_t");
+TT_DEFINE_TYPE_STRING(uint16_t, "uint16_t");
+TT_DEFINE_TYPE_STRING(uint32_t, "uint32_t");
+TT_DEFINE_TYPE_STRING(uint64_t, "uint64_t");
 
 } // end of ns util

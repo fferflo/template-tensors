@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     renderer(image_d, triangles.begin(), triangles.end(), shader, extr, intr);
 
     cv::namedWindow("Triangle");
-    cv::imshow("Triangle", tt::toCv(mem::toHost(TENSOR_ELWISE_MEMBER(image_d, gray))));
+    cv::imshow("Triangle", tt::toCv(mem::toHost(TT_ELWISE_MEMBER(image_d, gray))));
     cv::waitKey(0);
   }
 }

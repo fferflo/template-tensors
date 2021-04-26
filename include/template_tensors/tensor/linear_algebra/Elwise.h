@@ -51,7 +51,7 @@ public:
     ASSERT(areSameDimensions(tensors.dims()...), "Operation arguments must have same dimensions");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -65,7 +65,7 @@ public:
         util::forward<TCoordArgTypes>(coords)...
       )
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__
@@ -932,7 +932,7 @@ RETURN_AUTO(
 } // end of ns functor
 
 
-#define TENSOR_ELWISE_MEMBER(T, M) \
+#define TT_ELWISE_MEMBER(T, M) \
   template_tensors::elwise([]__host__ __device__(decltype((T)()) el) -> util::transfer_ref_const_t<decltype(el.M)&, decltype(T)> {return el.M;}, T)
 
 

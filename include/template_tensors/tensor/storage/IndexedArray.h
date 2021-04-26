@@ -41,7 +41,7 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   IndexedArrayTensor(ExplicitConstructWithDynDims, TArrayType array, TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
         util::move(array), TIndexStrategy(), util::forward<TDimArgTypes>(dim_args)...)
   {
   }
@@ -49,8 +49,8 @@ public:
   template <typename... TDimArgTypes, typename TIndexStrategy2, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value && std::is_constructible<TIndexStrategy, TIndexStrategy2&&>::value)>
   __host__ __device__
   IndexedArrayTensor(ExplicitConstructWithDynDims, TIndexStrategy2&& index_strategy, TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
-        TArrayType(ARRAY_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy.getSize(util::forward<TDimArgTypes>(dim_args)...)),
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
+        TArrayType(TT_ARRAY_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy.getSize(util::forward<TDimArgTypes>(dim_args)...)),
         util::forward<TIndexStrategy2>(index_strategy), util::forward<TDimArgTypes>(dim_args)...)
   {
   }
@@ -58,7 +58,7 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   IndexedArrayTensor(ExplicitConstructWithDynDims, TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
         TIndexStrategy(), util::forward<TDimArgTypes>(dim_args)...)
   {
   }
@@ -67,7 +67,7 @@ public:
     && !is_static_v<TDimSeq>::value), bool TDummy = true>
   __host__ __device__
   explicit IndexedArrayTensor(TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, util::forward<TDimArgTypes>(dim_args)...)
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, util::forward<TDimArgTypes>(dim_args)...)
   {
   }
 
@@ -75,7 +75,7 @@ public:
     && !is_static_v<TDimSeq>::value && std::is_constructible<TIndexStrategy, TIndexStrategy2&&>::value), bool TDummy = true>
   __host__ __device__
   explicit IndexedArrayTensor(TIndexStrategy2&& index_strategy, TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, util::forward<TIndexStrategy2>(index_strategy), util::forward<TDimArgTypes>(dim_args)...)
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, util::forward<TIndexStrategy2>(index_strategy), util::forward<TDimArgTypes>(dim_args)...)
   {
   }
 
@@ -83,7 +83,7 @@ public:
     && is_static_v<TDimSeq>::value)>
   __host__ __device__
   IndexedArrayTensor(TArrayArgs&&... storage_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_STORAGE_ARGS, util::forward<TArrayArgs>(storage_args)...)
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_STORAGE_ARGS, util::forward<TArrayArgs>(storage_args)...)
   {
   }
 
@@ -91,7 +91,7 @@ public:
     && is_static_v<TDimSeq>::value)>
   __host__ __device__
   IndexedArrayTensor(TTensorType2&& other)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TDimSeq())
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TDimSeq())
   {
     *this = util::forward<TTensorType2>(other);
   }
@@ -100,7 +100,7 @@ public:
     ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value && ::array::is_array_type_v<TOtherArrayType>::value)>
   __host__ __device__
   IndexedArrayTensor(TOtherArrayType&& storage, TDimArgTypes&&... dim_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
         TArrayType(util::forward<TOtherArrayType>(storage)), util::forward<TDimArgTypes>(dim_args)...)
   {
   }
@@ -109,7 +109,7 @@ public:
     ENABLE_IF(std::is_constructible<TArrayType, TArrayArgs...>::value && is_static_v<dimseq_t<SuperType>>::value)>
   __host__ __device__
   IndexedArrayTensor(ExplicitConstructWithStorageArgs, TArrayArgs&&... storage_args)
-    : IndexedArrayTensor(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS,
       TArrayType(util::forward<TArrayArgs>(storage_args)...), dimseq_t<SuperType>())
   {
   }
@@ -150,7 +150,7 @@ public:
     return *this;
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   __host__ __device__
   TArrayType& getArray()
@@ -290,5 +290,5 @@ struct is_atomic<template_tensors::IndexedArrayTensor<TArrayType, TElementType, 
 } // end of ns atomic
 
 template <typename TArrayType, typename TElementType, typename TIndexStrategy, typename TDimSeq>
-PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::IndexedArrayTensor<TArrayType, TElementType, TIndexStrategy, TDimSeq>),
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::IndexedArrayTensor<TArrayType, TElementType, TIndexStrategy, TDimSeq>),
   mem::is_trivially_relocatable_v<TIndexStrategy>::value && mem::is_trivially_relocatable_v<TElementType>::value && mem::is_trivially_relocatable_v<TArrayType>::value);

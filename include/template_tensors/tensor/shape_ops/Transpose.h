@@ -21,7 +21,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   template <size_t TIndex>
   __host__ __device__
@@ -54,7 +54,7 @@ public:
   RETURN_AUTO(
     getHelper(util::forward<TThisType>(self), tmp::vs::ascending_numbers_t<TTransposeDims>(), util::forward<TCoordArgTypes>(coords)...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   HD_WARNING_DISABLE
   template <typename TTransform>

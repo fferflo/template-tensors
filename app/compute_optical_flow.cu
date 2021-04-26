@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
   using Pixel = tt::VectorXT<uint8_t, 4>;
 
-  CUDA_SAFE_CALL(cudaSetDevice(0));
+  TT_CUDA_SAFE_CALL(cudaSetDevice(0));
 
   tt::nvof::Op<Pixel> op(input_resolution, 4);
   std::unique_ptr<tt::nvof::Input<Pixel>> input1 = boost::make_unique<tt::nvof::Input<Pixel>>(op);

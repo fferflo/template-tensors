@@ -1,8 +1,8 @@
-#include <template_tensors/cuda/CudaReduction.h>
-#include <template_tensors/cuda/CudaMutex.h>
-
 #include <HostDeviceTest.h>
 #include <template_tensors/TemplateTensors.h>
+
+#include <template_tensors/cuda/CudaReduction.h>
+#include <template_tensors/cuda/CudaMutex.h>
 
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>

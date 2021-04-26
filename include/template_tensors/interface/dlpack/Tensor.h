@@ -158,7 +158,7 @@ public:
     m_data = util::move(other.m_data);
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType2>

@@ -13,7 +13,7 @@ public:
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     auto determinant = src(0, 0) * src(1, 1) - src(0, 1) * src(1, 0); // TODO: closed form determinant
     if (determinant == 0)
@@ -37,7 +37,7 @@ public:
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     auto determinant =
         src(0, 0) * (src(1, 1) * src(2, 2) - src(1, 2) * src(2, 1))

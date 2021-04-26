@@ -27,7 +27,7 @@ struct ToTupleHelper<TElementType, TRows, TRows>
 } // end of ns detail
 
 template <typename TElementType2 = util::EmptyDefaultType, typename TVectorType, size_t TRows = rows_v<TVectorType>::value,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementType2, decay_elementtype_t<TVectorType>), ENABLE_IF(template_tensors::is_vector_v<TVectorType>::value)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementType2, decay_elementtype_t<TVectorType>), ENABLE_IF(template_tensors::is_vector_v<TVectorType>::value)>
 __host__ __device__
 ::tuple::TupleEx<tmp::ts::repeat_t<TElementType, TRows>> toTuple(TVectorType&& vector)
 {
@@ -35,7 +35,7 @@ __host__ __device__
 }
 
 template <typename TElementType2 = util::EmptyDefaultType, typename TTuple,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementType2, tmp::ts::first_t<::tuple::types_t<TTuple>>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementType2, tmp::ts::first_t<::tuple::types_t<TTuple>>)>
 __host__ __device__
 auto fromTuple(TTuple&& tuple)
 RETURN_AUTO(::tuple::for_all(

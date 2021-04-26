@@ -136,7 +136,7 @@ public:
 #endif
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
@@ -153,7 +153,7 @@ public:
       return self.m_tensor2(detail::ConcatDimsForTensor2<TIndices, TConcatDim>::getCoord(self.m_tensor1, util::forward<TCoordArgTypes>(coords)...)...);
     }
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
   // TODO: self.m_tensorX should possibly be an rvalue here? Also everywhere else
 
   template <size_t TIndex>

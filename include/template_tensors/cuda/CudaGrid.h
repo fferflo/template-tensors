@@ -1,7 +1,4 @@
-#include <template_tensors/TemplateTensors.h>
-
-#ifndef CUDA_GRID_H
-#define CUDA_GRID_H
+#pragma once
 
 #include "Cuda.h"
 
@@ -273,5 +270,3 @@ inline size_t thread_id_in_grid()
 } // end of ns cuda
 
 #endif
-
-#endif /* CUDA_GRID_H */

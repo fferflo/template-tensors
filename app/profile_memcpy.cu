@@ -92,8 +92,8 @@ int main(int argc, char** argv)
         grid = dim3(grid_size);
         PROFILE("device grid-stride forloop (grid=" << std::setw(3) << grid_size << " block=" << std::setw(3) << block_size <<
                 " batch_size=" << std::setw(3) << batch_size << ")");
-        CUDA_SAFE_CALL((kernel_gridstride_forloop<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-        CUDA_SAFE_CALL(cudaDeviceSynchronize());
+        TT_CUDA_SAFE_CALL((kernel_gridstride_forloop<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
       }
     }
   }
@@ -112,8 +112,8 @@ int main(int argc, char** argv)
         grid = dim3(256);
         PROFILE("device grid-stride memcpy (grid=" << std::setw(3) << grid_size << " block=" << std::setw(3) << block_size <<
                 " batch_size=" << std::setw(3) << batch_size << ")");
-        CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-        CUDA_SAFE_CALL(cudaDeviceSynchronize());
+        TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
       }
     }
   }
@@ -128,8 +128,8 @@ int main(int argc, char** argv)
     block = dim3(1);
     grid = dim3(1);
     PROFILE("device single forloop");
-    CUDA_SAFE_CALL((kernel_single_forloop<<<grid, block>>>(dest.data(), src.data(), src.size())));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL((kernel_single_forloop<<<grid, block>>>(dest.data(), src.data(), src.size())));
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 
   for (size_t batch_size = 1; batch_size <= 2 << 5; batch_size *= 2)
@@ -141,8 +141,8 @@ int main(int argc, char** argv)
     block = dim3(1);
     grid = dim3(1);
     PROFILE("device single memcpy (batch_size=" << std::setw(3) << batch_size << ")");
-    CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 
   {
@@ -153,8 +153,8 @@ int main(int argc, char** argv)
     block = dim3(1);
     grid = dim3(1);
     PROFILE("device single memcpy");
-    CUDA_SAFE_CALL((kernel_single_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size())));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL((kernel_single_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size())));
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 
   profiler::print();

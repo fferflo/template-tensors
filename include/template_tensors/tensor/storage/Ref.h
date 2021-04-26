@@ -35,7 +35,7 @@ template <mem::MemoryType TMemoryType, typename TIndexStrategy, typename... TDim
 __host__ __device__
 auto ref(const TPointerType& data, TIndexStrategy index_strategy, TDimArgTypes&&... dim_args)
 RETURN_AUTO(RefTensorType<TPointerType, TMemoryType, typename std::decay<TIndexStrategy>::type, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>(
-    TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, RefArrayType<TPointerType, TMemoryType, ::array::DYN>(data, index_strategy.getSize(util::forward<TDimArgTypes>(dim_args)...)), index_strategy, util::forward<TDimArgTypes>(dim_args)...
+    TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, RefArrayType<TPointerType, TMemoryType, ::array::DYN>(data, index_strategy.getSize(util::forward<TDimArgTypes>(dim_args)...)), index_strategy, util::forward<TDimArgTypes>(dim_args)...
   ))
 
 
@@ -46,7 +46,7 @@ __host__ __device__
 auto refEx(TArray&& array, TIndexStrategy index_strategy, TDimArgTypes&&... dim_args)
 RETURN_AUTO(
     IndexedArrayTensor<TArrayRef, ::array::elementtype_t<TArrayRef>, typename std::decay<TIndexStrategy>::type, TDimSeq>
-      (TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, ::array::ref(util::forward<TArray>(array)),
+      (TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, ::array::ref(util::forward<TArray>(array)),
         index_strategy, util::forward<TDimArgTypes>(dim_args)...)
   )
 

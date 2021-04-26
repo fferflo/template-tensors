@@ -19,7 +19,7 @@ namespace cudnn {
     { \
       printf("\nCudnn safe call '" #__VA_ARGS__ "' failed in " __FILE__ ": %u!\nCudnn Error Code: %u\nCudnn Error String: %s\n", \
         (unsigned int) __LINE__, (unsigned int) err, cudnnGetErrorString(err)); \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(false)
 

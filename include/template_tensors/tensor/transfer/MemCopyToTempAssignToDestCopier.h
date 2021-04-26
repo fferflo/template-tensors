@@ -21,7 +21,7 @@ struct MemCopyToTempAssignToDestCopier
     LocalOrAllocTensorT<
       decay_elementtype_t<TTensorSrc>,
       mem::alloc::default_for<mem::memorytype_v<TTensorDest>::value>,
-      indexstrategy_t<TTensorSrc>, dimseq_t<TTensorSrc>> temp(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, src.getIndexStrategy(), src.dims());
+      indexstrategy_t<TTensorSrc>, dimseq_t<TTensorSrc>> temp(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, src.getIndexStrategy(), src.dims());
 
     StorageArrayCopier::copy(temp, src);
     dest = temp;

@@ -48,7 +48,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -64,7 +64,7 @@ public:
       return static_cast<decay_elementtype_t<TVectorType>>(1);
     }
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
 
   template <size_t TIndex>
   __host__ __device__
@@ -126,7 +126,7 @@ public:
     ASSERT(input.template dim<0>() >= 1, "Cannot dehomogenize a vector with 0 rows!");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -135,7 +135,7 @@ public:
   RETURN_AUTO(
     self.m_input(row) / self.m_input(self.template dim<0>())
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
 
   template <size_t TIndex>
   __host__ __device__

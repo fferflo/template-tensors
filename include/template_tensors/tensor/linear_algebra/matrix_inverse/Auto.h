@@ -14,7 +14,7 @@ struct AutoInverseHelper<2>
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     return template_tensors::op::ClosedFormInverse<2>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
   }
@@ -27,7 +27,7 @@ struct AutoInverseHelper<3>
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     return template_tensors::op::ClosedFormInverse<3>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
   }
@@ -42,7 +42,7 @@ public:
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     return detail::AutoInverseHelper<RANK>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
   }
@@ -51,12 +51,12 @@ public:
 } // end of ns op
 
 template <typename TIndexStrategy = ColMajor, typename TAllocatorIn = util::EmptyDefaultType, typename TMatrixType,
-  typename TAllocator = WITH_DEFAULT_TYPE(TAllocatorIn, mem::alloc::default_for<mem::memorytype_v<TMatrixType>::value>),
+  typename TAllocator = TT_WITH_DEFAULT_TYPE(TAllocatorIn, mem::alloc::default_for<mem::memorytype_v<TMatrixType>::value>),
   typename TResultType = LocalOrAllocTensorT<decay_elementtype_t<TMatrixType>, TAllocator, TIndexStrategy, dimseq_t<TMatrixType>>>
 __host__ __device__
 TResultType inverse(TMatrixType&& matrix, TIndexStrategy index_strategy = TIndexStrategy())
 {
-  TResultType result(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, matrix.dims());
+  TResultType result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, matrix.dims());
   op::AutoInverse()(result, util::forward<TMatrixType>(matrix));
   return result;
 }

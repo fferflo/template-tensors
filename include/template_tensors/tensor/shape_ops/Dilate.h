@@ -53,7 +53,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -73,7 +73,7 @@ public:
       return self.m_background(util::forward<TCoordArgTypes>(coords)...);
     }
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__
@@ -139,7 +139,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -158,7 +158,7 @@ public:
       return self.m_background(util::forward<TCoordArgTypes>(coords)...);
     }
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__

@@ -16,7 +16,7 @@ public:
   __host__ __device__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     return GaussSolver<TScalar>(m_epsilon)
       (util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src), template_tensors::IdentityMatrix<TScalar, RANK>(dest.rows()));

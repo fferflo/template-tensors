@@ -26,7 +26,7 @@ struct SymmetricMatrixUpperTriangleRowMajor
     }
   }
 
-  INDEXSTRATEGY_TO_INDEX_2
+  TT_INDEXSTRATEGY_TO_INDEX_2
 
   template <typename... TDimArgTypes>
   __host__ __device__
@@ -83,4 +83,4 @@ void load(TArchive& archive, SymmetricMatrixUpperTriangleRowMajor& m)
 
 } // end of ns tensor
 
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((template_tensors::SymmetricMatrixUpperTriangleRowMajor));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((template_tensors::SymmetricMatrixUpperTriangleRowMajor));

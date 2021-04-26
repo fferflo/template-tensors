@@ -26,12 +26,12 @@ struct AssignToTempMemCopyToTempAssignToDestCopier
     LocalOrAllocTensorT<
       IntermediateElementType,
       mem::alloc::default_for<mem::memorytype_v<TTensorSrc>::value>,
-      TIndexStrategy, dimseq_t<TTensorSrc>> temp1(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, src.dims());
+      TIndexStrategy, dimseq_t<TTensorSrc>> temp1(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, src.dims());
 
     LocalOrAllocTensorT<
       IntermediateElementType,
       mem::alloc::default_for<mem::memorytype_v<TTensorDest>::value>,
-      TIndexStrategy, dimseq_t<TTensorDest>> temp2(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, dest.dims());
+      TIndexStrategy, dimseq_t<TTensorDest>> temp2(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, dest.dims());
 
     temp1 = src;
     StorageArrayCopier::copy(temp2, temp1);

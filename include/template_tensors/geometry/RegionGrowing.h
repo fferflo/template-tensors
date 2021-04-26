@@ -145,7 +145,7 @@ DECLARE_MEMBER_FUNCTOR(reset)
 DECLARE_MEMBER_FUNCTOR(merge)
 DECLARE_MEMBER_FUNCTOR(postprocess)
 
-template <typename TForEach = template_tensors::op::AutoForEach<>, bool TIsOnHost = IS_ON_HOST, typename TOutput, typename TValues, typename TGetNeighbors, typename TAreSimilar, typename TAtomicOps>
+template <typename TForEach = template_tensors::op::AutoForEach<>, bool TIsOnHost = TT_IS_ON_HOST, typename TOutput, typename TValues, typename TGetNeighbors, typename TAreSimilar, typename TAtomicOps>
 __host__ __device__
 void regionGrow(TOutput&& output, TValues&& values, TGetNeighbors&& get_neighbors, TAreSimilar&& are_similar, TAtomicOps&& atomic_ops)
 {
@@ -181,7 +181,7 @@ void regionGrow(TOutput&& output, TValues&& values, TGetNeighbors&& get_neighbor
 
 
 
-template <size_t TRank, typename TForEach = template_tensors::op::AutoForEach<>, typename TIndexStrategy = template_tensors::RowMajor, bool TIsOnHost = IS_ON_HOST, typename TValues, typename TGetNeighbors, typename TAreSimilar, typename TAtomicOps,
+template <size_t TRank, typename TForEach = template_tensors::op::AutoForEach<>, typename TIndexStrategy = template_tensors::RowMajor, bool TIsOnHost = TT_IS_ON_HOST, typename TValues, typename TGetNeighbors, typename TAreSimilar, typename TAtomicOps,
   typename TIndex = template_tensors::VectorXs<TRank>,
   typename TResultTensor = template_tensors::AllocTensorTEx<TIndex, mem::alloc::default_for<mem::memorytype_v<TValues>::value, TIsOnHost>, TIndexStrategy, template_tensors::dimseq_t<TValues&&>>
 >
@@ -193,7 +193,7 @@ TResultTensor regionGrow(TValues&& values, TGetNeighbors&& get_neighbors, TAreSi
   INSTANTIATE_DEVICE(ESC(regionGrow<TRank, TForEach, TIndexStrategy, false, TValues, TGetNeighbors, TAreSimilar, TAtomicOps>),
     INSTANTIATE_ARG(TValues&&), INSTANTIATE_ARG(TGetNeighbors&&), INSTANTIATE_ARG(TAreSimilar&&), INSTANTIATE_ARG(TAtomicOps&&));
 
-  TResultTensor result(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TValues>(values).dims());
+  TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TValues>(values).dims());
   regionGrow<TForEach>(result, util::forward<TValues>(values), util::forward<TGetNeighbors>(get_neighbors), util::forward<TAreSimilar>(are_similar), util::forward<TAtomicOps>(atomic_ops));
   return result;
 }
@@ -213,7 +213,7 @@ struct RegionGrowAtomicOps<true>
   static auto get(TDims&& dims)
   RETURN_AUTO(
     template_tensors::AllocTensorTEx<TAtomicOps, TAllocator, TIndexStrategy, TDimSeq>
-      (TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TDims>(dims))
+      (TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TDims>(dims))
   )
 };
 
@@ -230,7 +230,7 @@ struct RegionGrowAtomicOps<false>
 
 } // end of ns detail
 // TODO: take index strategy as value parameter?
-template <size_t TRank, typename TForEach = template_tensors::op::AutoForEach<>, typename TIndexStrategy = template_tensors::RowMajor, bool TIsOnHost = IS_ON_HOST, typename TValues, typename TGetNeighbors, typename TAreSimilar,
+template <size_t TRank, typename TForEach = template_tensors::op::AutoForEach<>, typename TIndexStrategy = template_tensors::RowMajor, bool TIsOnHost = TT_IS_ON_HOST, typename TValues, typename TGetNeighbors, typename TAreSimilar,
   typename TIndex = template_tensors::VectorXs<TRank>,
   typename TResultTensor = template_tensors::AllocTensorTEx<TIndex, mem::alloc::default_for<mem::memorytype_v<TValues>::value>, TIndexStrategy, template_tensors::dimseq_t<TValues&&>>
 >

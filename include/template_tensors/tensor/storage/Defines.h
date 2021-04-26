@@ -4,11 +4,11 @@ namespace template_tensors {
 struct ExplicitConstructWithDynDims
 {
 };
-#define TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS (::template_tensors::ExplicitConstructWithDynDims())
+#define TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS (::template_tensors::ExplicitConstructWithDynDims())
 struct ExplicitConstructWithStorageArgs
 {
 };
-#define TENSOR_EXPLICIT_CONSTRUCT_WITH_STORAGE_ARGS (::template_tensors::ExplicitConstructWithStorageArgs())
+#define TT_EXPLICIT_CONSTRUCT_WITH_STORAGE_ARGS (::template_tensors::ExplicitConstructWithStorageArgs())
 
 class IsIndexedPointerTensor
 {

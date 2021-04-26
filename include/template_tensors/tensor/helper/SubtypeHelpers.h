@@ -16,7 +16,7 @@ __host__ __device__
 void fill(TTensorType&& tensor, TElementType&& fill);
 
 // "using Copier" hack accomplishes that Copier is dependent of template paramters, and op::AutoCopier (which is only defined later) is not directly required here
-#define TENSOR_ASSIGN_ALL(...) \
+#define TT_ARRAY_SUBCLASS_ASSIGN_ALL(...) \
   template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value)> \
   __host__ __device__ \
   __VA_ARGS__& operator=(TTensorType2&& other) \
@@ -47,7 +47,7 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   }
 
 #ifdef OPENCV_INCLUDED
-#define TENSOR_ASSIGN_OPENCV(...) \
+#define TT_ARRAY_SUBCLASS_ASSIGN_OPENCV(...) \
   template <typename TTargetScalar> \
   operator cv::Point_<TTargetScalar>() const \
   { \
@@ -56,11 +56,11 @@ void fill(TTensorType&& tensor, TElementType&& fill);
     return cv::Point_<TTargetScalar>(static_cast<const __VA_ARGS__&>(*this)(0), static_cast<const __VA_ARGS__&>(*this)(1)); \
   }
 #else
-#define TENSOR_ASSIGN_OPENCV(...)
+#define TT_ARRAY_SUBCLASS_ASSIGN_OPENCV(...)
 #endif
 
 #ifdef __CUDACC__
-#define TENSOR_ASSIGN_THRUST(...) \
+#define TT_ARRAY_SUBCLASS_ASSIGN_THRUST(...) \
   template <typename T, typename TPtr, typename TRef> \
   __host__ __device__ \
   __VA_ARGS__& operator=(thrust::reference<T, TPtr, TRef> other) \
@@ -74,20 +74,20 @@ void fill(TTensorType&& tensor, TElementType&& fill);
     static_cast<volatile __VA_ARGS__&>(*this) = thrust::raw_reference_cast(other); \
   }
 #else
-#define TENSOR_ASSIGN_THRUST(...)
+#define TT_ARRAY_SUBCLASS_ASSIGN_THRUST(...)
 #endif
 
-#define TENSOR_ASSIGN(...) \
-  TENSOR_ASSIGN_ALL(__VA_ARGS__) \
-  TENSOR_ASSIGN_THRUST(__VA_ARGS__) \
-  TENSOR_ASSIGN_OPENCV(__VA_ARGS__)
+#define TT_ARRAY_SUBCLASS_ASSIGN(...) \
+  TT_ARRAY_SUBCLASS_ASSIGN_ALL(__VA_ARGS__) \
+  TT_ARRAY_SUBCLASS_ASSIGN_THRUST(__VA_ARGS__) \
+  TT_ARRAY_SUBCLASS_ASSIGN_OPENCV(__VA_ARGS__)
 
-// TODO: include ASSERTION in TENSOR_FORWARD_ELEMENT_ACCESS
-#define ASSERTION \
+// TODO: include ASSERTION in TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS
+/*#define ASSERTION \
   ASSERT_STREAM(coordsAreInRange(this->dims(), util::forward<TCoordArgTypes>(coords)...), \
     "Coordinates " << toCoordVector(util::forward<TCoordArgTypes>(coords)...) << " are out of range of dimensions " << this->dims());
-
-#define TENSOR_FORWARD_ELEMENT_ACCESS(NAME) \
+*/
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(NAME) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, typename... TCoordArgTypes__, ENABLE_IF(template_tensors::are_coord_args_v<TCoordArgTypes__...>::value)> \
   __host__ __device__ \
@@ -95,38 +95,38 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), util::forward<TCoordArgTypes__>(coords)...)) \
   FORWARD_ALL_QUALIFIERS(operator(), getElementForward__)
 
-#define TENSOR_FORWARD_ELEMENT_ACCESS_SEQ_N(NAME, N) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(NAME, N) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeqN__(TThisType__&& self, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), tmp::vs::ascending_numbers_t<N>(), \
     util::forward<TCoordArgTypes__>(coords)...)) \
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElementForwardSeqN__)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeqN__)
 
-#define TENSOR_FORWARD_ELEMENT_ACCESS_SEQ(NAME) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(NAME) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeq__(TThisType__&& self, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), tmp::vs::ascending_numbers_t<template_tensors::coordinate_num_v<TCoordArgTypes__...>::value>(), \
     util::forward<TCoordArgTypes__>(coords)...)) \
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElementForwardSeq__)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeq__)
 
-#define TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(NAME, N) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(NAME, N) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, size_t... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSizeTN__(TThisType__&& self, tmp::vs::IndexSequence<TIndices__...>, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ_N(getElementForwardSizeTN__, N)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElementForwardSizeTN__, N)
 
-#define TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T(NAME) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T(NAME) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, size_t... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSizeT__(TThisType__&& self, tmp::vs::IndexSequence<TIndices__...>, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ(getElementForwardSizeT__)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElementForwardSizeT__)
 
 } // end of ns tensor

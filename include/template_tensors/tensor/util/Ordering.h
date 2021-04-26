@@ -171,4 +171,6 @@ ORDER_COMPARE(lte, <=)
 ORDER_COMPARE(gt, >)
 ORDER_COMPARE(gte, >=)
 
+#undef ORDER_COMPARE
+
 } // end of ns tensor

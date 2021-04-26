@@ -13,8 +13,8 @@
 
 namespace array {
 
-#if CUDA_FUNCTIONS_AVAILABLE
-#define ARRAY_ITERATORS \
+#if TT_CUDA_FUNCTIONS_AVAILABLE
+#define TT_ARRAY_SUBCLASS_ITERATORS \
   using Iterator = typename std::conditional<mem::isOnHost<ThisType>(), \
     TElementType*, \
     thrust::device_ptr<TElementType> \
@@ -24,12 +24,12 @@ namespace array {
     thrust::device_ptr<const TElementType> \
   >::type;
 #else
-#define ARRAY_ITERATORS \
+#define TT_ARRAY_SUBCLASS_ITERATORS \
   using Iterator = TElementType*; \
   using ConstIterator = const TElementType*;
 #endif
 
-#define ARRAY_ITERATORS_BEGIN \
+#define TT_ARRAY_SUBCLASS_ITERATORS_BEGIN \
   __host__ __device__ \
   Iterator begin() \
   { \
@@ -46,7 +46,7 @@ namespace array {
     return ConstIterator(data()); \
   }
 
-#define ARRAY_ITERATORS_END \
+#define TT_ARRAY_SUBCLASS_ITERATORS_END \
   __host__ __device__ \
   Iterator end() \
   { \
@@ -63,11 +63,11 @@ namespace array {
     return ConstIterator(data() + size()); \
   }
 
-#define ASSERT_ELEMENT_ACCESS_MEMORY_TYPE \
-  util::constexpr_if<mem::isOnHost<mem::memorytype_v<ThisType>::value>() && IS_ON_DEVICE>([]__host__ __device__(){ \
+#define TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE \
+  util::constexpr_if<mem::isOnHost<mem::memorytype_v<ThisType>::value>() && TT_IS_ON_DEVICE>([]__host__ __device__(){ \
       ASSERT_(false, "Cannot access host elements from device"); \
     }); \
-  util::constexpr_if<mem::isOnDevice<mem::memorytype_v<ThisType>::value>() && IS_ON_HOST>([]__host__ __device__(){ \
+  util::constexpr_if<mem::isOnDevice<mem::memorytype_v<ThisType>::value>() && TT_IS_ON_HOST>([]__host__ __device__(){ \
       ASSERT_(false, "Cannot access device elements from host"); \
     });
 
@@ -76,7 +76,7 @@ static const size_t DYN = static_cast<size_t>(-1);
 struct ExplicitConstructWithDynDims
 {
 };
-#define ARRAY_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS (::array::ExplicitConstructWithDynDims())
+#define TT_ARRAY_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS (::array::ExplicitConstructWithDynDims())
 
 class IsArray
 {
@@ -117,7 +117,7 @@ public:
   static const size_t SIZE = TSize;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   constexpr LocalArray()
@@ -215,8 +215,8 @@ public:
     return m_data;
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   TElementType m_data[TSize];
@@ -240,7 +240,7 @@ public:
   static const size_t SIZE = 0;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   constexpr LocalArray()
@@ -313,8 +313,8 @@ public:
     return reinterpret_cast<TElementType*>(this);
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   bool m_dummy;
@@ -325,7 +325,7 @@ static_assert(sizeof(LocalArray<float, 3>) == 3 * sizeof(float), "Invalid size")
 
 } // end of ns array
 template <typename TElementType, size_t TSize>
-PROCLAIM_TRIVIALLY_RELOCATABLE((::array::LocalArray<TElementType, TSize>), mem::is_trivially_relocatable_v<TElementType>::value);
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE((::array::LocalArray<TElementType, TSize>), mem::is_trivially_relocatable_v<TElementType>::value);
 namespace array {
 
 #ifdef CEREAL_INCLUDED
@@ -360,7 +360,7 @@ public:
   static const size_t SIZE = DYN;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   DynamicAllocArray()
@@ -449,7 +449,7 @@ public:
   {
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -459,7 +459,7 @@ public:
   {
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -469,7 +469,7 @@ public:
   {
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -479,7 +479,7 @@ public:
   {
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -513,8 +513,8 @@ public:
     return m_data;
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   TElementType* m_data;
@@ -563,7 +563,7 @@ public:
   static const size_t SIZE = TSize;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   StaticAllocArray()
@@ -625,7 +625,7 @@ public:
   {
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -635,7 +635,7 @@ public:
   {
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -645,7 +645,7 @@ public:
   {
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -655,7 +655,7 @@ public:
   {
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
     ASSERT(m_data != nullptr, "Array data pointer is null");
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -689,8 +689,8 @@ public:
     return m_data;
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   TElementType* m_data;
@@ -712,7 +712,7 @@ public:
   static const size_t SIZE = TSize;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   ReferenceArray()
@@ -776,7 +776,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -787,7 +787,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -798,7 +798,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -809,7 +809,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < TSize, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) TSize);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -847,8 +847,8 @@ public:
     return m_data;
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   TPointerType m_data;
@@ -865,7 +865,7 @@ public:
   static const size_t SIZE = ::array::DYN;
   using ElementType = TElementType;
 
-  ARRAY_ITERATORS
+  TT_ARRAY_SUBCLASS_ITERATORS
 
   __host__ __device__
   ReferenceArray()
@@ -923,7 +923,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -934,7 +934,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -945,7 +945,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return m_data[index];
   }
 
@@ -956,7 +956,7 @@ public:
   {
     ASSERT(m_data, "Array data pointer is null");
     ASSERT(index < m_size, "Index %llu out of range %llu", (long long unsigned int) index, (long long unsigned int) m_size);
-    ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
+    TT_ARRAY_SUBCLASS_ASSERT_ELEMENT_ACCESS_MEMORY_TYPE
     return ptr::toRawPointer(m_data)[index];
   }
 
@@ -994,8 +994,8 @@ public:
     return m_data;
   }
 
-  ARRAY_ITERATORS_BEGIN
-  ARRAY_ITERATORS_END
+  TT_ARRAY_SUBCLASS_ITERATORS_BEGIN
+  TT_ARRAY_SUBCLASS_ITERATORS_END
 
 private:
   TPointerType m_data;

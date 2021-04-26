@@ -32,7 +32,7 @@ struct CublasGemm
 
     if (!TC)
     {
-      CUBLAS_SAFE_CALL(cublas::cublasTgemm<decay_elementtype_t<TTensorType1>>(
+      TT_CUBLAS_SAFE_CALL(cublas::cublasTgemm<decay_elementtype_t<TTensorType1>>(
         TA ? CUBLAS_OP_T : CUBLAS_OP_N,
         TB ? CUBLAS_OP_T : CUBLAS_OP_N,
         C.template dim<0>(), // = A.template dim<0>() = m
@@ -50,7 +50,7 @@ struct CublasGemm
     }
     else
     {
-      CUBLAS_SAFE_CALL(cublas::cublasTgemm<decay_elementtype_t<TTensorType1>>(
+      TT_CUBLAS_SAFE_CALL(cublas::cublasTgemm<decay_elementtype_t<TTensorType1>>(
         !TB ? CUBLAS_OP_T : CUBLAS_OP_N,
         !TA ? CUBLAS_OP_T : CUBLAS_OP_N,
         C.template dim<1>(), // = B.template dim<1>() = m
@@ -66,7 +66,7 @@ struct CublasGemm
         C.template dim<1>()
       ));
     }
-    CUDA_SAFE_CALL(cudaDeviceSynchronize()); // TODO: when to synchronize
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize()); // TODO: when to synchronize
   }
 };
 

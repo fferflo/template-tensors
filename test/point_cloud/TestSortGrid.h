@@ -77,7 +77,7 @@ struct Object
   tt::Vector3f features;
 };
 
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((Object));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((Object));
 
 struct GetFeatures
 {

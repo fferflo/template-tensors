@@ -198,7 +198,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -207,7 +207,7 @@ public:
   RETURN_AUTO(
     detail::TotalCoordinateHelper<TKeepSeq, DropSeq>::get(self.m_tensor, util::forward<TCoordArgTypes>(coords)...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__

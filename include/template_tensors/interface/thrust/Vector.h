@@ -44,7 +44,7 @@ template <typename TElementType>
 struct VectorByMemoryType<mem::LOCAL, TElementType>
 {
   using type =
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     thrust::host_vector<TElementType>
 #else
     thrust::device_vector<TElementType>
@@ -140,7 +140,7 @@ public:
     return *this;
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType2>
@@ -233,7 +233,7 @@ auto fromThrust(TThrustVector&& vector)
 RETURN_AUTO(FromThrustVector<util::store_member_t<TThrustVector>>(util::forward<TThrustVector>(vector)))
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType, ENABLE_IF(mem::isOnHost<mem::memorytype_v<TTensorType>::value>()),
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__
 thrust::host_vector<TElementType> toThrust(TTensorType&& tensor)
 {
@@ -245,7 +245,7 @@ thrust::host_vector<TElementType> toThrust(TTensorType&& tensor)
 }
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType, ENABLE_IF(mem::isOnDevice<mem::memorytype_v<TTensorType>::value>()),
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__
 thrust::device_vector<TElementType> toThrust(TTensorType&& tensor)
 {

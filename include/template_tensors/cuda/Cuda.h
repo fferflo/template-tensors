@@ -1,8 +1,8 @@
 #pragma once
 
 #ifndef __CUDACC__
-#  define IS_ON_HOST true
-#  define IS_ON_DEVICE false
+#  define TT_IS_ON_HOST true
+#  define TT_IS_ON_DEVICE false
 #  ifndef __host__
 #    define __host__
 #    define __device__
@@ -14,11 +14,11 @@
 #else
 #  include <cuda_runtime.h> // TODO: should this not be done by the user to switch cuda tensors on?
 #  ifdef __CUDA_ARCH__
-#    define IS_ON_HOST false
-#    define IS_ON_DEVICE true
+#    define TT_IS_ON_HOST false
+#    define TT_IS_ON_DEVICE true
 #  else
-#    define IS_ON_HOST true
-#    define IS_ON_DEVICE false
+#    define TT_IS_ON_HOST true
+#    define TT_IS_ON_DEVICE false
 #  endif
 #  define CUDA_RUNTIME_FUNCTIONS_AVAILABLE true
 #endif
@@ -33,7 +33,7 @@
 #  define HD_WARNING_DISABLE
 #endif
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
 #  define HD_NAME "Host"
 #else
 #  define HD_NAME "Device"
@@ -47,7 +47,7 @@
 #include <type_traits>
 #include <stdio.h>
 
-#define CUDA_SAFE_CALL(...) \
+#define TT_CUDA_SAFE_CALL(...) \
   do \
   { \
     __VA_ARGS__; \
@@ -56,11 +56,11 @@
     { \
       printf("\nCuda safe call '" #__VA_ARGS__ "' failed in " __FILE__ ": %u!\nCuda Error Code: %u\nCuda Error String: %s\n", \
         (unsigned int) __LINE__, (unsigned int) err, ::cudaGetErrorString(err)); \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(false)
 
-#define CUDA_DRIVER_SAFE_CALL(...) \
+#define TT_CUDA_DRIVER_SAFE_CALL(...) \
   do \
   { \
     CUresult err = __VA_ARGS__; \
@@ -70,7 +70,7 @@
       cuGetErrorName(err, &err_text); \
       printf("\nCuda driver safe call '" #__VA_ARGS__ "' failed in " __FILE__ ": %u!\nCuda Error Code: %u\nCuda Error String: %s\n", \
         (unsigned int) __LINE__, (unsigned int) err, err_text); \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(false)
 
@@ -121,7 +121,7 @@ void cudaMemcpy(T* dest, const T* src, size_t num)
 {
   ASSERT(TDestOnHost || isDevicePtr(dest), "cudaMemcpy destination pointer is invalid");
   ASSERT(TSrcOnHost || isDevicePtr(src), "cudaMemcpy source pointer is invalid");
-  CUDA_SAFE_CALL(cudaMemcpy(dest, src, num * sizeof(T), CudaMemcpyKind<TDestOnHost, TSrcOnHost>::value));
+  TT_CUDA_SAFE_CALL(cudaMemcpy(dest, src, num * sizeof(T), CudaMemcpyKind<TDestOnHost, TSrcOnHost>::value));
 }
 
 } // end of ns cuda

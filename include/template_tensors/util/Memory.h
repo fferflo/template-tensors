@@ -90,21 +90,21 @@ constexpr MemoryType combine()
   return combine<combine<T1, T2>, T3, TRest...>();
 }
 
-template <MemoryType T, bool TIsOnHost = IS_ON_HOST>
+template <MemoryType T, bool TIsOnHost = TT_IS_ON_HOST>
 __host__ __device__
 constexpr bool isOnHost()
 {
   return T == HOST || (T == LOCAL && TIsOnHost);
 }
 
-template <MemoryType T, bool TIsOnHost = IS_ON_HOST>
+template <MemoryType T, bool TIsOnHost = TT_IS_ON_HOST>
 __host__ __device__
 constexpr bool isOnDevice()
 {
   return T == DEVICE || (T == LOCAL && !TIsOnHost);
 }
 
-template <MemoryType T, bool TIsOnHost = IS_ON_HOST>
+template <MemoryType T, bool TIsOnHost = TT_IS_ON_HOST>
 __host__ __device__
 constexpr bool isOnLocal()
 {
@@ -254,13 +254,13 @@ struct toFunctor<true, false>
 
 } // end of ns detail
 
-template <mem::MemoryType TMemoryType, bool TIsOnHost = IS_ON_HOST, typename TType>
+template <mem::MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST, typename TType>
 __host__  __device__
 auto toFunctor(TType&& t)
 RETURN_AUTO(detail::toFunctor<mem::isOnHost<TMemoryType, TIsOnHost>(), TIsOnHost>::get(util::forward<TType>(t)))
 // TODO: naming toFunctor: toLambda?
 namespace functor {
-template <mem::MemoryType TMemoryType, bool TIsOnHost = IS_ON_HOST>
+template <mem::MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST>
 struct toFunctor
 {
   template <typename TType>
@@ -297,7 +297,7 @@ struct host_pinned
   static TType* allocate(size_t size)
   {
     TType* data;
-    CUDA_SAFE_CALL(cudaHostAlloc(&data, size * sizeof(TType), TFlags));
+    TT_CUDA_SAFE_CALL(cudaHostAlloc(&data, size * sizeof(TType), TFlags));
     return data;
   }
 
@@ -308,7 +308,7 @@ struct host_pinned
   __host__ __device__
   static void free(TType* data)
   {
-    CUDA_SAFE_CALL(cudaFreeHost(data));
+    TT_CUDA_SAFE_CALL(cudaFreeHost(data));
   }
 };
 
@@ -347,7 +347,7 @@ using host_heap = detail::heap<true>;
 #endif
 using device_heap = detail::heap<false>;
 
-using heap = typename std::conditional<IS_ON_HOST, host_heap, device_heap>::type;
+using heap = typename std::conditional<TT_IS_ON_HOST, host_heap, device_heap>::type;
 
 
 
@@ -397,7 +397,7 @@ struct device
     if (err != cudaSuccess)
     {
       printf("\ncudaMalloc failed to allocate %u * %u bytes \nCuda Error String: %s\n", (uint32_t) size, (uint32_t) sizeof(TType), ::cudaGetErrorString(err));
-      EXIT;
+      TT_EXIT;
     }
     // printf("Allocated device memory at %p\n", (void*) data);
     return data;
@@ -410,7 +410,7 @@ struct device
   __host__ __device__
   static void free(TType* data)
   {
-    CUDA_SAFE_CALL(cudaFree(data));
+    TT_CUDA_SAFE_CALL(cudaFree(data));
     // printf("Freed device memory at %p\n", (void*) data);
   }
 };
@@ -441,7 +441,7 @@ struct host_from_device
 
 } // end of ns detail
 
-template <MemoryType TMemoryType, bool TIsOnHost = IS_ON_HOST>
+template <MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST>
 using default_for =
 #ifdef __CUDACC__
   typename std::conditional<mem::isOnHost<TMemoryType, TIsOnHost>(),
@@ -487,24 +487,24 @@ struct is_trivially_relocatable_v
 };
 
 #ifdef __CUDACC__
-#define PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, ...) \
+#define TT_PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, ...) \
   struct thrust::proclaim_trivially_relocatable<ESC TYPE> \
     : std::conditional<__VA_ARGS__, ::thrust::true_type, ::thrust::false_type>::type \
   { \
   }
 #else
-#define PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, ...) \
+#define TT_PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, ...) \
   struct mem::detail::proclaim_trivially_relocatable<ESC TYPE> \
   { \
     static const bool value = __VA_ARGS__; \
   }
 #endif
 
-#define PROCLAIM_TRIVIALLY_RELOCATABLE_1(TYPE) PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, true)
-#define PROCLAIM_TRIVIALLY_RELOCATABLE(...) BOOST_PP_OVERLOAD(PROCLAIM_TRIVIALLY_RELOCATABLE_,__VA_ARGS__)(__VA_ARGS__)
-#define PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE(...) \
+#define TT_PROCLAIM_TRIVIALLY_RELOCATABLE_1(TYPE) TT_PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, true)
+#define TT_PROCLAIM_TRIVIALLY_RELOCATABLE(...) BOOST_PP_OVERLOAD(TT_PROCLAIM_TRIVIALLY_RELOCATABLE_,__VA_ARGS__)(__VA_ARGS__)
+#define TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE(...) \
   template <> \
-  PROCLAIM_TRIVIALLY_RELOCATABLE(__VA_ARGS__)
+  TT_PROCLAIM_TRIVIALLY_RELOCATABLE(__VA_ARGS__)
 
 
 
@@ -607,7 +607,7 @@ struct Copy
     static const bool dest_volatile = std::is_volatile<T1>::value;
     static const bool src_volatile = std::is_volatile<T2>::value;
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     VolatileCopyOnHost<dest_volatile || src_volatile>::template copy<TDestMemoryType, TSrcMemoryType, TNum>(dest, src, num);
 #else
     util::constexpr_if<!(isOnDevice<TDestMemoryType>() && isOnDevice<TSrcMemoryType>())>([]__host__ __device__(){
@@ -646,7 +646,7 @@ __host__
 T toHost(thrust::device_ptr<T> device_ptr)
 {
   T result;
-  copy<IS_ON_HOST ? HOST : DEVICE, DEVICE, 1>(&result, thrust::raw_pointer_cast(device_ptr), 1);
+  copy<TT_IS_ON_HOST ? HOST : DEVICE, DEVICE, 1>(&result, thrust::raw_pointer_cast(device_ptr), 1);
   return result;
 }
 
@@ -660,15 +660,15 @@ T toHost(thrust::device_reference<T> device_ref)
 
 } // end of ns mem
 
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((bool));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((float));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((double));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((char));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint8_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint16_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint32_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint64_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int8_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int16_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int32_t));
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int64_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((bool));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((float));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((double));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((char));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint8_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint16_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint32_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((uint64_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int8_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int16_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int32_t));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((int64_t));

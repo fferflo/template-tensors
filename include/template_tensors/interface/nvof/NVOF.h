@@ -113,7 +113,7 @@ public:
 
   Matrix<TElementType, TBufferUsage>& operator=(const Matrix<TElementType, TBufferUsage>& other) = delete;
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   template <typename TThisType2>
   __host__ __device__
@@ -174,7 +174,7 @@ private:
   static CUcontext getCurrentContext()
   {
     CUcontext context = nullptr;
-    CUDA_DRIVER_SAFE_CALL(cuCtxGetCurrent(&context));
+    TT_CUDA_DRIVER_SAFE_CALL(cuCtxGetCurrent(&context));
     return context;
   }
 
@@ -222,13 +222,13 @@ public:
   void operator()(Output& output, const Input<TPixel>& input1, const Input<TPixel>& input2)
   {
     m_context->Execute(input1.m_buffer_obj.get(), input2.m_buffer_obj.get(), output.m_buffer_obj.get(), nullptr, nullptr, 0, nullptr);
-    CUDA_DRIVER_SAFE_CALL(cuCtxSynchronize());
+    TT_CUDA_DRIVER_SAFE_CALL(cuCtxSynchronize());
   }
 
   void operator()(Output& output, Cost& cost, const Input<TPixel>& input1, const Input<TPixel>& input2)
   {
     m_context->Execute(input1.m_buffer_obj.get(), input2.m_buffer_obj.get(), output.m_buffer_obj.get(), nullptr, cost.m_buffer_obj.get(), 0, nullptr);
-    CUDA_DRIVER_SAFE_CALL(cuCtxSynchronize());
+    TT_CUDA_DRIVER_SAFE_CALL(cuCtxSynchronize());
   }
 
   template <typename TElementType, NV_OF_BUFFER_USAGE TBufferUsage>

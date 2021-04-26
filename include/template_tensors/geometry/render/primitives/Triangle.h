@@ -246,5 +246,5 @@ private:
 } // end of ns tensor
 
 template <typename TScalar, typename TIndexType>
-PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::geometry::render::VertexIndexTriangle<TScalar, TIndexType>),
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::geometry::render::VertexIndexTriangle<TScalar, TIndexType>),
   mem::is_trivially_relocatable_v<TScalar>::value && mem::is_trivially_relocatable_v<TIndexType>::value);

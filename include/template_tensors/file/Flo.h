@@ -2,9 +2,9 @@
 
 namespace template_tensors {
 
-#define FLO_MAGIC_BYTES 202021.250
-#define FLO_UNKNOWN_THRESH 1e9
-#define FLO_UNKNOWN 1e10
+#define TT_FLO_MAGIC_BYTES 202021.250
+#define TT_FLO_UNKNOWN_THRESH 1e9
+#define TT_FLO_UNKNOWN 1e10
 
 inline template_tensors::AllocMatrixT<template_tensors::Vector2f, mem::alloc::host_heap, template_tensors::RowMajor> readFlo(boost::filesystem::path path)
 {
@@ -16,7 +16,7 @@ inline template_tensors::AllocMatrixT<template_tensors::Vector2f, mem::alloc::ho
 
   float magic_bytes;
   stream.read(reinterpret_cast<char*>(&magic_bytes), sizeof(float));
-  if (magic_bytes != FLO_MAGIC_BYTES)
+  if (magic_bytes != TT_FLO_MAGIC_BYTES)
   {
     stream.close();
     throw boost::filesystem::filesystem_error("Flo file does not start with magic bytes", boost::system::errc::make_error_code(boost::system::errc::io_error));

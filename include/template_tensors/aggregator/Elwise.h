@@ -14,7 +14,7 @@ public:
   template <typename... TDimArgs>
   __host__ __device__
   elwise_helper(TElwiseAggregator aggregator, TIndexStrategy index_strategy, TDimArgs&&... dim_args)
-    : m_aggregators(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
+    : m_aggregators(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
   {
     template_tensors::fill(m_aggregators, aggregator);
   }

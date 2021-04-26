@@ -2,7 +2,7 @@ namespace template_tensors {
 
 namespace op {
 
-#define FOR_EACH_MAP_AND_COPY(...) \
+#define TT_FOR_EACH_MAP_AND_COPY(...) \
 template <typename TOperation, typename TTensorDest, typename... TTensorSrcs> \
 __VA_ARGS__ \
 static void map(TOperation&& op, TTensorDest&& dest, TTensorSrcs&&... srcs) \

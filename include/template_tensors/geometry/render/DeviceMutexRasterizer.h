@@ -109,10 +109,10 @@ public:
     auto mutex_map = template_tensors::ref<template_tensors::ColMajor, mem::DEVICE>(thrust::raw_pointer_cast(m_mutex_memory->data()), dest.template dims<2>());
     block = 96;
     grid  = 128;
-    CUDA_SAFE_CALL(kernel_DeviceMutexRasterizer_nthreadsperprimitive<TThreadsPerPrimitive><<<grid, block>>>
+    TT_CUDA_SAFE_CALL(kernel_DeviceMutexRasterizer_nthreadsperprimitive<TThreadsPerPrimitive><<<grid, block>>>
       (mem::toKernel(mutex_map), mem::toKernel(dest), primitives_begin, primitives_end, shader,
           static_cast<typename std::decay<TArgs&&>::type>(args)...));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 
   std::shared_ptr<thrust::device_vector<cuda::Mutex>> getMutexMemory()

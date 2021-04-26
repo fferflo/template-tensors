@@ -4,11 +4,11 @@
 
 namespace endian {
 
-#define IS_LITTLE_ENDIAN (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define IS_BIG_ENDIAN (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-static_assert(IS_LITTLE_ENDIAN || IS_BIG_ENDIAN, "Endianness is not supported");
+#define TT_IS_LITTLE_ENDIAN (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define TT_IS_BIG_ENDIAN (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+static_assert(TT_IS_LITTLE_ENDIAN || TT_IS_BIG_ENDIAN, "Endianness is not supported");
 
-#define IS_NETWORK_ENDIAN IS_BIG_ENDIAN
+#define TT_IS_NETWORK_ENDIAN TT_IS_BIG_ENDIAN
 
 template <size_t TSize>
 struct EndianSwap;
@@ -65,7 +65,7 @@ T swap(T element)
 template <typename T>
 T hton(T element)
 {
-#if IS_NETWORK_ENDIAN
+#if TT_IS_NETWORK_ENDIAN
   return element;
 #else
   return swap(element);
@@ -75,7 +75,7 @@ T hton(T element)
 template <typename T>
 T ntoh(T element)
 {
-#if IS_NETWORK_ENDIAN
+#if TT_IS_NETWORK_ENDIAN
   return element;
 #else
   return swap(element);
@@ -91,7 +91,7 @@ void swap_array(T* array, size_t num)
 template <typename T>
 void hton_array(T* array, size_t num)
 {
-#if !IS_NETWORK_ENDIAN
+#if !TT_IS_NETWORK_ENDIAN
   return swap_array(array, num);
 #endif
 }
@@ -99,7 +99,7 @@ void hton_array(T* array, size_t num)
 template <typename T>
 void ntoh_array(T* array, size_t num)
 {
-#if !IS_NETWORK_ENDIAN
+#if !TT_IS_NETWORK_ENDIAN
   return swap_array(array, num);
 #endif
 }
@@ -114,7 +114,7 @@ void swap(uint8_t* data)
 template <size_t TNum>
 void hton(uint8_t* data)
 {
-#if !IS_NETWORK_ENDIAN
+#if !TT_IS_NETWORK_ENDIAN
   swap<TNum>(data);
 #endif
 }
@@ -122,7 +122,7 @@ void hton(uint8_t* data)
 template <size_t TNum>
 void ntoh(uint8_t* data)
 {
-#if !IS_NETWORK_ENDIAN
+#if !TT_IS_NETWORK_ENDIAN
   swap<TNum>(data);
 #endif
 }

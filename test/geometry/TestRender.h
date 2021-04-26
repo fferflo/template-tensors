@@ -58,12 +58,12 @@ void render_surface_splat_sphere_from_different_angles(TRenderer& renderer, tt::
     else
     {
       image2_h = image_d;
-      size_t num_error = tt::count(tt::abs(TENSOR_ELWISE_MEMBER(image1_h, gray) - TENSOR_ELWISE_MEMBER(image2_h, gray)) > 0.05);
+      size_t num_error = tt::count(tt::abs(TT_ELWISE_MEMBER(image1_h, gray) - TT_ELWISE_MEMBER(image2_h, gray)) > 0.05);
       CHECK(((float) num_error) / tt::prod(resolution) <= 0.01); // Max 1% erroneous pixels
     }
 
     ImageH<GrayDepthPixel<float>>& image_h = angle == 0 ? image1_h : image2_h;
-    size_t num_sphere = tt::count(TENSOR_ELWISE_MEMBER(image_h, gray) > 1e-3);
+    size_t num_sphere = tt::count(TT_ELWISE_MEMBER(image_h, gray) > 1e-3);
     CHECK(((float) num_sphere) / tt::prod(resolution) >= 0.05); // At least 5% sphere pixels in image
   }
 };
@@ -122,12 +122,12 @@ void render_triangle_box_from_different_angles(TRenderer& renderer, tt::Vector2s
     else
     {
       image2_h = image_d;
-      size_t num_error = tt::count(tt::abs(TENSOR_ELWISE_MEMBER(image1_h, gray) - TENSOR_ELWISE_MEMBER(image2_h, gray)) > 0.05);
+      size_t num_error = tt::count(tt::abs(TT_ELWISE_MEMBER(image1_h, gray) - TT_ELWISE_MEMBER(image2_h, gray)) > 0.05);
       CHECK(((float) num_error) / tt::prod(resolution) <= 0.01); // Max 1% erroneous pixels
     }
 
     ImageH<GrayDepthPixel<float>>& image_h = angle == 0 ? image1_h : image2_h;
-    size_t num_box = tt::count(TENSOR_ELWISE_MEMBER(image_h, gray) > 1e-3);
+    size_t num_box = tt::count(TT_ELWISE_MEMBER(image_h, gray) > 1e-3);
     CHECK(((float) num_box) / tt::prod(resolution) >= 0.05); // At least 5% box pixels in image
   }
 }

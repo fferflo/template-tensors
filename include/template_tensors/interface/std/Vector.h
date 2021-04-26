@@ -111,7 +111,7 @@ public:
     return *this;
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType2>
@@ -184,11 +184,11 @@ auto fromStdVector(TStdVector&& vector)
 RETURN_AUTO(FromStdVector<util::store_member_t<TStdVector>>(util::forward<TStdVector>(vector)))
 
 template <typename TAllocatorIn = util::EmptyDefaultType, typename TVectorType,
-  typename TAllocator = WITH_DEFAULT_TYPE(TAllocatorIn, std::allocator<decay_elementtype_t<TVectorType>>), ENABLE_IF(is_vector_v<TVectorType>::value)>
+  typename TAllocator = TT_WITH_DEFAULT_TYPE(TAllocatorIn, std::allocator<decay_elementtype_t<TVectorType>>), ENABLE_IF(is_vector_v<TVectorType>::value)>
 __host__
 std::vector<decay_elementtype_t<TVectorType>, TAllocator> toStdVector(TVectorType&& vector)
 {
-  static_assert(IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TVectorType>::value>(), "Cannot convert device vector to std::vector");
+  static_assert(TT_IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TVectorType>::value>(), "Cannot convert device vector to std::vector");
   std::vector<decay_elementtype_t<TVectorType>, TAllocator> result(vector.rows());
   template_tensors::copy(fromStdVector(result), vector);
   return result;

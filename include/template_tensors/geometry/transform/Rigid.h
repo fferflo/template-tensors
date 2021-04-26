@@ -184,7 +184,7 @@ Rigid<TScalar, TRank> operator/(const Rigid<TScalar, TRank>& left, const Rigid<T
 
 
 template <typename TScalarIn = util::EmptyDefaultType, typename TVec1, typename TVec2, typename TVec3,
-  typename TScalar = WITH_DEFAULT_TYPE(TScalarIn, typename std::common_type<decay_elementtype_t<TVec1>, decay_elementtype_t<TVec2>, decay_elementtype_t<TVec3>>::type)>
+  typename TScalar = TT_WITH_DEFAULT_TYPE(TScalarIn, typename std::common_type<decay_elementtype_t<TVec1>, decay_elementtype_t<TVec2>, decay_elementtype_t<TVec3>>::type)>
 __host__ __device__
 Rigid<TScalar, 3> lookAt(TVec1&& eye, TVec2&& at, TVec3&& up)
 {

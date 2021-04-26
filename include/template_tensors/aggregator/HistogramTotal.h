@@ -14,7 +14,7 @@ public:
   template <typename... TDimArgs>
   __host__ __device__
   total_histogram(TBucketAggregator bucket_aggregator, TIndexStrategy index_strategy, TDimArgs&&... dim_args)
-    : m_buckets(TENSOR_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
+    : m_buckets(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
   {
     template_tensors::fill(m_buckets, bucket_aggregator);
   }

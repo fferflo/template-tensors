@@ -70,7 +70,7 @@ struct LocalForEach
     detail::LocalForEachHelper<MAX_RANK, TCoordsRank, TTensorTypes...>::for_each(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
   }
 
-  FOR_EACH_MAP_AND_COPY(__host__ __device__)
+  TT_FOR_EACH_MAP_AND_COPY(__host__ __device__)
 };
 
 } // end of ns op

@@ -6,7 +6,7 @@
 Show image snippet: TODO: as method
 
 cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
-cv::imshow("Display window", template_tensors::toCv(mem::toHost(TENSOR_ELWISE_MEMBER(image_d, gray))));
+cv::imshow("Display window", template_tensors::toCv(mem::toHost(TT_ELWISE_MEMBER(image_d, gray))));
 cv::waitKey(-1);
 
 */
@@ -113,7 +113,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType2>
@@ -181,7 +181,7 @@ __host__
 cv::Mat toCv(TTensorType&& tensor)
 {
   static_assert(math::lte(non_trivial_dimensions_num_v<TTensorType>::value, 2UL), "Must be matrix");
-  static_assert(IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TTensorType>::value>(), "Must be host tensor");
+  static_assert(TT_IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TTensorType>::value>(), "Must be host tensor");
   return detail::ToCvHelper<typename std::decay<TTensorType>::type>::toCv(util::forward<TTensorType>(tensor));
 }
 

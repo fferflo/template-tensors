@@ -17,7 +17,7 @@ const char* cublasGetErrorString(cublasStatus_t err);
 __host__ __device__
 const char* cublasGetOpString(cublasOperation_t op);
 
-#define CUBLAS_SAFE_CALL(...) \
+#define TT_CUBLAS_SAFE_CALL(...) \
     do \
     { \
       cublasStatus_t err = __VA_ARGS__; \
@@ -25,7 +25,7 @@ const char* cublasGetOpString(cublasOperation_t op);
       { \
         printf("\nCublas safe call '" #__VA_ARGS__ "' failed in " __FILE__ ": %u!\nCublas Error Code: %u\nCublas Error String: %s\n", \
           (unsigned int) __LINE__, (unsigned int) err, cublas::cublasGetErrorString(err)); \
-        EXIT; \
+        TT_EXIT; \
       } \
     } while(false)
 
@@ -35,13 +35,13 @@ public:
   __host__
   CublasContext()
   {
-    CUBLAS_SAFE_CALL(cublasCreate(&m_handle));
+    TT_CUBLAS_SAFE_CALL(cublasCreate(&m_handle));
   }
 
   __host__
   ~CublasContext()
   {
-    CUBLAS_SAFE_CALL(cublasDestroy(m_handle));
+    TT_CUBLAS_SAFE_CALL(cublasDestroy(m_handle));
   }
 
   __host__
@@ -90,6 +90,8 @@ DEFINE_CUBLAS_T_GEMM(double, cublasDgemm)
 DEFINE_CUBLAS_T_GEMM(cuComplex, cublasCgemm)
 DEFINE_CUBLAS_T_GEMM(cuDoubleComplex, cublasZgemm)
 DEFINE_CUBLAS_T_GEMM(__half, cublasHgemm)
+
+#undef DEFINE_CUBLAS_T_GEMM
 
 template <typename T>
 __host__

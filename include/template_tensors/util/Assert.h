@@ -17,10 +17,10 @@ PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object);
 
 
 
-#if IS_ON_DEVICE
-#define EXIT asm("trap;")
+#if TT_IS_ON_DEVICE
+#define TT_EXIT asm("trap;")
 #else
-#define EXIT ::exit(EXIT_FAILURE)
+#define TT_EXIT ::exit(EXIT_FAILURE)
 #endif
 
 #define ASSERT_(cond, str, ...) \
@@ -29,7 +29,7 @@ PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object);
     if (!(cond)) \
     { \
       printf("\nAssertion '%s' failed in %s:%u!\n" str "\n", #cond, __FILE__, __LINE__, ##__VA_ARGS__); \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(0)
 
@@ -39,7 +39,7 @@ PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object);
     if (!(cond)) \
     { \
       template_tensors::PrintStream<>() << "\nAssertion '" << #cond << "' failed in " << __FILE__<< ":" << __LINE__ << "!\n" << __VA_ARGS__ << "\n"; \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(0)
 

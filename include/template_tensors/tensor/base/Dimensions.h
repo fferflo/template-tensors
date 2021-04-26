@@ -174,7 +174,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -183,7 +183,7 @@ public:
   RETURN_AUTO(
     self.m_tensor.dim(row)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
 
   template <typename TTensorType>
   __host__

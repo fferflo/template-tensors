@@ -183,7 +183,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   template <typename TThisType, typename... TCoordArgTypes>
   __host__ __device__
@@ -204,7 +204,7 @@ public:
           );
     return aggregator.get();
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__
@@ -306,7 +306,7 @@ RETURN_AUTO(
  * @return the sum of all elements of the given tensor
  */
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__ __device__
 auto sum(TTensorType&& tensor, TElementType initial_value = 0)
 RETURN_AUTO(reduceAll(
@@ -322,7 +322,7 @@ FUNCTOR(sum, template_tensors::sum)
  * @return the product of all elements of the given tensor
  */
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__ __device__
 auto prod(TTensorType&& tensor, TElementType initial_value = 1)
 RETURN_AUTO(reduceAll(
@@ -332,14 +332,14 @@ RETURN_AUTO(reduceAll(
 FUNCTOR(prod, template_tensors::prod)
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__ __device__
 auto mean(TTensorType&& tensor)
 RETURN_AUTO(static_cast<TElementType>(template_tensors::sum(tensor)) / template_tensors::prod(tensor.dims()));
 FUNCTOR(mean, template_tensors::mean)
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__ __device__
 auto min_el(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(
@@ -349,7 +349,7 @@ RETURN_AUTO(reduceAll(
 FUNCTOR(min_el, template_tensors::min_el)
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType,
-  typename TElementType = WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
+  typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>
 __host__ __device__
 auto max_el(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(

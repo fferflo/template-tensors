@@ -17,7 +17,7 @@ public:
     ASSERT_(false, "Dummy tensor functions should never be called");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -27,7 +27,7 @@ public:
     ASSERT_(false, "Dummy tensor functions should never be called");
     return INSTANTIATE_ARG(TElementType);
   }
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <size_t TIndex>
   __host__ __device__

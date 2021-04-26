@@ -29,7 +29,7 @@ struct CopierDecider
 {
   static_assert(std::is_assignable<TElementTypeDest&, TElementTypeSrc>::value, "Element types must be assignable");
   static_assert(CopierDeciderHD<true, TCopierSeq, TTensorDest, TTensorSrc>::is_valid || CopierDeciderHD<false, TCopierSeq, TTensorDest, TTensorSrc>::is_valid,
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     "Host"
 #else
     "Device"
@@ -69,7 +69,7 @@ struct AutoCopier
     INSTANTIATE_HOST(HostCopier::copy, INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrc&&));
     INSTANTIATE_DEVICE(DeviceCopier::copy, INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrc&&));
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     HostCopier::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
 #else
     DeviceCopier::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));

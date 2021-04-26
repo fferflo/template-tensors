@@ -11,7 +11,7 @@ struct EigenColPivHouseholderQRSolver
   __host__
   bool operator()(TMatrixTypeX&& x, TMatrixTypeA&& A, TMatrixTypeB&& b) const
   {
-    TENSOR_SOLVER_CHECK_X_A_B_DIMS
+    TT_SOLVER_CHECK_X_A_B_DIMS
 
     Eigen::Matrix<TScalar, Eigen::Dynamic, Eigen::Dynamic> A_eigen = toEigen(template_tensors::static_cast_to<TScalar>(A));
     auto decomp = A_eigen.colPivHouseholderQr();
@@ -28,7 +28,7 @@ struct EigenColPivHouseholderQRSolver
     }
   }
   // TODO: this solves only with unique solutions. what about a solver for solution spaces? same with gaussian solver
-  TENSOR_SOLVER_FORWARD_X_AB(__host__)
+  TT_SOLVER_FORWARD_X_AB(__host__)
 };
 
 template <typename TScalar>
@@ -39,7 +39,7 @@ struct EigenColPivHouseholderQRInverse
   __host__
   bool operator()(TMatrixTypeDest&& dest, TMatrixTypeSrc&& src)
   {
-    TENSOR_MATRIX_INVERSE_CHECK_DIMS
+    TT_MATRIX_INVERSE_CHECK_DIMS
 
     Eigen::Matrix<TScalar, Eigen::Dynamic, Eigen::Dynamic> src_eigen = toEigen(template_tensors::static_cast_to<TScalar>(src));
     auto decomp = src_eigen.colPivHouseholderQr();

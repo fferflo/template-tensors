@@ -68,7 +68,7 @@ public:
     ASSERT(areCompatibleDimensions<TNewDimSeq>(util::forward<TDimArgTypes>(dim_args)...), "Incompatible run-time and compile-time dimensions");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -77,7 +77,7 @@ public:
   RETURN_AUTO(
     self.m_tensor(util::forward<TCoordArgTypes>(coords)...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
 private:
   TTensorTypeIn m_tensor;
@@ -170,7 +170,7 @@ public:
     ASSERT(areCompatibleCoordinates<TOffsetCoordSeq>(util::forward<TOffsetArgTypes>(offset_args)...), "Incompatible run-time and compile-time offset");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   template <size_t TIndex>
   __host__ __device__
@@ -196,7 +196,7 @@ public:
   RETURN_AUTO(
     util::forward<TThisType>(self).m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + nth_coordinate_v<TIndices, TOffsetCoordSeq>::value)...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
   HD_WARNING_DISABLE
   template <typename TTransform>
@@ -243,7 +243,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   template <size_t TIndex>
   __host__ __device__
@@ -272,7 +272,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + getNthCoordinate<TIndices>(self.m_offset))...)
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
   HD_WARNING_DISABLE
   template <typename TTransform>

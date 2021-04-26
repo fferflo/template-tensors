@@ -23,7 +23,7 @@ public:
     ASSERT(TRowsCols == DYN || TRowsCols == rows_cols, "Static and dynamic dimensions must be equal");
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -32,7 +32,7 @@ public:
   RETURN_AUTO(
     row == col ? 1 : 0
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
 
   template <typename TTransform>
   __host__ __device__
@@ -71,7 +71,7 @@ public:
   {
   }
 
-  TENSOR_ASSIGN(ThisType)
+  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -80,7 +80,7 @@ public:
   RETURN_AUTO(
     row == col ? 1 : 0
   )
-  TENSOR_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
 
   template <size_t TIndex>
   __host__ __device__

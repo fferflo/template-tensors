@@ -191,7 +191,7 @@ struct MortonDivideAndConquer
     return detail::MortonDivideAndConquerToIndexHelper<0, TRank>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
   }
 
-  INDEXSTRATEGY_TO_INDEX_2
+  TT_INDEXSTRATEGY_TO_INDEX_2
 
   template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
@@ -203,7 +203,7 @@ struct MortonDivideAndConquer
     return result;
   }
 
-  INDEXSTRATEGY_FROM_INDEX_2
+  TT_INDEXSTRATEGY_FROM_INDEX_2
 
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
@@ -247,4 +247,4 @@ using Morton = MortonDivideAndConquer<TRank>;
 } // end of ns tensor
 
 template <size_t TRank>
-PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonDivideAndConquer<TRank>));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonDivideAndConquer<TRank>));

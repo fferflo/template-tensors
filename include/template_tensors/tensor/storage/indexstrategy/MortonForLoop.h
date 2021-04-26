@@ -98,7 +98,7 @@ struct MortonForLoop
     return index;
   }
 
-  INDEXSTRATEGY_TO_INDEX_2
+  TT_INDEXSTRATEGY_TO_INDEX_2
 
   template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
@@ -110,7 +110,7 @@ struct MortonForLoop
     return result;
   }
 
-  INDEXSTRATEGY_FROM_INDEX_2
+  TT_INDEXSTRATEGY_FROM_INDEX_2
 
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
@@ -151,4 +151,4 @@ void load(TArchive& archive, MortonForLoop<TRank>& m)
 } // end of ns tensor
 
 template <size_t TRank>
-PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonForLoop<TRank>));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonForLoop<TRank>));

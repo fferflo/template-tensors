@@ -146,10 +146,10 @@ struct AutoForEach
     INSTANTIATE_HOST(ESC(detail::ExecuteAutoForEach<HostForEachSeq>::template run<TNum, TMemoryType>), INSTANTIATE_ARG(TIteratorBegin), INSTANTIATE_ARG(TIteratorEnd), INSTANTIATE_ARG(TFunctor&&));
     INSTANTIATE_DEVICE(ESC(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>), INSTANTIATE_ARG(TIteratorBegin), INSTANTIATE_ARG(TIteratorEnd), INSTANTIATE_ARG(TFunctor&&));
 
-#if IS_ON_HOST
-    return FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<HostForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
+#if TT_IS_ON_HOST
+    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<HostForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
 #else
-    return FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
+    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
 #endif
     return false;
   }

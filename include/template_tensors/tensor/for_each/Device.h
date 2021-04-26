@@ -28,14 +28,14 @@ struct DeviceForEachHelper
     dim3 block, grid;
     block = dim3(TBlockSize);
     grid = dim3(TGridSize);
-    CUDA_SAFE_CALL((detail::kernel_for_each_element_with_coords<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK, TCoordsRank><<<grid, block>>>(
+    TT_CUDA_SAFE_CALL((detail::kernel_for_each_element_with_coords<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK, TCoordsRank><<<grid, block>>>(
       mem::toKernel(func),
       size,
       util::first(util::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
       util::first(util::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>(),
       mem::toKernel(tensors)...
     )));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 };
 
@@ -62,13 +62,13 @@ struct DeviceForEachHelper<DYN>
     dim3 block, grid;
     block = dim3(TBlockSize);
     grid = dim3(TGridSize);
-    CUDA_SAFE_CALL((detail::kernel_for_each_element<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK><<<grid, block>>>(
+    TT_CUDA_SAFE_CALL((detail::kernel_for_each_element<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK><<<grid, block>>>(
       mem::toKernel(util::forward<TFunctor>(func)),
       size,
       util::first(util::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
       mem::toKernel(tensors)...
     )));
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
   }
 };
 
@@ -115,7 +115,7 @@ struct DeviceForEach
     );
   }
 
-  FOR_EACH_MAP_AND_COPY(__host__)
+  TT_FOR_EACH_MAP_AND_COPY(__host__)
 };
 
 #else
@@ -142,7 +142,7 @@ struct DeviceForEach
     static_assert(std::is_same<TFunctor, void>::value, "Cannot use DeviceForEach without CUDA");
   }
 
-  FOR_EACH_MAP_AND_COPY(__host__)
+  TT_FOR_EACH_MAP_AND_COPY(__host__)
 };
 
 #endif

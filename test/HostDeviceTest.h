@@ -17,8 +17,8 @@
   } \
   BOOST_AUTO_TEST_CASE(NAME##_device) \
   { \
-    CUDA_SAFE_CALL(kernel_##NAME##_test<<<1, 1>>>()); \
-    CUDA_SAFE_CALL(cudaDeviceSynchronize()); \
+    TT_CUDA_SAFE_CALL(kernel_##NAME##_test<<<1, 1>>>()); \
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize()); \
   } \
   __device__ void NAME##_test()
 #define HOST_DEVICE_TEST_CASE(NAME) \
@@ -29,8 +29,8 @@
   } \
   BOOST_AUTO_TEST_CASE(NAME##_device) \
   { \
-    CUDA_SAFE_CALL(kernel_##NAME##_test<<<1, 1>>>()); \
-    CUDA_SAFE_CALL(cudaDeviceSynchronize()); \
+    TT_CUDA_SAFE_CALL(kernel_##NAME##_test<<<1, 1>>>()); \
+    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize()); \
   } \
   BOOST_AUTO_TEST_CASE(NAME##_host) \
   { \
@@ -63,7 +63,7 @@
 
 
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
 #define CHECK(...) BOOST_CHECK((__VA_ARGS__))
 #else
 #define CHECK(...) \
@@ -72,7 +72,7 @@
     if (!(__VA_ARGS__)) \
     { \
       printf("\nCUDA device test failed: '%s' in %s:%u\n", #__VA_ARGS__, __FILE__, __LINE__); \
-      EXIT; \
+      TT_EXIT; \
     } \
   } while(0)
 #endif

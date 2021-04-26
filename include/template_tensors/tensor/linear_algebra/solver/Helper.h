@@ -1,6 +1,6 @@
 namespace template_tensors {
 
-#define TENSOR_SOLVER_CHECK_X_AB_DIMS \
+#define TT_SOLVER_CHECK_X_AB_DIMS \
   static const size_t RANK = rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value \
                            : rows_v<TMatrixTypeAb>::value != DYN ? rows_v<TMatrixTypeAb>::value \
                            : (cols_v<TMatrixTypeAb>::value && cols_v<TMatrixTypeX>::value != DYN) != DYN ? cols_v<TMatrixTypeAb>::value - cols_v<TMatrixTypeX>::value \
@@ -16,7 +16,7 @@ namespace template_tensors {
   ASSERT(Ab.rows() + x.cols() == Ab.cols(), "Incompatible dimensions"); \
   ASSERT(x.rows() == Ab.rows(), "Incompatible dimensions");
 
-#define TENSOR_SOLVER_CHECK_X_A_B_DIMS \
+#define TT_SOLVER_CHECK_X_A_B_DIMS \
   static const size_t RANK = \
                       rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value \
                     : rows_v<TMatrixTypeA>::value != DYN ? rows_v<TMatrixTypeA>::value \
@@ -39,23 +39,23 @@ namespace template_tensors {
   ASSERT(x.cols() == b.cols(), "Incompatible dimensions"); \
   ASSERT(A.rows() == A.cols(), "Incompatible dimensions");
 
-#define TENSOR_SOLVER_FORWARD_X_A_B(...) \
+#define TT_SOLVER_FORWARD_X_A_B(...) \
   template <typename TMatrixTypeX, typename TMatrixTypeA, typename TMatrixTypeB> \
   __VA_ARGS__ \
   bool operator()(TMatrixTypeX&& x, TMatrixTypeA&& A, TMatrixTypeB&& b) const \
   { \
-    TENSOR_SOLVER_CHECK_X_A_B_DIMS \
+    TT_SOLVER_CHECK_X_A_B_DIMS \
  \
     return (*this)(util::forward<TMatrixTypeX>(x), \
       template_tensors::concat<1>(util::forward<TMatrixTypeA>(A), util::forward<TMatrixTypeB>(b))); \
   }
 
-#define TENSOR_SOLVER_FORWARD_X_AB(...) \
+#define TT_SOLVER_FORWARD_X_AB(...) \
   template <typename TMatrixTypeX, typename TMatrixTypeAb> \
   __VA_ARGS__ \
   bool operator()(TMatrixTypeX&& x, TMatrixTypeAb&& Ab) const \
   { \
-    TENSOR_SOLVER_CHECK_X_AB_DIMS \
+    TT_SOLVER_CHECK_X_AB_DIMS \
  \
     return (*this)( \
       util::forward<TMatrixTypeX>(x), \

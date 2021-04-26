@@ -189,7 +189,7 @@ struct RowMajor
     return detail::RowMajorToIndexHelper<0, dimension_num_v<TDimArgType>::value>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
   }
 
-  INDEXSTRATEGY_TO_INDEX_2
+  TT_INDEXSTRATEGY_TO_INDEX_2
 
   template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
@@ -200,7 +200,7 @@ struct RowMajor
     return result;
   }
 
-  INDEXSTRATEGY_FROM_INDEX_2
+  TT_INDEXSTRATEGY_FROM_INDEX_2
 
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
@@ -248,4 +248,4 @@ void load(TArchive& archive, RowMajor& m)
 
 } // end of ns tensor
 
-PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((template_tensors::RowMajor));
+TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((template_tensors::RowMajor));

@@ -91,7 +91,7 @@ struct LocalArrayForEach
     );
   }
 
-  FOR_EACH_MAP_AND_COPY(__host__ __device__)
+  TT_FOR_EACH_MAP_AND_COPY(__host__ __device__)
 };
 
 } // end of ns op

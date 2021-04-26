@@ -37,7 +37,7 @@ struct ResultCheckerForEach<false>
 
 } // end of ns detail
 
-#define FOR_EACH_CHECK_RESULT(...) for_each::detail::ResultCheckerForEach<TMustBeAvailable>::check(__VA_ARGS__)
+#define TT_FOR_EACH_CHECK_RESULT(...) for_each::detail::ResultCheckerForEach<TMustBeAvailable>::check(__VA_ARGS__)
 
 enum Availability
 {

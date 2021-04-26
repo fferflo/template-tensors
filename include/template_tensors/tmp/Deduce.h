@@ -27,7 +27,7 @@ struct TypeWrapper
     static const type value = decltype(deduce(std::declval<TDeduceValueHelperArgs>()...))::value; \
   }; \
   static const typename STRUCT_NAME<__VA_ARGS__>::type value = STRUCT_NAME<__VA_ARGS__>::value;
-#define TMP_DEDUCE_VALUE(...) TMP_DEDUCE_VALUE1(CONCAT(DeduceValueHelper__, __COUNTER__), __VA_ARGS__)
+#define TMP_DEDUCE_VALUE(...) TMP_DEDUCE_VALUE1(TT_CONCAT(DeduceValueHelper__, __COUNTER__), __VA_ARGS__)
 
 #define TMP_DEDUCE_TYPE1(STRUCT_NAME, ...) \
   template <typename... TDeduceTypeHelperArgs> \
@@ -35,6 +35,6 @@ struct TypeWrapper
     using type = typename decltype(deduce(std::declval<TDeduceTypeHelperArgs>()...))::type; \
   }; \
   using type = typename STRUCT_NAME<__VA_ARGS__>::type;
-#define TMP_DEDUCE_TYPE(...) TMP_DEDUCE_TYPE1(CONCAT(DeduceTypeHelper__, __COUNTER__), __VA_ARGS__)
+#define TMP_DEDUCE_TYPE(...) TMP_DEDUCE_TYPE1(TT_CONCAT(DeduceTypeHelper__, __COUNTER__), __VA_ARGS__)
 
 } // end of ns tmp

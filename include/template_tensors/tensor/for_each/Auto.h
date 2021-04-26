@@ -20,7 +20,7 @@ struct ErrorForEach
     // TODO: better printing
   }
 
-  FOR_EACH_MAP_AND_COPY(__host__ __device__)
+  TT_FOR_EACH_MAP_AND_COPY(__host__ __device__)
 };
 
 struct ErrorMapper
@@ -179,7 +179,7 @@ struct AutoForEach
     INSTANTIATE_HOST(HostForEach::template for_each<TCoordsRank>, INSTANTIATE_ARG(TFunctor), INSTANTIATE_ARG(TTensorTypes&&)...);
     INSTANTIATE_DEVICE(DeviceForEach::template for_each<TCoordsRank>, INSTANTIATE_ARG(TFunctor), INSTANTIATE_ARG(TTensorTypes&&)...);
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     HostForEach dummy; // Doesn't compile without this hack for some reason
     decltype(dummy)::template for_each<TCoordsRank>(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
 #else
@@ -206,7 +206,7 @@ struct AutoForEach
     INSTANTIATE_HOST(HostMapper::map, INSTANTIATE_ARG(TOperation), INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrcs&&)...);
     INSTANTIATE_DEVICE(DeviceMapper::map, INSTANTIATE_ARG(TOperation), INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrcs&&)...);
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     HostMapper dummy; // Doesn't compile without this hack for some reason
     decltype(dummy)::map(util::forward<TOperation>(op), util::forward<TTensorDest>(dest), util::forward<TTensorSrcs>(srcs)...);
 #else
@@ -233,7 +233,7 @@ struct AutoForEach
     INSTANTIATE_HOST(HostCopier::copy, INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrc&&));
     INSTANTIATE_DEVICE(DeviceCopier::copy, INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrc&&));
 
-#if IS_ON_HOST
+#if TT_IS_ON_HOST
     HostCopier dummy; // Doesn't compile without this hack for some reason
     decltype(dummy)::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
 #else

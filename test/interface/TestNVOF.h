@@ -3,7 +3,7 @@
 
 BOOST_AUTO_TEST_CASE(nvof_test)
 {
-  CUDA_SAFE_CALL(cudaSetDevice(0));
+  TT_CUDA_SAFE_CALL(cudaSetDevice(0));
   using Pixel = tt::VectorXT<uint8_t, 4>;
 
   #ifdef OPENCV_INCLUDED
