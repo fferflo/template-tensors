@@ -11,13 +11,13 @@ namespace tbb {
 
 struct ForEach
 {
-  template <bool TIsOnHost, size_t TNum, mem::MemoryType TMemoryType>
+  template <bool TIsOnHost, metal::int_ TNum, mem::MemoryType TMemoryType>
   TVALUE(for_each::Availability, availability_v, (TIsOnHost && (mem::isOnHost<TMemoryType, TIsOnHost>() || TMemoryType == mem::UNKNOWN)) ? for_each::YES : for_each::NO)
 
-  template <bool TIsOnHost, size_t TNum, mem::MemoryType TMemoryType>
+  template <bool TIsOnHost, metal::int_ TNum, mem::MemoryType TMemoryType>
   TVALUE(bool, is_parallel_v, true)
 
-  template <size_t TNum = for_each::DYN, mem::MemoryType TMemoryType = mem::UNKNOWN, bool TMustBeAvailable = true, typename TIterator, typename TFunctor>
+  template <metal::int_ TNum = for_each::DYN, mem::MemoryType TMemoryType = mem::UNKNOWN, bool TMustBeAvailable = true, typename TIterator, typename TFunctor>
   __host__
   static bool for_each(TIterator begin, TIterator end, TFunctor func)
   {

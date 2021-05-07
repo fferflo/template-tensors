@@ -17,7 +17,7 @@ struct EigenColPivHouseholderQRSolver
     auto decomp = A_eigen.colPivHouseholderQr();
     Eigen::Matrix<TScalar, Eigen::Dynamic, Eigen::Dynamic> b_eigen = toEigen(template_tensors::static_cast_to<TScalar>(b));
     Eigen::Matrix<TScalar, Eigen::Dynamic, Eigen::Dynamic> x_eigen = decomp.solve(b_eigen);
-    if ((size_t) decomp.rank() == A.rows())
+    if (static_cast<size_t>(decomp.rank()) == A.rows())
     {
       x = fromEigen(x_eigen);
       return true;

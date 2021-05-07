@@ -38,7 +38,7 @@ using TensorTEx = IndexedArrayTensor<typename detail::TensorTExStorageHelper<TIn
  * @tparam TIndexStrategy the index strategy used for addressing the local memory
  * @tparam TDims... the dimensions of the tensor, cannot be DYN
  */
-template <typename TElementType, typename TIndexStrategy, size_t... TDims>
+template <typename TElementType, typename TIndexStrategy, metal::int_... TDims>
 using TensorT = TensorTEx<TElementType, TIndexStrategy, template_tensors::DimSeq<TDims...>>;
 
 
@@ -50,33 +50,33 @@ using TensorT = TensorTEx<TElementType, TIndexStrategy, template_tensors::DimSeq
  * @tparam TCols the number of columns, cannot be DYN
  * @tparam TIndexStrategy the index strategy used for addressing the local memory
  */
-template <typename TElementType, size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <typename TElementType, metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXT = TensorT<TElementType, TIndexStrategy, TRows, TCols>;
 
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXf = MatrixXXT<float, TRows, TCols, TIndexStrategy>;
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXd = MatrixXXT<double, TRows, TCols, TIndexStrategy>;
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXi = MatrixXXT<int32_t, TRows, TCols, TIndexStrategy>;
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXui = MatrixXXT<uint32_t, TRows, TCols, TIndexStrategy>;
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXs = MatrixXXT<size_t, TRows, TCols, TIndexStrategy>;
-template <size_t TRows, size_t TCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, metal::int_ TCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXXb = MatrixXXT<bool, TRows, TCols, TIndexStrategy>;
 
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXf = MatrixXXf<TRowsCols, TRowsCols, TIndexStrategy>;
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXd = MatrixXXd<TRowsCols, TRowsCols, TIndexStrategy>;
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXi = MatrixXXi<TRowsCols, TRowsCols, TIndexStrategy>;
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXui = MatrixXXui<TRowsCols, TRowsCols, TIndexStrategy>;
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXs = MatrixXXs<TRowsCols, TRowsCols, TIndexStrategy>;
-template <size_t TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRowsCols, typename TIndexStrategy = DefaultIndexStrategy>
 using MatrixXb = MatrixXXb<TRowsCols, TRowsCols, TIndexStrategy>;
 
 /*!
@@ -86,20 +86,20 @@ using MatrixXb = MatrixXXb<TRowsCols, TRowsCols, TIndexStrategy>;
  * @tparam TRows the number of rows, cannot be DYN
  * @tparam TIndexStrategy the index strategy used for addressing the local memory
  */
-template <typename TElementType, size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <typename TElementType, metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXT = TensorT<TElementType, TIndexStrategy, TRows>;
 
-template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXf = VectorXT<float, TRows, TIndexStrategy>;
-template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXd = VectorXT<double, TRows, TIndexStrategy>;
-template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXi = VectorXT<int32_t, TRows, TIndexStrategy>;
-template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXui = VectorXT<uint32_t, TRows, TIndexStrategy>;
-// template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy> // Defined in helper/TensorDefines.h
+// template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy> // Defined in helper/TensorDefines.h
 // using VectorXs = VectorXT<size_t, TRows, TIndexStrategy>;
-template <size_t TRows, typename TIndexStrategy = DefaultIndexStrategy>
+template <metal::int_ TRows, typename TIndexStrategy = DefaultIndexStrategy>
 using VectorXb = VectorXT<bool, TRows, TIndexStrategy>;
 
 using Matrix13f = MatrixXXf<1, 3>;
@@ -212,7 +212,7 @@ using AllocTensorTEx = IndexedArrayTensor<::array::AllocArray<TElementType, TAll
  * @tparam TIndexStrategy the index strategy used for addressing the allocated memory
  * @tparam TRank the rank of the tensor, i.e. the number of dimensions
  */
-template <typename TElementType, typename TAllocator, typename TIndexStrategy, size_t TRank>
+template <typename TElementType, typename TAllocator, typename TIndexStrategy, metal::int_ TRank>
 using AllocTensorT = AllocTensorTEx<TElementType, TAllocator, TIndexStrategy, dyn_dimseq_t<TRank>>;
 
 /*!
@@ -255,7 +255,7 @@ using AllocVectorui = AllocVectorT<uint32_t, TAllocator, TIndexStrategy>;
 template <typename TAllocator = DefaultAllocator, typename TIndexStrategy = DefaultIndexStrategy>
 using AllocVectors = AllocVectorT<size_t, TAllocator, TIndexStrategy>;
 
-template <typename TElementType, size_t TDims = DYN>
+template <typename TElementType, metal::int_ TDims = DYN>
 using Array = typename std::conditional<TDims == DYN,
   AllocVectorT<TElementType, mem::alloc::heap>,
   VectorXT<TElementType, TDims>>::type;

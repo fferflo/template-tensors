@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace template_tensors {
 
 namespace op {
@@ -12,7 +14,7 @@ void call_without_warning(TFunctor&& functor, TArgs&&... args)
   functor(util::forward<TArgs>(args)...);
 }
 
-template <size_t TCoordsRank>
+template <metal::int_ TCoordsRank>
 struct LocalArrayForEachHelper
 {
   HD_WARNING_DISABLE
@@ -20,7 +22,7 @@ struct LocalArrayForEachHelper
   __host__ __device__
   static void for_each(TFunctor&& func, size_t size, TTensorTypes&&... tensors)
   {
-    using IndexStrategy = indexstrategy_t<tmp::ts::get_t<0, tmp::ts::Sequence<TTensorTypes...>>>;
+    using IndexStrategy = indexstrategy_t<metal::front<metal::list<TTensorTypes...>>>;
     IndexStrategy index_strategy = util::first(util::forward<TTensorTypes>(tensors)...).getIndexStrategy();
     VectorXs<TCoordsRank> dims = util::first(util::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>();
 
@@ -73,7 +75,7 @@ struct LocalArrayForEach
   TVALUE(bool, is_parallel_v,
     TForEach::template is_parallel_v<TIsOnHost, multiply_dimensions_v<combine_dimseqs_t<TTensorTypes...>>::value, mem::combine<mem::memorytype_v<TTensorTypes>::value...>()>::value)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__ __device__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {
@@ -81,7 +83,7 @@ struct LocalArrayForEach
     ASSERT(math::eq(tensors.getIndexStrategy()...), "Storages must have the same indexing strategy");
     ASSERT(template_tensors::all(template_tensors::elwise(math::functor::eq(), tensors.dims()...)), "Incompatible runtime dimensions");
     static_assert(are_compatible_dimseqs_v<dimseq_t<TTensorTypes>...>::value, "Incompatible static dimensions");
-    static_assert(tmp::ts::are_same_v<tmp::ts::Sequence<indexstrategy_t<TTensorTypes>...>>::value,
+    static_assert(metal::same<indexstrategy_t<TTensorTypes>...>::value,
       "Storages must have the same indexing strategy");
 
     detail::LocalArrayForEachHelper<TCoordsRank>::template for_each<TForEach>(

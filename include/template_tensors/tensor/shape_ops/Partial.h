@@ -2,50 +2,50 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TTargetOuterDim, size_t TOuterDim, size_t TInnerDim, typename TDropSeq,
-  bool TDimIsDropped = tmp::vs::contains_v<size_t, TDropSeq, TInnerDim>::value>
+template <metal::int_ TTargetOuterDim, metal::int_ TOuterDim, metal::int_ TInnerDim, typename TDropSeq,
+  bool TDimIsDropped = metal::contains<TDropSeq, metal::number<TInnerDim>>::value>
 struct KeepDim;
 
-template <size_t TTargetOuterDim, size_t TOuterDim, size_t TInnerDim, typename TDropSeq>
+template <metal::int_ TTargetOuterDim, metal::int_ TOuterDim, metal::int_ TInnerDim, typename TDropSeq>
 struct KeepDim<TTargetOuterDim, TOuterDim, TInnerDim, TDropSeq, true>
 {
-  static const size_t value = KeepDim<TTargetOuterDim, TOuterDim, TInnerDim + 1, TDropSeq>::value;
+  static const metal::int_ value = KeepDim<TTargetOuterDim, TOuterDim, TInnerDim + 1, TDropSeq>::value;
 };
 
-template <size_t TTargetOuterDim, size_t TOuterDim, size_t TInnerDim, typename TDropSeq>
+template <metal::int_ TTargetOuterDim, metal::int_ TOuterDim, metal::int_ TInnerDim, typename TDropSeq>
 struct KeepDim<TTargetOuterDim, TOuterDim, TInnerDim, TDropSeq, false>
 {
-  static const size_t value = KeepDim<TTargetOuterDim, TOuterDim + 1, TInnerDim + 1, TDropSeq>::value;
+  static const metal::int_ value = KeepDim<TTargetOuterDim, TOuterDim + 1, TInnerDim + 1, TDropSeq>::value;
 };
 
-template <size_t TTargetOuterDim, size_t TInnerDim, typename TDropSeq>
+template <metal::int_ TTargetOuterDim, metal::int_ TInnerDim, typename TDropSeq>
 struct KeepDim<TTargetOuterDim, TTargetOuterDim, TInnerDim, TDropSeq, false>
 {
-  static const size_t value = TInnerDim;
+  static const metal::int_ value = TInnerDim;
 };
 
-template <size_t TInnerRank, typename TDropSeq, typename TIndices = tmp::vs::ascending_numbers_t<TInnerRank - tmp::vs::length_v<TDropSeq>::value>>
+template <metal::int_ TInnerRank, typename TDropSeq, typename TIndices = metal::iota<metal::number<0>, metal::number<TInnerRank - metal::size<TDropSeq>::value>>>
 struct KeepSeq;
 
-template <size_t TInnerRank, typename TDropSeq, size_t... TIndices>
-struct KeepSeq<TInnerRank, TDropSeq, tmp::vs::IndexSequence<TIndices...>>
+template <metal::int_ TInnerRank, typename TDropSeq, metal::int_... TIndices>
+struct KeepSeq<TInnerRank, TDropSeq, metal::numbers<TIndices...>>
 {
   using type = DimSeq<KeepDim<TIndices, 0, 0, TDropSeq>::value...>;
 };
 
-template <size_t TInnerRank, typename TDropSeq>
+template <metal::int_ TInnerRank, typename TDropSeq>
 using invert_seq_t = typename KeepSeq<TInnerRank, TDropSeq>::type;
 
-static_assert(std::is_same<tmp::vs::IndexSequence<0>, invert_seq_t<2, tmp::vs::IndexSequence<1>>>::value, "invert_seq_t not working");
-static_assert(std::is_same<tmp::vs::IndexSequence<0, 2>, invert_seq_t<3, tmp::vs::IndexSequence<1>>>::value, "invert_seq_t not working");
+static_assert(std::is_same<metal::numbers<0>, invert_seq_t<2, metal::numbers<1>>>::value, "invert_seq_t not working");
+static_assert(std::is_same<metal::numbers<0, 2>, invert_seq_t<3, metal::numbers<1>>>::value, "invert_seq_t not working");
 
 
 
 template <typename TInnerDimSeq, typename TKeepSeq>
 struct PickDimSeq;
 
-template <typename TInnerDimSeq, size_t... TKeepDims>
-struct PickDimSeq<TInnerDimSeq, tmp::vs::IndexSequence<TKeepDims...>>
+template <typename TInnerDimSeq, metal::int_... TKeepDims>
+struct PickDimSeq<TInnerDimSeq, metal::numbers<TKeepDims...>>
 {
   using type = DimSeq<nth_dimension_v<TKeepDims, TInnerDimSeq>::value...>;
 };
@@ -53,15 +53,15 @@ struct PickDimSeq<TInnerDimSeq, tmp::vs::IndexSequence<TKeepDims...>>
 template <typename TInnerDimSeq, typename TKeepSeq>
 using pick_dimseq_t = typename PickDimSeq<TInnerDimSeq, TKeepSeq>::type;
 
-static_assert(are_compatible_dimseqs_v<DimSeq<4>, pick_dimseq_t<DimSeq<3, 4>, tmp::vs::IndexSequence<1>>>::value, "pick_dimseq_t not working");
+static_assert(are_compatible_dimseqs_v<DimSeq<4>, pick_dimseq_t<DimSeq<3, 4>, metal::numbers<1>>>::value, "pick_dimseq_t not working");
 
 
 
 template <typename TKeepSeq>
 struct PickDims;
 
-template <size_t... TKeepDims>
-struct PickDims<tmp::vs::IndexSequence<TKeepDims...>>
+template <metal::int_... TKeepDims>
+struct PickDims<metal::numbers<TKeepDims...>>
 {
   template <typename TInnerTensor>
   __host__ __device__
@@ -75,49 +75,49 @@ struct PickDims<tmp::vs::IndexSequence<TKeepDims...>>
 
 
 
-template <size_t N, size_t TDropDim, size_t TKeepDim, typename TDropSeq,
-  bool TDimIsDropped = tmp::vs::contains_v<size_t, TDropSeq, TDropDim + TKeepDim>::value>
+template <metal::int_ N, metal::int_ TDropDim, metal::int_ TKeepDim, typename TDropSeq,
+  bool TDimIsDropped = metal::contains<TDropSeq, metal::number<TDropDim + TKeepDim>>::value>
 struct PartialCoordinateHelper;
 
-template <size_t N, size_t TDropDim, size_t TKeepDim, typename TDropSeq>
+template <metal::int_ N, metal::int_ TDropDim, metal::int_ TKeepDim, typename TDropSeq>
 struct PartialCoordinateHelper<N, TDropDim, TKeepDim, TDropSeq, true>
 {
   template <typename TKeepCoordVector, typename... TCoordArgTypes>
   __host__ __device__
-  static size_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
+  static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
     return PartialCoordinateHelper<N - 1, TDropDim + 1, TKeepDim, TDropSeq>::coord(util::forward<TKeepCoordVector>(keep_coords), util::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
-template <size_t N, size_t TDropDim, size_t TKeepDim, typename TDropSeq>
+template <metal::int_ N, metal::int_ TDropDim, metal::int_ TKeepDim, typename TDropSeq>
 struct PartialCoordinateHelper<N, TDropDim, TKeepDim, TDropSeq, false>
 {
   template <typename TKeepCoordVector, typename... TCoordArgTypes>
   __host__ __device__
-  static size_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
+  static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
     return PartialCoordinateHelper<N - 1, TDropDim, TKeepDim + 1, TDropSeq>::coord(util::forward<TKeepCoordVector>(keep_coords), util::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
-template <size_t TDropDim, size_t TKeepDim, typename TDropSeq>
+template <metal::int_ TDropDim, metal::int_ TKeepDim, typename TDropSeq>
 struct PartialCoordinateHelper<0, TDropDim, TKeepDim, TDropSeq, true>
 {
   template <typename TKeepCoordVector, typename... TCoordArgTypes>
   __host__ __device__
-  static size_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
+  static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
     return getNthCoordinate<TDropDim>(util::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
-template <size_t TDropDim, size_t TKeepDim, typename TDropSeq>
+template <metal::int_ TDropDim, metal::int_ TKeepDim, typename TDropSeq>
 struct PartialCoordinateHelper<0, TDropDim, TKeepDim, TDropSeq, false>
 {
   template <typename TKeepCoordVector, typename... TCoordArgTypes>
   __host__ __device__
-  static size_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
+  static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
     return getNthCoordinate<TKeepDim>(util::forward<TKeepCoordVector>(keep_coords));
   }
@@ -127,13 +127,13 @@ struct PartialCoordinateHelper<0, TDropDim, TKeepDim, TDropSeq, false>
 
 
 
-template <size_t TFirst, typename TRestSeq>
+template <metal::int_ TFirst, typename TRestSeq>
 struct PartialMaxHelper;
 
-template <size_t TFirst, size_t... TRest>
-struct PartialMaxHelper<TFirst, tmp::vs::IndexSequence<TRest...>>
+template <metal::int_ TFirst, metal::int_... TRest>
+struct PartialMaxHelper<TFirst, metal::numbers<TRest...>>
 {
-  static const size_t value = math::max(TFirst, (TRest + 1)...);
+  static const metal::int_ value = math::max(TFirst, (TRest + 1)...);
 };
 
 } // end of ns detail
@@ -161,7 +161,7 @@ public:
   PartialTensorElement(TTensorTypeIn tensor, TCoordArgTypes&&... keep_coords)
     : SuperType(detail::PickDims<TDropSeq>::pick(tensor))
     , m_tensor(tensor)
-    , m_keep_coords(toCoordVector<tmp::vs::length_v<KeepSeq>::value>(util::forward<TCoordArgTypes>(keep_coords)...))
+    , m_keep_coords(toCoordVector<metal::size<KeepSeq>::value>(util::forward<TCoordArgTypes>(keep_coords)...))
   {
   }
 
@@ -183,28 +183,28 @@ public:
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
-    return m_tensor.template dim<tmp::vs::get_v<TIndex, TDropSeq>::value>();
+    return m_tensor.template dim<metal::at<TDropSeq, metal::number<TIndex>>::value>();
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    return m_tensor.dim(tmp::vs::getByIterating<TDropSeq>(index, 1UL));
+    return m_tensor.dim(getNthDimension(index, TDropSeq()));
   }
 
 private:
   TTensorTypeIn m_tensor;
-  VectorXs<tmp::vs::length_v<KeepSeq>::value> m_keep_coords;
+  VectorXs<metal::size<KeepSeq>::value> m_keep_coords;
 
 public:
   HD_WARNING_DISABLE
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     util::move_if<TRValue>(self.m_tensor)(detail::PartialCoordinateHelper<TIndices, 0, 0, TDropSeq>::coord(self.m_keep_coords, util::forward<TCoordArgTypes>(coords)...)...)
   )
@@ -267,17 +267,17 @@ public:
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
   // TODO: self is not properly forwarded as rvalue
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
-    return m_tensor.template dim<tmp::vs::get_v<TIndex, TKeepSeq>::value>();
+    return m_tensor.template dim<metal::at<TKeepSeq, metal::number<TIndex>>::value>();
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    return m_tensor.dim(tmp::vs::getByIterating<TKeepSeq>(index, 1UL));
+    return m_tensor.dim(getNthDimension(index, TKeepSeq()));
   }
 
 private:
@@ -314,10 +314,10 @@ RETURN_AUTO(PartialTensor<util::store_member_t<TOtherTensorType&&>, TKeepSeq>
   (util::forward<TOtherTensorType>(tensor))
 );
 
-template <size_t... TDropDims, typename TOtherTensorType>
+template <metal::int_... TDropDims, typename TOtherTensorType>
 __host__ __device__
 auto partial(TOtherTensorType&& tensor)
-RETURN_AUTO(partial<tmp::vs::IndexSequence<TDropDims...>>
+RETURN_AUTO(partial<metal::numbers<TDropDims...>>
   (util::forward<TOtherTensorType>(tensor))
 );
 

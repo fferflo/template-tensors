@@ -149,15 +149,15 @@ public:
   RETURN_AUTO(ptr::toRawPointer(self.m_vector.data()))
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_vector.size() : 1;
   }
 
   __host__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? m_vector.size() : 1;
   }

@@ -3,11 +3,11 @@ namespace template_tensors {
 namespace detail {
 
 template <typename TDimSeq, typename TRepetitionsSeq, typename TIndexSequence
-  = tmp::vs::ascending_numbers_t<math::max(non_trivial_dimensions_num_v<TDimSeq>::value, non_trivial_dimensions_num_v<TRepetitionsSeq>::value)>>
+  = metal::iota<metal::number<0>, metal::number<math::max(non_trivial_dimensions_num_v<TDimSeq>::value, non_trivial_dimensions_num_v<TRepetitionsSeq>::value)>>>
 struct StaticRepeatDimSeq;
 
-template <typename TDimSeq, typename TRepetitionsSeq, size_t... TIndices>
-struct StaticRepeatDimSeq<TDimSeq, TRepetitionsSeq, tmp::vs::IndexSequence<TIndices...>>
+template <typename TDimSeq, typename TRepetitionsSeq, metal::int_... TIndices>
+struct StaticRepeatDimSeq<TDimSeq, TRepetitionsSeq, metal::numbers<TIndices...>>
 {
   using type = DimSeq<(nth_dimension_v<TIndices, TDimSeq>::value == DYN ? DYN :
     nth_dimension_v<TIndices, TDimSeq>::value * nth_dimension_v<TIndices, TRepetitionsSeq>::value
@@ -20,11 +20,11 @@ static_assert(std::is_same<
 >::value, "StaticRepeatDimSeq not working");
 
 template <typename TDimSeq, typename TRepetitionsSeq, typename TIndexSequence
-  = tmp::vs::ascending_numbers_t<math::max(non_trivial_dimensions_num_v<TDimSeq>::value, non_trivial_dimensions_num_v<TRepetitionsSeq>::value)>>
+  = metal::iota<metal::number<0>, metal::number<math::max(non_trivial_dimensions_num_v<TDimSeq>::value, non_trivial_dimensions_num_v<TRepetitionsSeq>::value)>>>
 struct StaticRepeatDims;
 
-template <typename TDimSeq, typename TRepetitionsSeq, size_t... TIndices>
-struct StaticRepeatDims<TDimSeq, TRepetitionsSeq, tmp::vs::IndexSequence<TIndices...>>
+template <typename TDimSeq, typename TRepetitionsSeq, metal::int_... TIndices>
+struct StaticRepeatDims<TDimSeq, TRepetitionsSeq, metal::numbers<TIndices...>>
 {
   template <typename TTensorType>
   __host__ __device__
@@ -50,7 +50,7 @@ class StaticRepeatTensor : public SuperType
 public:
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor");
 
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   __host__ __device__
   StaticRepeatTensor(TTensorTypeIn tensor)
@@ -62,25 +62,25 @@ public:
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_tensor((coords / util::constant<size_t, nth_dimension_v<TIndices, TRepetitionsSeq>::value>())...)
+    self.m_tensor((coords / util::constant<metal::int_, nth_dimension_v<TIndices, TRepetitionsSeq>::value>())...)
   ) // TODO: util::forward coords
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<TIndex>() * nth_dimension_v<TIndex, TRepetitionsSeq>::value;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    static const size_t rows = NON_TRIVIAL_DIMENSIONS_NUM;
+    static const metal::int_ rows = NON_TRIVIAL_DIMENSIONS_NUM;
     return math::lt(index, rows) ? (m_tensor.dim(index) * toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(TRepetitionsSeq())(index)) : 1;
   }
 
@@ -120,7 +120,7 @@ class DynamicRepeatTensor : public SuperType
 public:
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor");
 
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   __host__ __device__
   DynamicRepeatTensor(TTensorTypeIn tensor, TRepetitionsVector repetitions)
@@ -133,26 +133,26 @@ public:
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor((coords / getNthDimension<TIndices>(self.m_repetitions))...)
-  ) // TODO: util::forward coords
+  ) // TODO: util::forward coords?
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<TIndex>() * getNthDimension<TIndex>(m_repetitions);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    static const size_t rows = NON_TRIVIAL_DIMENSIONS_NUM;
-    return math::lt(index, rows) ? (m_tensor.dim(index) * m_repetitions(index)) : 1;
+    static const metal::int_ rows = NON_TRIVIAL_DIMENSIONS_NUM;
+    return math::lt(index, static_cast<size_t>(rows)) ? (m_tensor.dim(index) * m_repetitions(index)) : 1;
   }
 
 private:

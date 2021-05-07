@@ -6,7 +6,7 @@ namespace template_tensors {
                                         mem::LOCAL, \
                                         template_tensors::DimSeq<TRows> \
                               >
-template <typename TElementType, size_t TRows = template_tensors::DYN, size_t TDirection = template_tensors::DYN>
+template <typename TElementType, metal::int_ TRows = template_tensors::DYN, metal::int_ TDirection = template_tensors::DYN>
 class UnitVector : public SuperType, public StoreDimensions<template_tensors::DimSeq<TRows>>
 {
 public:
@@ -25,11 +25,11 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     row == TDirection ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -55,13 +55,13 @@ public:
                                         template_tensors::DimSeq<TRows> \
                               >
 
-template <typename TElementType, size_t TRows>
+template <typename TElementType, metal::int_ TRows>
 class UnitVector<TElementType, TRows, DYN> : public SuperType, public StoreDimensions<template_tensors::DimSeq<TRows>>
 {
 public:
   template <typename... TDimArgTypes>
   __host__ __device__
-  UnitVector(size_t direction, TDimArgTypes&&... dims)
+  UnitVector(dim_t direction, TDimArgTypes&&... dims)
     : SuperType(util::forward<TDimArgTypes>(dims)...)
     , StoreDimensions<template_tensors::DimSeq<TRows>>(util::forward<TDimArgTypes>(dims)...)
     , m_direction(direction)
@@ -74,11 +74,11 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     row == self.m_direction ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -95,7 +95,7 @@ public:
   }
 
 private:
-  size_t m_direction;
+  dim_t m_direction;
 };
 #undef SuperType
 #undef ThisType
@@ -107,7 +107,7 @@ private:
                                         template_tensors::DimSeq<DYN> \
                               >
 
-template <typename TElementType, size_t TDirection>
+template <typename TElementType, metal::int_ TDirection>
 class UnitVector<TElementType, DYN, TDirection> : public SuperType, public StoreDimensions<template_tensors::DimSeq<DYN>>
 {
 public:
@@ -125,11 +125,11 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     row == TDirection ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -161,7 +161,7 @@ class UnitVector<TElementType, DYN, DYN> : public SuperType, public StoreDimensi
 public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
-  UnitVector(size_t direction, TDimArgTypes&&... dims)
+  UnitVector(dim_t direction, TDimArgTypes&&... dims)
     : SuperType(util::forward<TDimArgTypes>(dims)...)
     , StoreDimensions<template_tensors::DimSeq<DYN>>(util::forward<TDimArgTypes>(dims)...)
     , m_direction(direction)
@@ -174,11 +174,11 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     row == self.m_direction ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -195,7 +195,7 @@ public:
   }
 
 private:
-  size_t m_direction;
+  dim_t m_direction;
 };
 #undef SuperType
 #undef ThisType
@@ -211,7 +211,7 @@ private:
                                         template_tensors::DimSeq<TRows> \
                               >
 
-template <typename TElementType, size_t TRows>
+template <typename TElementType, metal::int_ TRows>
 class UnitVectors : public SuperType, public StoreDimensions<template_tensors::DimSeq<TRows>>
 {
 public:
@@ -228,11 +228,11 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     UnitVector<TElementType, TRows>(row, self.rows())
   )
- TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+ TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__

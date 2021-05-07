@@ -29,16 +29,16 @@ public:
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     ASSERT_(false, "Dummy tensor functions should never be called");
     return 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     ASSERT_(false, "Dummy tensor functions should never be called");
     return 1;

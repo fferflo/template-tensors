@@ -2,11 +2,11 @@
 
 namespace field {
 
-template <size_t TRank, typename TSupplier>
+template <metal::int_ TRank, typename TSupplier>
 class FromSupplierField
 {
 public:
-  static const size_t RANK = TRank;
+  static const metal::int_ RANK = TRank;
 
 private:
   TSupplier m_supplier;
@@ -28,7 +28,7 @@ public:
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
 
-template <size_t TRank, typename TSupplier>
+template <metal::int_ TRank, typename TSupplier>
 __host__ __device__
 auto fromSupplier(TSupplier&& supplier)
 RETURN_AUTO(FromSupplierField<TRank, util::store_member_t<TSupplier&&>>(util::forward<TSupplier>(supplier)))

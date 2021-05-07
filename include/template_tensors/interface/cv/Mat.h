@@ -123,9 +123,9 @@ public:
   FORWARD_ALL_QUALIFIERS(data, data2)
 
   HD_WARNING_DISABLE
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_mat.rows :
            TIndex == 1 ? m_mat.cols :
@@ -134,7 +134,7 @@ public:
 
   HD_WARNING_DISABLE
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? m_mat.rows :
            index == 1 ? m_mat.cols :
@@ -180,7 +180,7 @@ template <typename TTensorType, ENABLE_IF(has_indexstrategy_v<TTensorType, RowMa
 __host__
 cv::Mat toCv(TTensorType&& tensor)
 {
-  static_assert(math::lte(non_trivial_dimensions_num_v<TTensorType>::value, 2UL), "Must be matrix");
+  static_assert(math::lte(non_trivial_dimensions_num_v<TTensorType>::value, 2), "Must be matrix");
   static_assert(TT_IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TTensorType>::value>(), "Must be host tensor");
   return detail::ToCvHelper<typename std::decay<TTensorType>::type>::toCv(util::forward<TTensorType>(tensor));
 }

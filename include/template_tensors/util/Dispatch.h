@@ -162,7 +162,7 @@ struct type
   {
     if (check)
     {
-      functor(util::Type<TResultType>());
+      functor(metal::value<TResultType>()); // TODO: metal::lazy
       return SimpleResult();
     }
     else
@@ -172,7 +172,7 @@ struct type
   }
 };
 
-template <typename TValueType, TValueType TValue>
+template <typename T, T TValue>
 struct value
 {
   using Result = SimpleResult;
@@ -186,14 +186,14 @@ struct value
   {
   }
 
-  DEFAULT_COPY_MOVE_DESTRUCTOR(value<TValueType, TValue>)
+  DEFAULT_COPY_MOVE_DESTRUCTOR(value<T, TValue>)
 
   template <typename TFunctor>
   SimpleResult operator()(TFunctor&& functor)
   {
     if (check)
     {
-      functor(util::Value<TValueType, TValue>());
+      functor(std::integral_constant<T, TValue>());
       return SimpleResult();
     }
     else
@@ -209,7 +209,7 @@ template <typename TElementTypeSeq>
 struct FirstTypeHelper;
 
 template <typename... TElementTypes>
-struct FirstTypeHelper<tmp::ts::Sequence<TElementTypes...>>
+struct FirstTypeHelper<metal::list<TElementTypes...>>
 {
   template <typename TTypePredicate>
   static auto make(TTypePredicate&& pred, std::string name)
@@ -228,25 +228,25 @@ RETURN_AUTO(
 
 namespace detail {
 
-template <typename TValueSeq>
+template <typename TType, typename TNumbers>
 struct FirstValueHelper;
 
-template <typename T, T... TValues>
-struct FirstValueHelper<tmp::vs::Sequence<T, TValues...>>
+template <typename TType, metal::int_... TNumbers>
+struct FirstValueHelper<TType, metal::numbers<TNumbers...>>
 {
-  template <typename TValuePredicate>
-  static auto make(TValuePredicate&& pred, std::string name)
+  template <typename TPredicate>
+  static auto make(TPredicate&& pred, std::string name)
   RETURN_AUTO(
-    dispatch::first(dispatch::value<T, TValues>(pred.template operator()<T, TValues>(), name)...)
+    dispatch::first(dispatch::value<TType, static_cast<TType>(TNumbers)>(pred.template operator()<static_cast<TType>(TNumbers)>(), name)...)
   )
 };
 
 } // end of ns detail
 
-template <typename TValueSeq, typename TValuePredicate>
-auto first_value(TValuePredicate&& pred, std::string name = "Value")
+template <typename TType, typename TNumbers, typename TPredicate>
+auto first_value(TPredicate&& pred, std::string name = "Value")
 RETURN_AUTO(
-  detail::FirstValueHelper<TValueSeq>::make(util::forward<TValuePredicate>(pred), name)
+  detail::FirstValueHelper<TType, TNumbers>::make(util::forward<TPredicate>(pred), name)
 )
 
 
@@ -471,10 +471,10 @@ template <size_t N, typename TCompareType, typename TTypes>
 struct UnionExGet;
 
 template <size_t N, typename TCompareType, typename TFirstType, typename... TTypes>
-struct UnionExGet<N, TCompareType, tmp::ts::Sequence<TFirstType, TTypes...>>
+struct UnionExGet<N, TCompareType, metal::list<TFirstType, TTypes...>>
 {
   static const bool check = std::is_same<typename std::decay<TCompareType>::type, typename std::decay<TFirstType>::type>::value;
-  using Next = UnionExGet<N + 1, TCompareType, tmp::ts::Sequence<TTypes...>>;
+  using Next = UnionExGet<N + 1, TCompareType, metal::list<TTypes...>>;
 
   static const size_t id = check ? N : Next::id;
   using type = typename std::conditional<check, TFirstType, typename Next::type>::type;
@@ -482,7 +482,7 @@ struct UnionExGet<N, TCompareType, tmp::ts::Sequence<TFirstType, TTypes...>>
 };
 
 template <size_t N, typename TCompareType>
-struct UnionExGet<N, TCompareType, tmp::ts::Sequence<>>
+struct UnionExGet<N, TCompareType, metal::list<>>
 {
   static const size_t id = static_cast<size_t>(-1);
   using type = void;
@@ -521,7 +521,7 @@ public:
     {
       static const size_t ID = detail::UnionExGet<0, TType, TTypes>::id;
       using Type = typename detail::UnionExGet<0, TType, TTypes>::type;
-      static_assert(ID < tmp::ts::length_v<TTypes>::value, "This should never happen");
+      static_assert(ID < metal::size<TTypes>::value, "This should never happen");
 
       self.m_data = new Type(util::forward<TType>(other));
       self.m_id = ID;
@@ -565,7 +565,7 @@ public:
 
     static const size_t ID = detail::UnionExGet<0, TType, TTypes>::id;
     using Type = typename detail::UnionExGet<0, TType, TTypes>::type;
-    static_assert(ID < tmp::ts::length_v<TTypes>::value, "Cannot assign object to union");
+    static_assert(ID < metal::size<TTypes>::value, "Cannot assign object to union");
     m_id = ID;
     m_data = new Type(util::forward<TType>(other));
 
@@ -595,7 +595,7 @@ public:
   {
     TThisType self;
 
-    template <typename, size_t TId>
+    template <metal::int_ TId>
     bool operator()() const
     {
       return self.m_id == TId;
@@ -609,9 +609,9 @@ public:
     TFunctor functor;
 
     template <size_t TId>
-    void operator()(util::Value<size_t, TId>)
+    void operator()(std::integral_constant<size_t, TId>)
     {
-      using Type = tmp::ts::get_t<TId, TTypes>;
+      using Type = metal::at<TTypes, metal::number<TId>>;
       using QualifiedType = util::copy_qualifiers_t<Type, TThisType>;
       using QualifiedPtr = typename std::remove_reference<QualifiedType>::type;
       functor(static_cast<QualifiedType>(*reinterpret_cast<QualifiedPtr*>(self.m_data)));
@@ -623,7 +623,7 @@ public:
   template <typename TThisType, typename TFunctor>
   static auto dispatch(TThisType&& self, TFunctor&& functor)
   RETURN_AUTO(
-    ::dispatch::first_value<tmp::vs::ascending_numbers_t<tmp::ts::length_v<TTypes>::value>>
+    ::dispatch::first_value<size_t, metal::iota<metal::number<0>, metal::size<TTypes>>>
       (IdMatches<TThisType&&>{util::forward<TThisType>(self)}, std::string(DISPATCH_NAME))
       (Dispatch<TThisType&&, TFunctor&&>{util::forward<TThisType>(self), util::forward<TFunctor>(functor)})
   )
@@ -633,7 +633,7 @@ public:
 };
 
 template <typename... TTypes>
-using Union = UnionEx<tmp::ts::Sequence<TTypes...>>;
+using Union = UnionEx<metal::list<TTypes...>>;
 
 
 

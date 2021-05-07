@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <type_traits>
+#include <metal.hpp>
 
 #include <template_tensors/cuda/Cuda.h>
 #include <template_tensors/util/Memory.h>
@@ -9,7 +10,6 @@
 #include <template_tensors/util/Constexpr.h>
 #include <template_tensors/util/Assert.h>
 #include <template_tensors/util/Ptr.h>
-#include <template_tensors/tmp/ValueSequence.h>
 
 namespace array {
 
@@ -71,7 +71,7 @@ namespace array {
       ASSERT_(false, "Cannot access device elements from host"); \
     });
 
-static const size_t DYN = static_cast<size_t>(-1);
+static const metal::int_ DYN = static_cast<metal::int_>(-1);
 
 struct ExplicitConstructWithDynDims
 {
@@ -85,7 +85,7 @@ class IsArray
 template <typename TArrayType>
 TVALUE(bool, is_array_type_v, std::is_base_of<IsArray, typename std::decay<TArrayType>::type>::value)
 template <typename TArrayType>
-TVALUE(size_t, size_v, std::decay<TArrayType>::type::SIZE)
+TVALUE(metal::int_, size_v, std::decay<TArrayType>::type::SIZE)
 template <typename TArrayType>
 using elementtype_t = typename std::decay<TArrayType>::type::ElementType;
 
@@ -93,7 +93,7 @@ using elementtype_t = typename std::decay<TArrayType>::type::ElementType;
 
 namespace detail {
 
-template <size_t TIndex>
+template <metal::int_ TIndex>
 struct LocalArrayFillHelper
 {
   template <typename T>
@@ -107,14 +107,14 @@ struct LocalArrayFillHelper
 } // end of ns detail
 
 #define ThisType LocalArray<TElementType, TSize>
-template <typename TElementType, size_t TSize>
+template <typename TElementType, metal::int_ TSize>
 class LocalArray : public IsArray
                  , public mem::HasMemoryType<ThisType, mem::LOCAL>
 {
 public:
   static_assert(TSize != DYN, "LocalArray cannot have dynamic size");
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = false;
-  static const size_t SIZE = TSize;
+  static const metal::int_ SIZE = TSize;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -135,7 +135,7 @@ public:
   template <typename TValueFill, ENABLE_IF(TSize != 1 && TSize < MAX_COMPILE_RECURSION_DEPTH && std::is_convertible<TValueFill, TElementType>::value)>
   __host__ __device__
   constexpr LocalArray(TValueFill fill)
-    : LocalArray(tmp::vs::ascending_numbers_t<TSize>(), static_cast<TElementType>(fill))
+    : LocalArray(metal::iota<metal::number<0>, metal::number<TSize>>(), static_cast<TElementType>(fill))
   {
   }
 
@@ -144,7 +144,7 @@ public:
   LocalArray(TValueFill fill)
     : m_data()
   {
-    for (size_t i = 0; i < TSize; i++)
+    for (auto i = 0; i < TSize; i++)
     {
       m_data[i] = fill;
     }
@@ -221,9 +221,9 @@ public:
 private:
   TElementType m_data[TSize];
 
-  template <size_t... TIndices, typename TValueFill>
+  template <metal::int_... TIndices, typename TValueFill>
   __host__ __device__
-  constexpr LocalArray(tmp::vs::IndexSequence<TIndices...>, TValueFill fill)
+  constexpr LocalArray(metal::numbers<TIndices...>, TValueFill fill)
     : LocalArray(detail::LocalArrayFillHelper<TIndices>::get(fill)...)
   {
   }
@@ -237,7 +237,7 @@ class LocalArray<TElementType, 0> : public IsArray
 {
 public:
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = false;
-  static const size_t SIZE = 0;
+  static const metal::int_ SIZE = 0;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -324,12 +324,12 @@ private:
 static_assert(sizeof(LocalArray<float, 3>) == 3 * sizeof(float), "Invalid size");
 
 } // end of ns array
-template <typename TElementType, size_t TSize>
+template <typename TElementType, metal::int_ TSize>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((::array::LocalArray<TElementType, TSize>), mem::is_trivially_relocatable_v<TElementType>::value);
 namespace array {
 
 #ifdef CEREAL_INCLUDED
-template <typename TArchive, typename TElementType, size_t TSize>
+template <typename TArchive, typename TElementType, metal::int_ TSize>
 void save(TArchive& archive, const LocalArray<TElementType, TSize>& m)
 {
   for (const TElementType& el : m)
@@ -338,7 +338,7 @@ void save(TArchive& archive, const LocalArray<TElementType, TSize>& m)
   }
 }
 
-template <typename TArchive, typename TElementType, size_t TSize>
+template <typename TArchive, typename TElementType, metal::int_ TSize>
 void load(TArchive& archive, LocalArray<TElementType, TSize>& m)
 {
   for (TElementType& el : m)
@@ -357,7 +357,7 @@ class DynamicAllocArray : public IsArray
 {
 public:
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = true;
-  static const size_t SIZE = DYN;
+  static const metal::int_ SIZE = DYN;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -553,14 +553,14 @@ using AllocArray = DynamicAllocArray<TElementType, TAllocator>;
 
 
 #define ThisType StaticAllocArray<TElementType, TAllocator, TSize>
-template <typename TElementType, typename TAllocator, size_t TSize>
+template <typename TElementType, typename TAllocator, metal::int_ TSize>
 class StaticAllocArray : public IsArray
                        , public mem::HasMemoryType<ThisType, mem::memorytype_v<TAllocator>::value>
 {
 public:
   static_assert(TSize != DYN, "StaticAllocArray cannot have dynamic size");
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = false;
-  static const size_t SIZE = TSize;
+  static const metal::int_ SIZE = TSize;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -703,13 +703,13 @@ private:
 
 // TODO: this is a dangerous class and should be removed/ only be used with managed pointers?
 #define ThisType ReferenceArray<TElementType, TMemoryType, TSize, TPointerType>
-template <typename TElementType, mem::MemoryType TMemoryType, size_t TSize, typename TPointerType = TElementType*>
+template <typename TElementType, mem::MemoryType TMemoryType, metal::int_ TSize, typename TPointerType = TElementType*>
 class ReferenceArray : public IsArray
                      , public mem::HasMemoryType<ThisType, TMemoryType>
 {
 public:
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = false;
-  static const size_t SIZE = TSize;
+  static const metal::int_ SIZE = TSize;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -862,7 +862,7 @@ class ReferenceArray<TElementType, TMemoryType, ::array::DYN, TPointerType> : pu
 {
 public:
   static const bool HAS_DYN_SIZE_CONSTRUCTOR = false;
-  static const size_t SIZE = ::array::DYN;
+  static const metal::int_ SIZE = ::array::DYN;
   using ElementType = TElementType;
 
   TT_ARRAY_SUBCLASS_ITERATORS
@@ -1008,12 +1008,12 @@ __host__ __device__
 auto ref(TArray&& array)
 RETURN_AUTO(ReferenceArray<ptr::value_t<decltype(std::declval<TArray&&>().data())>, mem::memorytype_v<TArray&&>::value, size_v<TArray&&>::value>(util::forward<TArray>(array)))
 
-template <mem::MemoryType TMemoryType, size_t TSize, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
+template <mem::MemoryType TMemoryType, metal::int_ TSize, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
 __host__ __device__
 auto ref(TPointerType&& ptr)
 RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(util::forward<TPointerType>(ptr)))
 
-template <mem::MemoryType TMemoryType, size_t TSize = ::array::DYN, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
+template <mem::MemoryType TMemoryType, metal::int_ TSize = ::array::DYN, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
 __host__ __device__
 auto ref(TPointerType&& ptr, size_t size)
 RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(util::forward<TPointerType>(ptr), size))
@@ -1045,7 +1045,7 @@ namespace atomic {
 template <typename T>
 struct is_atomic;
 
-template <typename TElementType, size_t TSize>
+template <typename TElementType, metal::int_ TSize>
 struct is_atomic<::array::LocalArray<TElementType, TSize>>
 {
   static const bool value = is_atomic<TElementType>::value && TSize == 1;

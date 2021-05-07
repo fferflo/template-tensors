@@ -15,7 +15,7 @@ private:
   RETURN_AUTO(util::forward<TThisType>(self).m_field(util::forward<TThisType>(self).m_coord_functor(util::forward<TCoordVector>(coords))))
 
 public:
-  static const size_t RANK = std::decay<TField>::type::RANK;
+  static const metal::int_ RANK = std::decay<TField>::type::RANK;
 
   __host__ __device__
   CoordinateTransformedField(TField field, TCoordFunctor coord_functor)

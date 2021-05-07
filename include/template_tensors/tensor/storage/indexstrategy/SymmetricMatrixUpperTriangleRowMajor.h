@@ -13,9 +13,9 @@ struct SymmetricMatrixUpperTriangleRowMajor
   {
     ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
     ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    const size_t rows = getNthDimension<0>(util::forward<TDimArgType>(dims));
-    const size_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
-    const size_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
+    const dim_t rows = getNthDimension<0>(util::forward<TDimArgType>(dims));
+    const dim_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
+    const dim_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
     if (col >= row)
     {
       return row * (rows - 1) - ((row - 1) * row >> 1) + col;
@@ -33,15 +33,15 @@ struct SymmetricMatrixUpperTriangleRowMajor
   constexpr size_t getSize(TDimArgTypes&&... dims) const
   {
     // TODO: ASSERT is symmetric and rest of dimension are 1
-    const size_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
     return (dim0 * dim0 + dim0) >> 1;
   }
 
-  /*template <size_t... TDims> // TODO: implement
+  /*template <metal::int_... TDims> // TODO: implement
   __host__ __device__
   auto fromIndex(size_t index) const -> decltype(TGetSizeStaticDims::template getSize<TDims...>(index));*/
 
-  /*template <typename TVectorType, typename TElementType, size_t TRank>
+  /*template <typename TVectorType, typename TElementType, metal::int_ TRank>
   __host__ __device__
   VectorXs<TRank> fromIndex(const Vector<TVectorType, TElementType, TRank>& dims, size_t index) const
   {

@@ -120,7 +120,7 @@ struct ElementAdder
 
 
 
-template <typename TScalar, size_t TNum, typename TIndexType = uint32_t>
+template <typename TScalar, metal::int_ TNum, typename TIndexType = uint32_t>
 class ReadProperty
 {
 private:
@@ -285,7 +285,7 @@ void read(const boost::filesystem::path& path, TElements&&... elements)
 
 
 
-template <typename TScalar, size_t TNum, typename TIndexType = uint32_t>
+template <typename TScalar, metal::int_ TNum, typename TIndexType = uint32_t>
 class WriteProperty
 {
 private:

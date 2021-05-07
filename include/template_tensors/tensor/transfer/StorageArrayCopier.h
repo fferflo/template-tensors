@@ -21,9 +21,9 @@ struct StorageArrayCopier
     ASSERT(areSameDimensions(dest.dims(), src.dims()), "Incompatible runtime dimensions");
     ASSERT(dest.getIndexStrategy() == src.getIndexStrategy(), "Different index strategies given");
 
-    const size_t STATIC_SIZE_DEST = indexed_size_v<TTensorDest>::value;
-    const size_t STATIC_SIZE_SRC = indexed_size_v<TTensorSrc>::value;
-    const size_t NUM =
+    const metal::int_ STATIC_SIZE_DEST = indexed_size_v<TTensorDest>::value;
+    const metal::int_ STATIC_SIZE_SRC = indexed_size_v<TTensorSrc>::value;
+    const metal::int_ NUM =
         STATIC_SIZE_DEST != mem::DYN ? STATIC_SIZE_DEST
       : STATIC_SIZE_SRC != mem::DYN ? STATIC_SIZE_SRC
       : mem::DYN;

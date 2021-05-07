@@ -111,7 +111,7 @@ struct DynamicLessThanHelper
   __host__ __device__
   static int get(TTensorType1&& tensor1, TTensorType2&& tensor2)
   {
-    static const size_t TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value);
+    static const metal::int_ TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value);
     int compare_dims = SameDimLessThanHelper::get(util::forward<TTensorType1>(tensor1).template dims<TMaxRank>(), util::forward<TTensorType2>(tensor2).template dims<TMaxRank>());
     if (compare_dims == 0)
     {
@@ -141,7 +141,7 @@ struct DynamicLessThanHelper
   RETURN_AUTO(detail::DynamicLessThanHelper::get(util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2)) OPERATOR 0) \
    \
   template <typename TTensorType1, typename TTensorType2, \
-    size_t TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value), \
+    metal::int_ TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value), \
     ENABLE_IF(!are_compatible_dimseqs_v<dimseq_t<TTensorType1>, dimseq_t<TTensorType2>>::value \
       && (is_tensor_v<TTensorType1>::value || is_tensor_v<TTensorType2>::value))> \
   __host__ __device__ \

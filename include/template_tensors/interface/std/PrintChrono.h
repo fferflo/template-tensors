@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <tuple>
+#include <metal.hpp>
 
 namespace std {
 namespace chrono {
@@ -42,7 +43,7 @@ struct print_duration
 };
 
 template <typename TFirst, typename... TRest>
-struct print_duration<tmp::ts::Sequence<TFirst, TRest...>>
+struct print_duration<metal::list<TFirst, TRest...>>
 {
   template <typename TDuration>
   static void print(std::ostream& stream, TDuration&& duration, bool force_print = false, bool first = true)
@@ -58,7 +59,7 @@ struct print_duration<tmp::ts::Sequence<TFirst, TRest...>>
       stream << duration_part_in_unit.count() << " " << duration_name<TFirst>::name;
     }
 
-    print_duration<tmp::ts::Sequence<TRest...>>::print(stream, duration - duration_part_in_unit, print, first && !print);
+    print_duration<metal::list<TRest...>>::print(stream, duration - duration_part_in_unit, print, first && !print);
   }
 };
 
@@ -69,7 +70,7 @@ struct print_duration<tmp::ts::Sequence<TFirst, TRest...>>
 template <typename TRep, typename TPeriod>
 std::ostream& operator<<(std::ostream& stream, const std::chrono::duration<TRep, TPeriod>& duration)
 {
-  using divisions = tmp::ts::Sequence<
+  using divisions = metal::list<
     std::chrono::days,
     std::chrono::hours,
     std::chrono::minutes,

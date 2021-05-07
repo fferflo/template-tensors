@@ -100,7 +100,7 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeqN__(TThisType__&& self, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), tmp::vs::ascending_numbers_t<N>(), \
+  RETURN_AUTO(NAME(util::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<N>>(), \
     util::forward<TCoordArgTypes__>(coords)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeqN__)
 
@@ -109,23 +109,23 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeq__(TThisType__&& self, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), tmp::vs::ascending_numbers_t<template_tensors::coordinate_num_v<TCoordArgTypes__...>::value>(), \
+  RETURN_AUTO(NAME(util::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<template_tensors::coordinate_num_v<TCoordArgTypes__...>::value>>(), \
     util::forward<TCoordArgTypes__>(coords)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeq__)
 
-#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(NAME, N) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(NAME, N) \
   HD_WARNING_DISABLE \
-  template <typename TThisType__, size_t... TIndices__, typename... TCoordArgTypes__> \
+  template <typename TThisType__, metal::int_... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
-  static auto getElementForwardSizeTN__(TThisType__&& self, tmp::vs::IndexSequence<TIndices__...>, TCoordArgTypes__&&... coords) \
+  static auto getElementForwardSizeTN__(TThisType__&& self, metal::numbers<TIndices__...>, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElementForwardSizeTN__, N)
 
-#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T(NAME) \
+#define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T(NAME) \
   HD_WARNING_DISABLE \
-  template <typename TThisType__, size_t... TIndices__, typename... TCoordArgTypes__> \
+  template <typename TThisType__, metal::int_... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
-  static auto getElementForwardSizeT__(TThisType__&& self, tmp::vs::IndexSequence<TIndices__...>, TCoordArgTypes__&&... coords) \
+  static auto getElementForwardSizeT__(TThisType__&& self, metal::numbers<TIndices__...>, TCoordArgTypes__&&... coords) \
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElementForwardSizeT__)
 

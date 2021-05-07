@@ -45,7 +45,7 @@ struct PclElementAccess<false>
 #define SuperType TensorBase< \
                                         ThisType, \
                                         mem::HOST, \
-                                        template_tensors::DimSeq<DYN, TOrganized ? DYN : 1UL> \
+                                        template_tensors::DimSeq<DYN, TOrganized ? DYN : (metal::int_) 1> \
                               >
 template <typename TPointCloud, bool TOrganized = false>
 class FromPCLWrapperTensor : public SuperType
@@ -53,7 +53,7 @@ class FromPCLWrapperTensor : public SuperType
 public:
   __host__
   FromPCLWrapperTensor(TPointCloud point_cloud)
-    : SuperType(point_cloud.width, point_cloud.height)
+    : SuperType(static_cast<dim_t>(point_cloud.width), static_cast<dim_t>(point_cloud.height))
     , m_point_cloud(point_cloud)
   {
   }
@@ -62,15 +62,15 @@ public:
 
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::PclElementAccess<TOrganized>::getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_point_cloud.width : TIndex == 1 ? m_point_cloud.height : 1;
   }
 
   __host__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     switch (index)
     {

@@ -2,13 +2,13 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TCoordsRank>
+template <metal::int_ TCoordsRank>
 struct ElwiseOperationTensorElementAccess
 {
   HD_WARNING_DISABLE
-  template <typename TOperation, typename TTensorTuple, size_t... TTensorIndices, typename... TCoordArgTypes>
+  template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
-  static auto get(TOperation&& op, TTensorTuple&& tensors, tmp::vs::IndexSequence<TTensorIndices...>, TCoordArgTypes&&... coords)
+  static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(util::forward<TOperation>(op)(toCoordVector<TCoordsRank>(util::forward<TCoordArgTypes>(coords)...), ::tuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
 };
 
@@ -16,9 +16,9 @@ template <>
 struct ElwiseOperationTensorElementAccess<DYN>
 {
   HD_WARNING_DISABLE
-  template <typename TOperation, typename TTensorTuple, size_t... TTensorIndices, typename... TCoordArgTypes>
+  template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
-  static auto get(TOperation&& op, TTensorTuple&& tensors, tmp::vs::IndexSequence<TTensorIndices...>, TCoordArgTypes&&... coords)
+  static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(util::forward<TOperation>(op)(::tuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
 };
 
@@ -31,14 +31,14 @@ struct ElwiseOperationTensorElementAccess<DYN>
                                         combine_dimseqs_t<TTensorTypesIn...> \
                               >
 
-template <size_t TCoordsRank, typename TOperation, typename... TTensorTypesIn>
+template <metal::int_ TCoordsRank, typename TOperation, typename... TTensorTypesIn>
 class ElwiseOperationTensor : public SuperType
 {
 public:
   static_assert(sizeof...(TTensorTypesIn) > 0, "Invalid number of input tensors");
-  static_assert(tmp::ts::all_apply_v<is_tensor_v, tmp::ts::Sequence<TTensorTypesIn...>>::value, "TTensorTypesIn must be tensors");
+  static_assert(metal::all_of<metal::list<TTensorTypesIn...>, metal::trait<is_tensor_v>>::value, "TTensorTypesIn must be tensors");
 
-  using FirstTensorType = tmp::ts::get_t<0, tmp::ts::Sequence<TTensorTypesIn...>>;
+  using FirstTensorType = metal::front<metal::list<TTensorTypesIn...>>;
 
   HD_WARNING_DISABLE
   __host__ __device__
@@ -61,21 +61,21 @@ public:
     detail::ElwiseOperationTensorElementAccess<TCoordsRank>::get(
         self.m_op,
         self.m_tensors,
-        tmp::vs::ascending_numbers_t<sizeof...(TTensorTypesIn)>(),
+        metal::iota<metal::number<0>, metal::number<sizeof...(TTensorTypesIn)>>(),
         util::forward<TCoordArgTypes>(coords)...
       )
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return ::tuple::get<0>(m_tensors).template dim<TIndex>();
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return ::tuple::get<0>(m_tensors).dim(index);
   }
@@ -85,18 +85,18 @@ private:
   ::tuple::Tuple<TTensorTypesIn...> m_tensors;
 
   HD_WARNING_DISABLE
-  template <typename TTransform, size_t... TIndices>
+  template <typename TTransform, metal::int_... TIndices>
   __host__ __device__
-  auto map(TTransform transform, tmp::vs::Sequence<size_t, TIndices...>)
+  auto map(TTransform transform, metal::numbers<TIndices...>)
   RETURN_AUTO(ElwiseOperationTensor
     <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(::tuple::get<TIndices>(m_tensors)))>...>
     (transform(m_op), transform(::tuple::get<TIndices>(m_tensors))...)
   )
 
   HD_WARNING_DISABLE
-  template <typename TTransform, size_t... TIndices>
+  template <typename TTransform, metal::int_... TIndices>
   __host__ __device__
-  auto map(TTransform transform, tmp::vs::Sequence<size_t, TIndices...>) const
+  auto map(TTransform transform, metal::numbers<TIndices...>) const
   RETURN_AUTO(ElwiseOperationTensor
     <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(::tuple::get<TIndices>(m_tensors)))>...>
     (transform(m_op), transform(::tuple::get<TIndices>(m_tensors))...)
@@ -106,12 +106,12 @@ public:
   template <typename TTransform>
   __host__ __device__
   auto map(TTransform transform)
-  RETURN_AUTO(map(transform, tmp::vs::ascending_numbers_t<sizeof...(TTensorTypesIn)>()))
+  RETURN_AUTO(map(transform, metal::iota<metal::number<0>, metal::number<sizeof...(TTensorTypesIn)>>()))
 
   template <typename TTransform>
   __host__ __device__
   auto map(TTransform transform) const
-  RETURN_AUTO(map(transform, tmp::vs::ascending_numbers_t<sizeof...(TTensorTypesIn)>()))
+  RETURN_AUTO(map(transform, metal::iota<metal::number<0>, metal::number<sizeof...(TTensorTypesIn)>>()))
 };
 #undef SuperType
 #undef ThisType
@@ -134,7 +134,7 @@ public:
  * @return the resulting tensor of the element-wise operation
  */
 HD_WARNING_DISABLE
-template <size_t TCoordsRank = DYN, typename TOperation, typename... TTensorTypesIn>
+template <metal::int_ TCoordsRank = DYN, typename TOperation, typename... TTensorTypesIn>
 __host__ __device__
 auto elwise(TOperation&& op, TTensorTypesIn&&... tensors)
 RETURN_AUTO(
@@ -145,7 +145,7 @@ namespace functor {
 
 namespace detail {
 
-template <size_t TCoordsRank, typename TOperation>
+template <metal::int_ TCoordsRank, typename TOperation>
 struct elwise
 {
   TOperation op;
@@ -165,7 +165,7 @@ struct elwise
 
 } // end of ns detail
 
-template <size_t TCoordsRank = DYN, typename TOperation>
+template <metal::int_ TCoordsRank = DYN, typename TOperation>
 __host__ __device__
 auto elwise(TOperation&& op)
 RETURN_AUTO(detail::elwise<TCoordsRank, util::store_member_t<TOperation&&>>(util::forward<TOperation>(op)))

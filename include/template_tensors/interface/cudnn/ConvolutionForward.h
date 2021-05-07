@@ -51,7 +51,7 @@ private:
 
 
 // in/ out dims: [Batch, Channel, Image(row-major)...]
-template <typename TDataElementType, size_t TRank, typename TCalculateElementType = TDataElementType>
+template <typename TDataElementType, metal::int_ TRank, typename TCalculateElementType = TDataElementType>
 class CudnnConvolutionForward
 {
 public:

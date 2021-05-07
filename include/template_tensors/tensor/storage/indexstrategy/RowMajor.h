@@ -2,7 +2,7 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct RowMajorToIndexHelper
 {
   template <typename TDimArgType, typename... TCoordArgTypes>
@@ -21,7 +21,7 @@ struct RowMajorToIndexHelper
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct RowMajorToIndexHelper<N, N>
 {
   template <typename TDimArgType, typename... TCoordArgTypes>
@@ -34,41 +34,41 @@ struct RowMajorToIndexHelper<N, N>
 
 
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct RowMajorFromIndexHelper
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
     index = RowMajorFromIndexHelper<I + 1, N>::fromIndex(dest, index, util::forward<TDimArgTypes>(dims)...);
     dest(I - 1) = index % dim;
     return index / dim;
   }
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct RowMajorFromIndexHelper<I, I>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
     dest(I - 1) = index % dim;
     return index / dim;
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct RowMajorFromIndexHelper<1, N>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
     index = RowMajorFromIndexHelper<2, N>::fromIndex(dest, index, util::forward<TDimArgTypes>(dims)...);
     dest(0) = index % dim;
     return 0; // This return value is not used
@@ -78,7 +78,7 @@ struct RowMajorFromIndexHelper<1, N>
 template <>
 struct RowMajorFromIndexHelper<1, 1>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
@@ -90,7 +90,7 @@ struct RowMajorFromIndexHelper<1, 1>
 template <>
 struct RowMajorFromIndexHelper<1, 0>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
@@ -100,46 +100,46 @@ struct RowMajorFromIndexHelper<1, 0>
 
 
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct RowMajorToStrideHelper
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<N - I>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<N - I>(util::forward<TDimArgTypes>(dims)...);
     dest(N - I - 1) = dest(N - I) * dim;
     RowMajorToStrideHelper<I + 1, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct RowMajorToStrideHelper<N, N>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct RowMajorToStrideHelper<1, N>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<N - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<N - 1>(util::forward<TDimArgTypes>(dims)...);
     dest(N - 2) = dim;
     RowMajorToStrideHelper<2, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct RowMajorToStrideHelper<0, N>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
@@ -151,7 +151,7 @@ struct RowMajorToStrideHelper<0, N>
 template <>
 struct RowMajorToStrideHelper<1, 1>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
@@ -161,7 +161,7 @@ struct RowMajorToStrideHelper<1, 1>
 template <>
 struct RowMajorToStrideHelper<0, 0>
 {
-  template <size_t TRank, typename... TDimArgTypes>
+  template <metal::int_ TRank, typename... TDimArgTypes>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
@@ -191,7 +191,7 @@ struct RowMajor
 
   TT_INDEXSTRATEGY_TO_INDEX_2
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
@@ -209,7 +209,7 @@ struct RowMajor
     return multiplyDimensions(util::forward<TDimArgTypes>(dim_args)...);
   }
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> toStride(TDimArgTypes&&... dims) const volatile
   {

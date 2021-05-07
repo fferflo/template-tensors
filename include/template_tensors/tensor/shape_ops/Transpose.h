@@ -4,10 +4,10 @@ namespace template_tensors {
 #define SuperType TensorBase< \
                                         ThisType, \
                                         mem::memorytype_v<TTensorTypeIn>::value, \
-                                        tmp::vs::reverse_t<dimseq_make_length_t<TTensorTypeIn, TTransposeDims>> \
+                                        metal::reverse<dimseq_make_length_t<TTensorTypeIn, TTransposeDims>> \
                               >
 // TODO: convert this to a general dimension permutation tensor
-template <typename TTensorTypeIn, size_t TTransposeDims>
+template <typename TTensorTypeIn, metal::int_ TTransposeDims>
 class TransposedTensor : public SuperType
 {
 public:
@@ -23,15 +23,15 @@ public:
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<math::lt(TIndex, TTransposeDims) ? TTransposeDims - 1 - TIndex : 1>();
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return m_tensor.dim(index < TTransposeDims ? TTransposeDims - 1 - index : 1);
   }
@@ -39,9 +39,9 @@ public:
 private:
   TTensorTypeIn m_tensor;
 
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TTransposeIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TTransposeIndices>
   __host__ __device__
-  static auto getHelper(TThisType&& self, tmp::vs::Sequence<size_t, TTransposeIndices...>, TCoordArgTypes&&... coords)
+  static auto getHelper(TThisType&& self, metal::numbers<TTransposeIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor(getNthCoordinate<TTransposeDims - 1 - TTransposeIndices>(util::forward<TCoordArgTypes>(coords)...)...)
   )
@@ -52,7 +52,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    getHelper(util::forward<TThisType>(self), tmp::vs::ascending_numbers_t<TTransposeDims>(), util::forward<TCoordArgTypes>(coords)...)
+    getHelper(util::forward<TThisType>(self), metal::iota<metal::number<0>, metal::number<TTransposeDims>>(), util::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
@@ -75,7 +75,7 @@ public:
 #undef SuperType
 #undef ThisType
 
-template <size_t TTransposeDims, typename TOtherTensorType>
+template <metal::int_ TTransposeDims, typename TOtherTensorType>
 __host__ __device__
 auto transpose(TOtherTensorType&& tensor)
 RETURN_AUTO(TransposedTensor<util::store_member_t<TOtherTensorType&&>, TTransposeDims>

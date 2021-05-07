@@ -3,6 +3,8 @@
 #include <template_tensors/tmp/Deduce.h>
 #include <template_tensors/util/Util.h>
 
+#include <metal.hpp>
+
 namespace tmp {
 
 template <typename TFunctor, typename... TArgs>
@@ -25,7 +27,7 @@ template <typename TFunctor, typename TArgSeq>
 struct takes_arguments_ex_v;
 
 template <typename TFunctor, typename... TArgs>
-struct takes_arguments_ex_v<TFunctor, tmp::ts::Sequence<TArgs...>>
+struct takes_arguments_ex_v<TFunctor, metal::list<TArgs...>>
 {
   static const bool value = takes_arguments_v<TFunctor, TArgs...>::value;
 };

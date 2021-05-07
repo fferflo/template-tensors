@@ -8,7 +8,7 @@ namespace boost {
 
 namespace python {
 
-template <typename TElementType, size_t TRank, mem::MemoryType TMemoryType>
+template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
 __host__
 auto fromTensorflow(::boost::python::object tensorflow)
 -> decltype(template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(std::declval<SafeDLManagedTensor>()))
@@ -22,7 +22,7 @@ auto fromTensorflow(::boost::python::object tensorflow)
   return template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(template_tensors::boost::python::toDlPack(dlpack, "dltensor"));
 }
 
-template <size_t TRank2 = DYN, typename TTensorType, size_t TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
+template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
 __host__
 ::boost::python::object toTensorflow(TTensorType&& tensor)
 {

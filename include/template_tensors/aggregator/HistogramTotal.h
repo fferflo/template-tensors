@@ -67,7 +67,7 @@ RETURN_AUTO(aggregator::total_histogram(
   util::forward<TDimArgs>(dim_args)...
 ))
 
-template <size_t... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,
+template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,
   ENABLE_IF(math::gt(sizeof...(TDims), 0UL))>
 __host__ __device__
 auto total_histogram(TBucketAggregator aggregator, TIndexStrategy index_strategy)
@@ -76,7 +76,7 @@ RETURN_AUTO(detail::total_histogram<typename std::decay<TBucketAggregator>::type
   index_strategy
 ))
 
-template <size_t... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,
+template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,
   ENABLE_IF(math::gt(sizeof...(TDims), 0UL))>
 __host__ __device__
 auto total_histogram(TBucketAggregator aggregator)

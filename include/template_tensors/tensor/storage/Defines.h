@@ -52,22 +52,22 @@ struct IndexedStaticLength;
 template <typename TIndexStrategy, typename TDimSeq>
 struct IndexedStaticLength<true, TIndexStrategy, TDimSeq>
 {
-  static const size_t value = TIndexStrategy().getSize(TDimSeq());
+  static const metal::int_ value = TIndexStrategy().getSize(TDimSeq());
 };
 
 template <typename TIndexStrategy, typename TDimSeq>
 struct IndexedStaticLength<false, TIndexStrategy, TDimSeq>
 {
-  static const size_t value = mem::DYN;
+  static const metal::int_ value = mem::DYN;
 };
 
 } // end of ns detail
 
 template <typename TIndexStrategy, typename TDimSeq>
-TVALUE(size_t, indexed_size_ex_v, detail::IndexedStaticLength<
+TVALUE(metal::int_, indexed_size_ex_v, detail::IndexedStaticLength<
   TIndexStrategy::IS_STATIC && template_tensors::is_static_v<TDimSeq>::value, TIndexStrategy, TDimSeq>::value)
 template <typename TTensorType, ENABLE_IF(is_indexed_pointer_tensor_v<TTensorType>::value)>
-TVALUE(size_t, indexed_size_v, indexed_size_ex_v<indexstrategy_t<TTensorType>, dimseq_t<TTensorType>>::value)
+TVALUE(metal::int_, indexed_size_v, indexed_size_ex_v<indexstrategy_t<TTensorType>, dimseq_t<TTensorType>>::value)
 
 
 

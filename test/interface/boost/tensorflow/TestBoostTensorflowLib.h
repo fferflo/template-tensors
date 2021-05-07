@@ -14,9 +14,9 @@ struct Storage
   void store(::boost::python::object input)
   {
     auto result = tt::boost::python::dispatch::FromTensorflow<
-      tmp::ts::Sequence<float>,
-      tmp::vs::Sequence<size_t, 2>,
-      tmp::vs::Sequence<mem::MemoryType, TAllocator::MEMORY_TYPE>
+      metal::list<float>,
+      metal::numbers<2>,
+      metal::numbers<TAllocator::MEMORY_TYPE>
     >(input)(util::functor::assign_to(data));
     if (!result)
     {

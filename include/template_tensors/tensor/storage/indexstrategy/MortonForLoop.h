@@ -1,11 +1,11 @@
 namespace template_tensors {
-
+// TODO: this uses size_t, but should use dim_t, metal::int_?
 namespace detail {
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct MortonForLoopToIndexHelper
 {
-  static const size_t FIELD_BITS = sizeof(size_t) * 8 / N;
+  static const metal::int_ FIELD_BITS = sizeof(size_t) * 8 / N;
 
   template <typename TDimArgType, typename... TCoordArgTypes>
   __host__ __device__
@@ -15,7 +15,7 @@ struct MortonForLoopToIndexHelper
     ASSERT(N == 1 || ((((size_t) -1) << (N == 1 ? 0 : FIELD_BITS)) & field) == 0, "Coordinate out of morton range");
     ASSERT(N == 1 || getNthDimension<I>(util::forward<TDimArgType>(dims)) < (1UL << (N == 1 ? 0 : FIELD_BITS)), "Dimension out of morton range");
 
-    for (size_t field_bit = 0; field_bit < FIELD_BITS; field_bit++)
+    for (auto field_bit = 0; field_bit < FIELD_BITS; field_bit++)
     {
       const size_t index_bit = I + field_bit * N;
       index |= (field & (1UL << field_bit)) << (index_bit - field_bit);
@@ -25,7 +25,7 @@ struct MortonForLoopToIndexHelper
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct MortonForLoopToIndexHelper<N, N>
 {
   template <typename TDimArgType, typename... TCoordArgTypes>
@@ -35,12 +35,12 @@ struct MortonForLoopToIndexHelper<N, N>
   }
 };
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct MortonForLoopFromIndexHelper
 {
-  static const size_t FIELD_BITS = sizeof(size_t) * 8 / N;
+  static const metal::int_ FIELD_BITS = sizeof(size_t) * 8 / N;
 
-  template <size_t TDims, typename... TDimArgTypes>
+  template <metal::int_ TDims, typename... TDimArgTypes>
   __host__ __device__
   static void fromIndex(VectorXs<TDims>& result, size_t index, TDimArgTypes&&... dims)
   {
@@ -49,7 +49,7 @@ struct MortonForLoopFromIndexHelper
     if (I < TDims)
     {
       size_t field = 0;
-      for (size_t field_bit = 0; field_bit < FIELD_BITS; field_bit++)
+      for (auto field_bit = 0; field_bit < FIELD_BITS; field_bit++)
       {
         const size_t index_bit = I + field_bit * N;
         field |= (index & (1UL << index_bit)) >> (index_bit - field_bit);
@@ -61,14 +61,14 @@ struct MortonForLoopFromIndexHelper
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct MortonForLoopFromIndexHelper<N, N>
 {
-  template <size_t TDims, typename... TDimArgTypes>
+  template <metal::int_ TDims, typename... TDimArgTypes>
   __host__ __device__
   static void fromIndex(VectorXs<TDims>& result, size_t index, TDimArgTypes&&... dims)
   {
-    for (size_t i = N; i < TDims; i++)
+    for (auto i = N; i < TDims; i++)
     {
       result(i) = 0;
     }
@@ -81,10 +81,10 @@ struct MortonForLoopFromIndexHelper<N, N>
 
 
 
-template <size_t TRank>
+template <metal::int_ TRank>
 struct MortonForLoop
 {
-  static const size_t FIELD_BITS = sizeof(size_t) * 8 / TRank;
+  static const metal::int_ FIELD_BITS = sizeof(size_t) * 8 / TRank;
   static const bool IS_STATIC = false;
 
   template <typename TDimArgType, typename... TCoordArgTypes, ENABLE_IF(are_dim_args_v<TDimArgType&&>::value)>
@@ -100,7 +100,7 @@ struct MortonForLoop
 
   TT_INDEXSTRATEGY_TO_INDEX_2
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
@@ -120,7 +120,7 @@ struct MortonForLoop
   }
 };
 
-template <size_t TRank>
+template <metal::int_ TRank>
 __host__ __device__
 bool operator==(const volatile MortonForLoop<TRank>&, const volatile MortonForLoop<TRank>&)
 {
@@ -128,7 +128,7 @@ bool operator==(const volatile MortonForLoop<TRank>&, const volatile MortonForLo
 }
 
 HD_WARNING_DISABLE
-template <typename TStreamType, size_t TRank>
+template <typename TStreamType, metal::int_ TRank>
 __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const MortonForLoop<TRank>& index_strategy)
 {
@@ -137,12 +137,12 @@ TStreamType&& operator<<(TStreamType&& stream, const MortonForLoop<TRank>& index
 }
 
 #ifdef CEREAL_INCLUDED
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void save(TArchive& archive, const MortonForLoop<TRank>& m)
 {
 }
 
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void load(TArchive& archive, MortonForLoop<TRank>& m)
 {
 }
@@ -150,5 +150,5 @@ void load(TArchive& archive, MortonForLoop<TRank>& m)
 
 } // end of ns tensor
 
-template <size_t TRank>
+template <metal::int_ TRank>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonForLoop<TRank>));

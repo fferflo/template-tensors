@@ -2,7 +2,6 @@
 
 #include <template_tensors/cuda/Cuda.h>
 #include <template_tensors/util/Util.h>
-#include <template_tensors/tmp/TypeSequence.h>
 
 namespace tuple {
 
@@ -137,7 +136,7 @@ template <typename TSequence>
 struct TupleExHelper;
 
 template <typename... TTypes>
-struct TupleExHelper<tmp::ts::Sequence<TTypes...>>
+struct TupleExHelper<metal::list<TTypes...>>
 {
   using type = ::tuple::Tuple<TTypes...>;
 };
@@ -184,7 +183,7 @@ struct types;
 template <typename... TTypes>
 struct types<Tuple<TTypes...>>
 {
-  using type = tmp::ts::Sequence<TTypes...>;
+  using type = metal::list<TTypes...>;
 };
 
 } // end of ns detail
@@ -464,7 +463,7 @@ template <typename TFunc, typename... TTuples>
 __host__ __device__
 auto map(TFunc&& functor, TTuples&&... tuples)
 RETURN_AUTO(
-  detail::map<0, ::tuple::size_v<tmp::ts::first_t<tmp::ts::Sequence<TTuples...>>>::value, TTuples&&...>
+  detail::map<0, ::tuple::size_v<metal::front<metal::list<TTuples...>>>::value, TTuples&&...>
     ::exec(util::forward<TFunc>(functor), util::forward<TTuples>(tuples)...)
 )
 

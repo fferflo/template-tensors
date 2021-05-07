@@ -1,6 +1,6 @@
 namespace template_tensors {
 
-template <typename TPointerType, mem::MemoryType TMemoryType, size_t TSize>
+template <typename TPointerType, mem::MemoryType TMemoryType, metal::int_ TSize>
 using RefArrayType = ::array::ReferenceArray<ptr::value_t<TPointerType>, TMemoryType, TSize, typename std::decay<TPointerType>::type>;
 template <typename TPointerType, mem::MemoryType TMemoryType, typename TIndexStrategy, typename TDimSeq>
 using RefArrayTypeEx = ::array::ReferenceArray<ptr::value_t<TPointerType>, TMemoryType, indexed_size_ex_v<TIndexStrategy, TDimSeq>::value, typename std::decay<TPointerType>::type>;
@@ -12,7 +12,7 @@ using RefTensorType = IndexedArrayTensor<
 
 
 HD_WARNING_DISABLE
-template <typename TIndexStrategy, mem::MemoryType TMemoryType, size_t... TDims, typename TPointerType,
+template <typename TIndexStrategy, mem::MemoryType TMemoryType, metal::int_... TDims, typename TPointerType,
   ENABLE_IF(is_static_v<DimSeq<TDims...>>::value)>
 __host__ __device__
 auto ref(const TPointerType& data)
@@ -50,13 +50,13 @@ RETURN_AUTO(
         index_strategy, util::forward<TDimArgTypes>(dim_args)...)
   )
 
-template <size_t... TDims, typename TIndexStrategy, typename TArray, ENABLE_IF(::array::is_array_type_v<TArray>::value),
+template <metal::int_... TDims, typename TIndexStrategy, typename TArray, ENABLE_IF(::array::is_array_type_v<TArray>::value),
   typename TArrayRef = decltype(::array::ref(std::declval<TArray&&>()))>
 __host__ __device__
 auto ref(TArray&& array, TIndexStrategy index_strategy)
 RETURN_AUTO(template_tensors::refEx<DimSeq<TDims...>>(util::forward<TArray>(array), index_strategy, DimSeq<TDims...>()))
 
-template <typename TIndexStrategy, size_t... TDims, typename TArray, ENABLE_IF(::array::is_array_type_v<TArray>::value)>
+template <typename TIndexStrategy, metal::int_... TDims, typename TArray, ENABLE_IF(::array::is_array_type_v<TArray>::value)>
 __host__ __device__
 auto ref(TArray&& array)
 RETURN_AUTO(template_tensors::ref<TDims...>(util::forward<TArray>(array), TIndexStrategy()))

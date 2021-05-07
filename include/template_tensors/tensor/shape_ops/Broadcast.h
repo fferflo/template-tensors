@@ -25,9 +25,9 @@ public:
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) % self.m_tensor.template dim<TIndices>())...)
   )
@@ -72,14 +72,14 @@ public:
  * @tparam TBroadcastedDims... the new compile-time dimensions of the broadcast tensor
  * @return the broadcast tensor
  */
-template <size_t... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) != 0)>
+template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) != 0)>
 __host__ __device__
 auto broadcast(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
 RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<TBroadcastedDims...>>
   (util::forward<TOtherTensorType>(tensor), util::forward<TDimArgTypes>(dim_args)...)
 );
 
-template <size_t... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) == 0)>
+template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) == 0)>
 __host__ __device__
 auto broadcast(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
 RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
@@ -101,14 +101,14 @@ RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, TBroadc
  * @tparam TBroadcastedDims... the new compile-time dimensions of the broadcast tensor
  * @return the broadcast tensor
  */
-template <size_t... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) != 0)>
+template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) != 0)>
 __host__ __device__
 auto broadcast(TSingletonType&& singleton, TDimArgTypes&&... dim_args)
 RETURN_AUTO(BroadcastingTensor<util::store_member_t<SingletonT<typename std::decay<TSingletonType>::type>&&>, DimSeq<TBroadcastedDims...>>
   (SingletonT<typename std::decay<TSingletonType>::type>(util::forward<TSingletonType>(singleton)), util::forward<TDimArgTypes>(dim_args)...)
 )
 
-template <size_t... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) == 0)>
+template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) == 0)>
 __host__ __device__
 auto broadcast(TSingletonType&& singleton, TDimArgTypes&&... dim_args)
 RETURN_AUTO(BroadcastingTensor<util::store_member_t<SingletonT<typename std::decay<TSingletonType>::type>&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>

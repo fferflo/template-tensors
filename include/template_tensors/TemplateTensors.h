@@ -13,8 +13,6 @@
 
 #include <template_tensors/cuda/Cuda.h>
 #include <template_tensors/util/Array.h>
-#include <template_tensors/tmp/ValueSequence.h>
-#include <template_tensors/tmp/TypeSequence.h>
 #include <template_tensors/tmp/Reflection.h>
 #include <template_tensors/util/Constexpr.h>
 #include <template_tensors/util/Tuple.h>

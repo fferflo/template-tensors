@@ -62,7 +62,7 @@ private:
                     dyn_dimseq_t<TRank> \
                   >
 
-template <typename TElementType, size_t TRank, typename TNumpyArray = ::boost::python::numpy::ndarray>
+template <typename TElementType, metal::int_ TRank, typename TNumpyArray = ::boost::python::numpy::ndarray>
 class FromPythonNumpyWrapper : public SuperType
 {
 private:
@@ -74,7 +74,7 @@ public:
   __host__
   FromPythonNumpyWrapper(TNumpyArray numpy)
     : SuperType(
-        Stride<TRank>(VectorXT<size_t, TRank>(template_tensors::ref<template_tensors::ColMajor, mem::HOST>(numpy.get_strides(), TRank) / sizeof(TElementType))),
+        Stride<TRank>(VectorXT<size_t, TRank>(template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(numpy.get_strides()) / sizeof(TElementType))),
         VectorXT<size_t, TRank>(template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(numpy.get_shape()))
       )
     , m_numpy(numpy)
@@ -102,15 +102,15 @@ public:
   RETURN_AUTO(reinterpret_cast<typename std::remove_reference<util::copy_qualifiers_t<TElementType, TThisType2>>::type*>(self.m_numpy.get_data()))
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex < TRank ? m_numpy.get_shape()[TIndex] : 1;
   }
 
   __host__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < TRank ? m_numpy.get_shape()[index] : 1;
   }
@@ -131,7 +131,7 @@ public:
 #undef ThisType
 
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 __host__
 FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::ndarray arr)
 {
@@ -150,7 +150,7 @@ FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::nd
   return FromPythonNumpyWrapper<TElementType, TRank>(arr);
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 __host__
 FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::ndarray arr, template_tensors::VectorXT<size_t, TRank> dims)
 {
@@ -162,7 +162,7 @@ FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::nd
   return FromPythonNumpyWrapper<TElementType, TRank>(arr);
 }
 
-template <size_t TRank2 = DYN, typename TTensorType, size_t TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
+template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
 __host__
 ::boost::python::numpy::ndarray toNumpy(TTensorType&& tensor)
 {

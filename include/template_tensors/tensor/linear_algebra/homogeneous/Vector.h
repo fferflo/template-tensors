@@ -2,28 +2,28 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TRows>
+template <metal::int_ TRows>
 struct HomogenizedRowsHelper
 {
-  static const size_t value = TRows + 1;
+  static const metal::int_ value = TRows + 1;
 };
 
 template <>
 struct HomogenizedRowsHelper<DYN>
 {
-  static const size_t value = DYN;
+  static const metal::int_ value = DYN;
 };
 
-template <size_t TRows>
+template <metal::int_ TRows>
 struct DehomogenizedRowsHelper
 {
-  static const size_t value = TRows - 1;
+  static const metal::int_ value = TRows - 1;
 };
 // TODO: constexpr application of lambda? or with all args plus result and checking first n-1 values for DYN?, grep DYN
 template <>
 struct DehomogenizedRowsHelper<DYN>
 {
-  static const size_t value = DYN;
+  static const metal::int_ value = DYN;
 };
 
 } // end of ns detail
@@ -53,7 +53,7 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static decay_elementtype_t<TVectorType> getElement(TThisType&& self, size_t row)
+  static decay_elementtype_t<TVectorType> getElement(TThisType&& self, dim_t row)
   {
     if (row < self.template dim<0>() - 1)
     {
@@ -64,17 +64,17 @@ public:
       return static_cast<decay_elementtype_t<TVectorType>>(1);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_input.template dim<0>() + 1 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? m_input.template dim<0>() + 1 : 1;
   }
@@ -115,7 +115,7 @@ template <typename TVectorType>
 class DehomogenizedVector : public SuperType
 {
 public:
-  static_assert(tmp::vs::get_v<0, dimseq_t<TVectorType>>::value >= 1, "Cannot dehomogenize a vector with 0 rows!");
+  static_assert(metal::front<dimseq_t<TVectorType>>::value >= 1, "Cannot dehomogenize a vector with 0 rows!");
   static_assert(is_vector_v<TVectorType>::value, "TVectorType must be a vector");
 
   __host__ __device__
@@ -131,21 +131,21 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     self.m_input(row) / self.m_input(self.template dim<0>())
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_input.template dim<0>() - 1 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? m_input.template dim<0>() - 1 : 1;
   }

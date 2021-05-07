@@ -6,7 +6,7 @@ template <typename TField, typename TMapper>
 class MapField
 {
 public:
-  static const size_t RANK = std::decay<TField>::type::RANK;
+  static const metal::int_ RANK = std::decay<TField>::type::RANK;
 
 private:
   TField m_field;

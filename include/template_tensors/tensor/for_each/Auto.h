@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace template_tensors {
 
 namespace op {
@@ -12,7 +14,7 @@ struct ErrorForEach
   template <bool TIsOnHost, typename... TTensorTypes>
   TVALUE(bool, is_parallel_v, false)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__ __device__
   static void for_each(TFunctor func, TTensorTypes&&... tensors)
   {
@@ -79,11 +81,11 @@ template <bool TIsOnHost, typename TForEachSeq, typename TTensorTypeSeq>
 struct ForEachDeciderHDSeq;
 
 template <bool TIsOnHost, typename... TTensorTypes, typename TForEach1, typename... TForEachs>
-struct ForEachDeciderHDSeq<TIsOnHost, tmp::ts::Sequence<TForEach1, TForEachs...>, tmp::ts::Sequence<TTensorTypes...>>
+struct ForEachDeciderHDSeq<TIsOnHost, metal::list<TForEach1, TForEachs...>, metal::list<TTensorTypes...>>
 {
   static_assert(sizeof...(TTensorTypes) > 0, "No tensors given to AutoForEach");
 
-  using Next = ForEachDeciderHDSeq<TIsOnHost, tmp::ts::Sequence<TForEachs...>, tmp::ts::Sequence<TTensorTypes...>>;
+  using Next = ForEachDeciderHDSeq<TIsOnHost, metal::list<TForEachs...>, metal::list<TTensorTypes...>>;
   static const bool this_is_for_each_available = TForEach1::template is_for_each_available_v<TIsOnHost, TTensorTypes...>::value;
   static const bool this_is_map_available = TForEach1::template is_map_available_v<TIsOnHost, TTensorTypes...>::value;
   static const bool this_is_copy_available = IsCopyAvailableHelper<TIsOnHost, TForEach1, TTensorTypes...>::value;
@@ -98,7 +100,7 @@ struct ForEachDeciderHDSeq<TIsOnHost, tmp::ts::Sequence<TForEach1, TForEachs...>
 };
 
 template <bool TIsOnHost, typename... TTensorTypes>
-struct ForEachDeciderHDSeq<TIsOnHost, tmp::ts::Sequence<>, tmp::ts::Sequence<TTensorTypes...>>
+struct ForEachDeciderHDSeq<TIsOnHost, metal::list<>, metal::list<TTensorTypes...>>
 {
   static_assert(sizeof...(TTensorTypes) > 0, "No tensors given to AutoForEach");
 
@@ -112,7 +114,7 @@ struct ForEachDeciderHDSeq<TIsOnHost, tmp::ts::Sequence<>, tmp::ts::Sequence<TTe
 };
 
 template <bool TIsOnHost, typename TForEachSeq, typename... TTensorTypes>
-using ForEachDeciderHD = ForEachDeciderHDSeq<TIsOnHost, TForEachSeq, tmp::ts::Sequence<TTensorTypes...>>;
+using ForEachDeciderHD = ForEachDeciderHDSeq<TIsOnHost, TForEachSeq, metal::list<TTensorTypes...>>;
 
 
 
@@ -140,8 +142,8 @@ template <typename... TForEachs>
 struct AutoForEach
 {
   using ForEachSeq = typename std::conditional<sizeof...(TForEachs) != 0,
-    tmp::ts::Sequence<TForEachs...>,
-    tmp::ts::Sequence<LocalForEach, LocalArrayForEach<>, DeviceArrayForEach<>, DeviceForEach<>>
+    metal::list<TForEachs...>,
+    metal::list<LocalForEach, LocalArrayForEach<>, DeviceArrayForEach<>, DeviceForEach<>>
   >::type;
 
   template <bool TIsOnHost, typename... TTensorTypes>
@@ -161,7 +163,7 @@ struct AutoForEach
   )
 
   HD_WARNING_DISABLE
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__ __device__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {
@@ -245,7 +247,7 @@ struct AutoForEach
 
 } // end of ns op
 
-template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes, ENABLE_IF(tmp::ts::all_apply_v<template_tensors::is_tensor_v, tmp::ts::Sequence<TTensorTypes...>>::value)>
+template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes, ENABLE_IF(metal::all_of<metal::list<TTensorTypes...>, metal::trait<is_tensor_v>>::value)>
 __host__ __device__
 void for_each(TFunctor&& func, TTensorTypes&&... tensors)
 {

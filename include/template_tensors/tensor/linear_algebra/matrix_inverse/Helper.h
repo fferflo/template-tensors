@@ -3,7 +3,7 @@ namespace template_tensors {
 namespace op {
 
 #define TT_MATRIX_INVERSE_CHECK_DIMS \
-  static const size_t RANK = combine_dims_v< \
+  static const metal::int_ RANK = combine_dims_v< \
                               rows_v<TMatrixTypeDest>::value, \
                               cols_v<TMatrixTypeDest>::value, \
                               rows_v<TMatrixTypeSrc>::value, \

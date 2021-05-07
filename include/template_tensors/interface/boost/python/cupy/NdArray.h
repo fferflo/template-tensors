@@ -147,7 +147,7 @@ struct cupy_elementtype_name<int64_t>
 
 } // end of ns detail
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 __host__
 auto fromCupy(::boost::python::object arr) -> decltype(template_tensors::ref<mem::DEVICE>(std::declval<TElementType*>(),
   std::declval<template_tensors::Stride<TRank>>(), std::declval<template_tensors::VectorXs<TRank>>()))
@@ -169,16 +169,16 @@ auto fromCupy(::boost::python::object arr) -> decltype(template_tensors::ref<mem
   }
 
   template_tensors::VectorXs<TRank> shape, strides;
-  for (size_t i = 0; i < TRank; i++)
+  for (auto i = 0; i < TRank; i++)
   {
     shape(i) = ::boost::python::extract<size_t>(static_cast<::boost::python::tuple>(arr.attr("shape"))[i]);
     strides(i) = ::boost::python::extract<size_t>(static_cast<::boost::python::tuple>(arr.attr("strides"))[i]) / sizeof(TElementType);
   }
 
-  return template_tensors::ref<mem::DEVICE>(data_ptr_d, template_tensors::Stride<TRank>(strides), shape);
+  return ref<mem::DEVICE>(data_ptr_d, template_tensors::Stride<TRank>(strides), shape);
 }
 
-template <size_t TRank2 = DYN, typename TTensorType, size_t TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
+template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
 __host__
 ::boost::python::object toCupy(TTensorType&& tensor)
 {

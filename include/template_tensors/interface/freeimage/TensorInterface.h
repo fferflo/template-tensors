@@ -40,7 +40,7 @@ public:
         {
           alpha_palette = nullptr;
         }
-        for (size_t i = 0; i < m_palette.rows(); i++)
+        for (dim_t i = 0; i < m_palette.rows(); i++)
         {
           m_palette(i)(0) = palette[i].rgbRed;
           m_palette(i)(1) = palette[i].rgbGreen;
@@ -54,7 +54,7 @@ public:
       else
       {
         ASSERT(template_tensors::all(m_masks > 0UL), "Invalid color masks");
-        for (size_t i = 0; i < 3; i++)
+        for (auto i = 0; i < 3; i++)
         {
           size_t begin;
           for (begin = 0; begin < sizeof(size_t) * 8 && ((m_masks(i) >> begin) & 1) == 0; begin++)

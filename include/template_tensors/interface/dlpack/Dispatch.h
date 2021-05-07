@@ -31,7 +31,7 @@ struct FromDlPack
   {
     template_tensors::SafeDLManagedTensor& dl;
 
-    template <typename, size_t TRank>
+    template <metal::int_ TRank>
     bool operator()()
     {
       return dl->dl_tensor.ndim == TRank;
@@ -42,7 +42,7 @@ struct FromDlPack
   {
     template_tensors::SafeDLManagedTensor& dl;
 
-    template <typename, mem::MemoryType TMemoryType>
+    template <mem::MemoryType TMemoryType>
     bool operator()()
     {
       return dl->dl_tensor.ctx.device_type == template_tensors::dlpack_devicetype<TMemoryType>::value;
@@ -57,8 +57,8 @@ struct FromDlPack
   RETURN_AUTO(
     ::dispatch::all(
       ::dispatch::first_type<TElementTypes>(ElementTypeMatches{dl}, ELEMENT_TYPE_STR),
-      ::dispatch::first_value<TRanks>(RankMatches{dl}, RANK_STR),
-      ::dispatch::first_value<TMemoryTypes>(MemoryTypeMatches{dl}, MEMORY_TYPE_STR)
+      ::dispatch::first_value<metal::int_, TRanks>(RankMatches{dl}, RANK_STR),
+      ::dispatch::first_value<mem::MemoryType, TMemoryTypes>(MemoryTypeMatches{dl}, MEMORY_TYPE_STR)
     )
   )
 
@@ -109,8 +109,8 @@ struct FromDlPack
     template_tensors::SafeDLManagedTensor& dl;
     TFunctor functor;
 
-    template <typename TElementType, size_t TRank, mem::MemoryType TMemoryType>
-    void operator()(util::Type<TElementType>, util::Value<size_t, TRank>, util::Value<mem::MemoryType, TMemoryType>)
+    template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
+    void operator()(metal::value<TElementType>, std::integral_constant<metal::int_, TRank>, std::integral_constant<mem::MemoryType, TMemoryType>)
     {
       functor(template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(util::move(dl)));
     }

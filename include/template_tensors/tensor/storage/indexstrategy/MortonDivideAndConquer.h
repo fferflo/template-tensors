@@ -1,5 +1,5 @@
 namespace template_tensors {
-
+// TODO: this uses size_t, but should use dim_t, metal::int_?
 namespace detail {
 
 template <size_t TBit, size_t TBits, size_t TStep, size_t TRank>
@@ -176,10 +176,10 @@ struct MortonDivideAndConquerFromIndexHelper<N, N>
 
 
 
-template <size_t TRank>
+template <metal::int_ TRank>
 struct MortonDivideAndConquer
 {
-  static const size_t FIELD_BITS = sizeof(size_t) * 8 / TRank;
+  static const metal::int_ FIELD_BITS = sizeof(size_t) * 8 / TRank;
   static const bool IS_STATIC = false;
 
   template <typename TDimArgType, typename... TCoordArgTypes, ENABLE_IF(are_dim_args_v<TDimArgType&&>::value)>
@@ -193,7 +193,7 @@ struct MortonDivideAndConquer
 
   TT_INDEXSTRATEGY_TO_INDEX_2
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
@@ -213,7 +213,7 @@ struct MortonDivideAndConquer
   }
 };
 
-template <size_t TRank>
+template <metal::int_ TRank>
 __host__ __device__
 bool operator==(const volatile MortonDivideAndConquer<TRank>&, const volatile MortonDivideAndConquer<TRank>&)
 {
@@ -221,7 +221,7 @@ bool operator==(const volatile MortonDivideAndConquer<TRank>&, const volatile Mo
 }
 
 HD_WARNING_DISABLE
-template <typename TStreamType, size_t TRank>
+template <typename TStreamType, metal::int_ TRank>
 __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const MortonDivideAndConquer<TRank>& index_strategy)
 {
@@ -230,21 +230,21 @@ TStreamType&& operator<<(TStreamType&& stream, const MortonDivideAndConquer<TRan
 }
 
 #ifdef CEREAL_INCLUDED
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void save(TArchive& archive, const MortonDivideAndConquer<TRank>& m)
 {
 }
 
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void load(TArchive& archive, MortonDivideAndConquer<TRank>& m)
 {
 }
 #endif
 
-template <size_t TRank>
+template <metal::int_ TRank>
 using Morton = MortonDivideAndConquer<TRank>;
 
 } // end of ns tensor
 
-template <size_t TRank>
+template <metal::int_ TRank>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonDivideAndConquer<TRank>));

@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace point_cloud {
 
 namespace detail {
@@ -58,7 +60,7 @@ struct SortGridCellEntry
                                         template_tensors::dyn_dimseq_t<TRank> \
                               >
 // TODO: make this multithreaded for cpu: modify ::atomic::op::Void and for_each calls
-template <typename TObjectVector, size_t TRank, typename TAllocator, typename TIndexStrategy = template_tensors::RowMajor,
+template <typename TObjectVector, metal::int_ TRank, typename TAllocator, typename TIndexStrategy = template_tensors::RowMajor,
   typename TAtomicOpsIn = void, bool TIsOnHost = TT_IS_ON_HOST>
 class SortGrid : public SuperType
 {
@@ -202,15 +204,15 @@ public:
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__
-  size_t getDynDim() const
+  template_tensors::dim_t getDynDim() const
   {
     return m_grid.template getDynDim<TIndex>();
   }
 
   __host__
-  size_t getDynDim(size_t index) const
+  template_tensors::dim_t getDynDim(size_t index) const
   {
     return m_grid.getDynDim(index);
   }

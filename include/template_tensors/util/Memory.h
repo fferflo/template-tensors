@@ -4,6 +4,7 @@
 #include <cstring>
 #include <type_traits>
 #include <stdlib.h>
+#include <metal.hpp>
 
 #include <template_tensors/util/Util.h>
 #include <template_tensors/util/Constexpr.h>
@@ -24,7 +25,7 @@
 
 namespace mem {
 
-static const size_t DYN = static_cast<size_t>(-1);
+static const metal::int_ DYN = static_cast<metal::int_>(-1);
 
 enum MemoryType
 {
@@ -351,7 +352,7 @@ using heap = typename std::conditional<TT_IS_ON_HOST, host_heap, device_heap>::t
 
 
 
-template <size_t TAlignmentBytes>
+template <metal::int_ TAlignmentBytes>
 struct host_aligned_alloc
 {
   static const MemoryType MEMORY_TYPE = HOST;
@@ -558,12 +559,12 @@ struct VolatileCopyOnHost;
 template <>
 struct VolatileCopyOnHost<false>
 {
-  template <mem::MemoryType TDestMemoryType, mem::MemoryType TSrcMemoryType, size_t TNum = DYN, typename T1, typename T2>
+  template <mem::MemoryType TDestMemoryType, mem::MemoryType TSrcMemoryType, metal::int_ TNum = DYN, typename T1, typename T2>
   static void copy(T1* dest, const T2* src, size_t num)
   {
     static const bool can_assign =
          TNum != DYN
-      && math::lt(TNum * sizeof(T1), (size_t) (COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES))
+      && math::lt(TNum * sizeof(T1), static_cast<size_t>(COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES))
       && mem::isOnLocal<TDestMemoryType>()
       && mem::isOnLocal<TSrcMemoryType>();
     static const bool must_memcpy = mem::isOnLocal<TDestMemoryType>() != mem::isOnLocal<TSrcMemoryType>();
@@ -577,7 +578,7 @@ struct VolatileCopyOnHost<false>
 template <>
 struct VolatileCopyOnHost<true>
 {
-  template <MemoryType TDestMemoryType, MemoryType TSrcMemoryType, size_t TNum = DYN, typename T1, typename T2>
+  template <MemoryType TDestMemoryType, MemoryType TSrcMemoryType, metal::int_ TNum = DYN, typename T1, typename T2>
   static void copy(T1* dest, const T2* src, size_t num)
   {
     static_assert((isOnHost<TDestMemoryType>() && isOnHost<TSrcMemoryType>()), "Cannot copy volatile device memory from host");
@@ -600,7 +601,7 @@ struct VolatileCopyOnHost<true>
 template <MemoryType TDestMemoryType, MemoryType TSrcMemoryType>
 struct Copy
 {
-  template <size_t TNum = DYN, typename T1, typename T2>
+  template <metal::int_ TNum = DYN, typename T1, typename T2>
   __host__ __device__
   static void copy(T1* dest, T2* src, size_t num)
   {
@@ -629,7 +630,7 @@ struct Copy
 
 } // detail
 
-template <MemoryType TDestMemoryType, MemoryType TSrcMemoryType, size_t TNum = DYN, typename T1, typename T2,
+template <MemoryType TDestMemoryType, MemoryType TSrcMemoryType, metal::int_ TNum = DYN, typename T1, typename T2,
   ENABLE_IF(std::is_same<typename std::decay<T1>::type, typename std::decay<T2>::type>::value)>
 __host__ __device__
 void copy(T1* dest, T2* src, size_t num)

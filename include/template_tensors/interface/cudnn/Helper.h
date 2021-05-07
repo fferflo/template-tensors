@@ -27,7 +27,7 @@ public:
   __host__
   void set(const TVectorType& dimensions)
   {
-    const size_t RANK = rows_v<TVectorType>::value;
+    const metal::int_ RANK = rows_v<TVectorType>::value;
     static_assert(RANK <= CUDNN_DIM_MAX, "Ranks greater than CUDNN_DIM_MAX are not allowed");
     static_assert(RANK >= 4, "Ranks smaller than 4 are not allowed");
 
@@ -70,7 +70,7 @@ public:
   __host__
   void set(const TVectorType& out_channels_in_channels_dimensions)
   {
-    const size_t RANK = rows_v<TVectorType>::value;
+    const metal::int_ RANK = rows_v<TVectorType>::value;
     static_assert(RANK <= CUDNN_DIM_MAX, "Ranks greater than CUDNN_DIM_MAX are not allowed");
     static_assert(RANK >= 4, "Ranks smaller than 4 are not allowed");
 
@@ -88,7 +88,7 @@ public:
   __host__
   void set(size_t out_channels, size_t in_channels, const TVectorType& dimensions)
   {
-    const size_t RANK = rows_v<TVectorType>::value;
+    const metal::int_ RANK = rows_v<TVectorType>::value;
     VectorXs<RANK + 2> out_channels_in_channels_dimensions;
     out_channels_in_channels_dimensions(0) = out_channels;
     out_channels_in_channels_dimensions(1) = in_channels;
@@ -122,7 +122,7 @@ public:
   }
 
   // Dims: [OutputChannel, InputChannel, Image(row-major)...]
-  template <typename TElementType, size_t TRank>
+  template <typename TElementType, metal::int_ TRank>
   __host__
   void set(
     const VectorXs<TRank>& pad,

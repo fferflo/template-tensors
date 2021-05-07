@@ -15,7 +15,7 @@ namespace cnpy {
                                         mem::HOST, \
                                         dyn_dimseq_t<TRank> \
                               >
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 class FromCnpyWrapperMatrix : public SuperType
 {
 public:
@@ -35,13 +35,13 @@ public:
   RETURN_AUTO(self.m_npy_array.template data<TElementType>())
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  template <size_t TIndex>
-  size_t getDynDim() const
+  template <metal::int_ TIndex>
+  dim_t getDynDim() const
   {
     return TIndex < TRank ? m_npy_array.shape[TIndex] : 1;
   }
 
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < TRank ? m_npy_array.shape[index] : 1;
   }
@@ -69,7 +69,7 @@ private:
   std::string m_message;
 };
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load_npz(const boost::filesystem::path& path, std::string name = "arr_0")
 {
   ::cnpy::NpyArray arr;
@@ -94,7 +94,7 @@ FromCnpyWrapperMatrix<TElementType, TRank> load_npz(const boost::filesystem::pat
   return FromCnpyWrapperMatrix<TElementType, TRank>(arr);
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load_npz(const boost::filesystem::path& path, VectorXs<TRank> dims, std::string name = "arr_0")
 {
   FromCnpyWrapperMatrix<TElementType, TRank> result = load_npz<TElementType, TRank>(path, name);
@@ -106,7 +106,7 @@ FromCnpyWrapperMatrix<TElementType, TRank> load_npz(const boost::filesystem::pat
   return result;
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load_npy(const boost::filesystem::path& path)
 {
   ::cnpy::NpyArray arr;
@@ -132,7 +132,7 @@ FromCnpyWrapperMatrix<TElementType, TRank> load_npy(const boost::filesystem::pat
   return FromCnpyWrapperMatrix<TElementType, TRank>(arr);
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load_npy(const boost::filesystem::path& path, VectorXs<TRank> dims)
 {
   FromCnpyWrapperMatrix<TElementType, TRank> result = load_npy<TElementType, TRank>(path);
@@ -144,7 +144,7 @@ FromCnpyWrapperMatrix<TElementType, TRank> load_npy(const boost::filesystem::pat
   return result;
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load(const boost::filesystem::path& path)
 {
   if (boost::filesystem::extension(path) == ".npy")
@@ -162,7 +162,7 @@ FromCnpyWrapperMatrix<TElementType, TRank> load(const boost::filesystem::path& p
   }
 }
 
-template <typename TElementType, size_t TRank>
+template <typename TElementType, metal::int_ TRank>
 FromCnpyWrapperMatrix<TElementType, TRank> load(const boost::filesystem::path& path, VectorXs<TRank> dims)
 {
   if (boost::filesystem::extension(path) == ".npy")
@@ -180,21 +180,21 @@ FromCnpyWrapperMatrix<TElementType, TRank> load(const boost::filesystem::path& p
   }
 }
 
-template <size_t TRank2 = DYN, typename TTensorType, size_t TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
+template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
 void save_npz(const boost::filesystem::path& path, TTensorType&& tensor, std::string name = "arr_0")
 {
   auto data = template_tensors::eval<template_tensors::RowMajor>(tensor);
   ::cnpy::npz_save(path.string(), name, data.data(), template_tensors::toStdVector(data.dims()), "w");
 }
 
-template <size_t TRank2 = DYN, typename TTensorType, size_t TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
+template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TRank2 == DYN ? non_trivial_dimensions_num_v<TTensorType>::value : TRank2>
 void save_npy(const boost::filesystem::path& path, TTensorType&& tensor)
 {
   auto data = template_tensors::eval<template_tensors::RowMajor>(tensor);
   ::cnpy::npy_save(path.string(), data.data(), template_tensors::toStdVector(data.dims()), "w");
 }
 
-template <size_t TRank = DYN, typename TTensorType>
+template <metal::int_ TRank = DYN, typename TTensorType>
 void save(const boost::filesystem::path& path, TTensorType&& tensor)
 {
   if (boost::filesystem::extension(path) == ".npy")

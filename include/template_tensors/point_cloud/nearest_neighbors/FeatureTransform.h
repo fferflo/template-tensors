@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace point_cloud {
 
 namespace nearest_neighbors {
@@ -75,7 +77,7 @@ public:
   }
 
   HD_WARNING_DISABLE
-  template <typename TOp, size_t TRank, typename TScalar>
+  template <typename TOp, metal::int_ TRank, typename TScalar>
   __host__ __device__
   void for_each(TOp&& op, template_tensors::VectorXT<TScalar, TRank> center, template_tensors::VectorXT<TScalar, TRank> range)
   {

@@ -22,13 +22,13 @@ void gaussian_elimination(TMatrixType&& matrix, decay_elementtype_t<TMatrixType>
 {
   using ElementType = decay_elementtype_t<TMatrixType>;
 
-  size_t pivotRow = 0;
-  for (size_t pivotCol = 0; pivotCol < matrix.template dim<1>(); pivotCol++)
+  dim_t pivotRow = 0;
+  for (dim_t pivotCol = 0; pivotCol < matrix.template dim<1>(); pivotCol++)
   {
     // Find non-zero element in column
     ElementType largestAbsValue = 0;
-    size_t r = 0;
-    for (size_t r2 = pivotRow; r2 < matrix.template dim<0>(); r2++)
+    dim_t r = 0;
+    for (dim_t r2 = pivotRow; r2 < matrix.template dim<0>(); r2++)
     {
       if (math::abs(matrix(r2, pivotCol)) > largestAbsValue)
       {
@@ -39,7 +39,7 @@ void gaussian_elimination(TMatrixType&& matrix, decay_elementtype_t<TMatrixType>
     if (largestAbsValue > epsilon)
     {
       // Move row with non-zero element up
-      for (size_t c = pivotCol; c < matrix.template dim<1>(); c++)
+      for (dim_t c = pivotCol; c < matrix.template dim<1>(); c++)
       {
         util::swap(matrix(r, c), matrix(pivotRow, c));
       }
@@ -47,7 +47,7 @@ void gaussian_elimination(TMatrixType&& matrix, decay_elementtype_t<TMatrixType>
       // Normalize row -> first element is 1.0
       ElementType divisor = matrix(pivotRow, pivotCol);
       matrix(pivotRow, pivotCol) = 1;
-      for (size_t c = pivotCol + 1; c < matrix.template dim<1>(); c++)
+      for (dim_t c = pivotCol + 1; c < matrix.template dim<1>(); c++)
       {
         matrix(pivotRow, c) /= divisor;
       }
@@ -57,7 +57,7 @@ void gaussian_elimination(TMatrixType&& matrix, decay_elementtype_t<TMatrixType>
       {
         ElementType multiplier = matrix(r, pivotCol);
         matrix(r, pivotCol) = 0;
-        for (size_t c = pivotCol + 1; c < matrix.template dim<1>(); c++)
+        for (dim_t c = pivotCol + 1; c < matrix.template dim<1>(); c++)
         {
           matrix(r, c) -= multiplier * matrix(pivotRow, c);
         }
@@ -79,34 +79,34 @@ void gaussian_elimination(TMatrixType&& matrix, decay_elementtype_t<TMatrixType>
  */
 template <typename TMatrixType>
 __host__ __device__
-void back_substitution(TMatrixType&& matrix, size_t rightHandSideColumns, decay_elementtype_t<TMatrixType> epsilon)
+void back_substitution(TMatrixType&& matrix, dim_t rightHandSideColumns, decay_elementtype_t<TMatrixType> epsilon)
 {
   using ElementType = decay_elementtype_t<TMatrixType>;
 
-  size_t pivotCol = matrix.template dim<1>() - rightHandSideColumns;
-  for (size_t pivotRow = matrix.template dim<0>() - 1; pivotRow != static_cast<size_t>(-1); pivotRow--)
+  dim_t pivotCol = matrix.template dim<1>() - rightHandSideColumns;
+  for (dim_t pivotRow = matrix.template dim<0>() - 1; pivotRow != static_cast<dim_t>(-1); pivotRow--)
   {
     // Find first non-zero element in row
-    size_t newPivotCol;
+    dim_t newPivotCol;
     for (newPivotCol = 0; newPivotCol < pivotCol && math::abs(matrix(pivotRow, newPivotCol)) <= epsilon; newPivotCol++)
     {
     }
     if (newPivotCol < pivotCol)
     {
       // Subtract row from higher rows -> column elements above pivotRow are 0.0
-      for (size_t r = pivotRow - 1; r != static_cast<size_t>(-1); r--)
+      for (dim_t r = pivotRow - 1; r != static_cast<dim_t>(-1); r--)
       {
         ElementType multiplier = matrix(r, newPivotCol);
 
         // Left hand side
         matrix(r, newPivotCol) = 0;
-        for (size_t c = newPivotCol + 1; c < pivotCol; c++)
+        for (dim_t c = newPivotCol + 1; c < pivotCol; c++)
         {
           matrix(r, c) -= multiplier * matrix(pivotRow, c);
         }
 
         // Right hand side
-        for (size_t c = matrix.template dim<1>() - rightHandSideColumns; c < matrix.template dim<1>(); c++)
+        for (dim_t c = matrix.template dim<1>() - rightHandSideColumns; c < matrix.template dim<1>(); c++)
         {
           matrix(r, c) -= multiplier * matrix(pivotRow, c);
         }
@@ -128,11 +128,11 @@ template <typename TMatrixTypeX, typename TMatrixTypeAb>
 __host__ __device__
 bool find_unique_solution(TMatrixTypeX&& x, const TMatrixTypeAb& Ab, decay_elementtype_t<TMatrixTypeAb> epsilon)
 {
-  const size_t RANK = rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value
+  static const metal::int_ RANK = rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value
                     : rows_v<TMatrixTypeAb>::value != DYN ? rows_v<TMatrixTypeAb>::value
                     : (cols_v<TMatrixTypeAb>::value && cols_v<TMatrixTypeX>::value != DYN) != DYN ? cols_v<TMatrixTypeAb>::value - cols_v<TMatrixTypeX>::value
                     : DYN;
-  const size_t COLS = (RANK != DYN && cols_v<TMatrixTypeX>::value != DYN) ? (RANK + cols_v<TMatrixTypeX>::value)
+  static const metal::int_ COLS = (RANK != DYN && cols_v<TMatrixTypeX>::value != DYN) ? (RANK + cols_v<TMatrixTypeX>::value)
                     : cols_v<TMatrixTypeAb>::value != DYN ? cols_v<TMatrixTypeAb>::value
                     : DYN;
 
@@ -142,10 +142,10 @@ bool find_unique_solution(TMatrixTypeX&& x, const TMatrixTypeAb& Ab, decay_eleme
   ASSERT(Ab.rows() + x.cols() == Ab.cols(), "Incompatible dimensions");
   ASSERT(x.rows() == Ab.rows(), "Incompatible dimensions");
 
-  for (size_t r = Ab.rows() - 1; r != static_cast<size_t>(-1); r--)
+  for (dim_t r = Ab.rows() - 1; r != static_cast<dim_t>(-1); r--)
   {
     // Find non-zero element in row on left side of system
-    size_t c;
+    dim_t c;
     for (c = 0; c < Ab.rows() && math::abs(Ab(r, c)) <= epsilon; c++)
     {
     }

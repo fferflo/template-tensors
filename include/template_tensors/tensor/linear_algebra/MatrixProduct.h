@@ -2,12 +2,12 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TIndex>
+template <metal::int_ TIndex>
 struct MatrixProductDimHelper
 {
   template <typename TMatrixTypeLeft, typename TMatrixTypeRight>
   __host__ __device__
-  static size_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
+  static dim_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
   {
     return 1;
   }
@@ -18,7 +18,7 @@ struct MatrixProductDimHelper<0>
 {
   template <typename TMatrixTypeLeft, typename TMatrixTypeRight>
   __host__ __device__
-  static size_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
+  static dim_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
   {
     return left.template dim<0>();
   }
@@ -29,7 +29,7 @@ struct MatrixProductDimHelper<1>
 {
   template <typename TMatrixTypeLeft, typename TMatrixTypeRight>
   __host__ __device__
-  static size_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
+  static dim_t get(TMatrixTypeLeft&& left, TMatrixTypeRight&& right)
   {
     return right.template dim<1>();
   }
@@ -100,28 +100,28 @@ public:
   template <typename TThisType,
     typename TElementType = decltype(std::declval<TThisType&&>().m_left() * std::declval<TThisType&&>().m_right())>
   __host__ __device__
-  static TElementType getElement(TThisType&& self, size_t row, size_t col)
+  static TElementType getElement(TThisType&& self, dim_t row, dim_t col)
   {
     TElementType sum = 0;
-    for (size_t k = 0; k < self.m_left.template dim<1>(); k++)
+    for (dim_t k = 0; k < self.m_left.template dim<1>(); k++)
     {
       sum += self.m_left(row, k) * self.m_right(k, col);
     }
     return sum;
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
   // TODO: replace this with dotproduct between template_tensors::row and template_tensors::col call?
   // TODO: all self.member should be rvalue if self is rvalue?
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return detail::MatrixProductDimHelper<TIndex>::get(m_left, m_right);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     switch (index)
     {

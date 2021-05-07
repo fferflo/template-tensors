@@ -2,11 +2,11 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TStaticDim>
+template <metal::int_ TStaticDim>
 struct HeadTensorDimHelper
 {
   __host__ __device__
-  static size_t get(size_t dynamic_dim)
+  static dim_t get(dim_t dynamic_dim)
   {
     return TStaticDim;
   }
@@ -16,7 +16,7 @@ template <>
 struct HeadTensorDimHelper<template_tensors::DYN>
 {
   __host__ __device__
-  static size_t get(size_t dynamic_dim)
+  static dim_t get(dim_t dynamic_dim)
   {
     return dynamic_dim;
   }
@@ -37,23 +37,27 @@ public:
   static_assert(
     !is_static_v<TNewDimSeq>::value ||
     !is_static_v<TTensorTypeIn>::value ||
-    tmp::vs::all_v<
-      tmp::vs::map2_t<
-        math::functor::lte,
-        dimseq_make_length_t<TNewDimSeq             , math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TNewDimSeq>::value)>,
-        dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TNewDimSeq>::value)>
+    metal::apply<
+      metal::lambda<metal::and_>,
+      metal::transform<
+        metal::bind<
+          metal::lambda<metal::not_>,
+          metal::lambda<metal::greater>
+        >,
+        dimseq_make_length_t<TNewDimSeq             , math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TNewDimSeq>::value)>,
+        dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TNewDimSeq>::value)>
       >
     >::value,
     "New dimensions must be smaller or equal to original dimensions");
 
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor"); // TODO: remove all of these assertions
 
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   __host__ __device__
   HeadTensor(TTensorTypeIn tensor)
-    : SuperType(dims_helper(tmp::vs::ascending_numbers_t<NON_TRIVIAL_DIMENSIONS_NUM>(), tensor))
-    , StoreDimensions<TNewDimSeq>(dims_helper(tmp::vs::ascending_numbers_t<NON_TRIVIAL_DIMENSIONS_NUM>(), tensor))
+    : SuperType(dims_helper(metal::iota<metal::number<0>, metal::number<NON_TRIVIAL_DIMENSIONS_NUM>>(), tensor))
+    , StoreDimensions<TNewDimSeq>(dims_helper(metal::iota<metal::number<0>, metal::number<NON_TRIVIAL_DIMENSIONS_NUM>>(), tensor))
     , m_tensor(tensor)
   {
   }
@@ -82,9 +86,9 @@ public:
 private:
   TTensorTypeIn m_tensor;
 
-  template <size_t... TIndices, typename TTensorType>
+  template <metal::int_... TIndices, typename TTensorType>
   __host__ __device__
-  auto dims_helper(tmp::vs::Sequence<size_t, TIndices...>, const TTensorType& tensor)
+  auto dims_helper(metal::numbers<TIndices...>, const TTensorType& tensor)
   RETURN_AUTO(VectorXs<sizeof...(TIndices)>(
       detail::HeadTensorDimHelper<
                       nth_dimension_v<TIndices, TNewDimSeq>::value
@@ -115,13 +119,8 @@ public:
 
 namespace detail {
 
-struct OffsetDimHelper
-{
-  constexpr size_t operator()(size_t dim, size_t offset) const
-  {
-    return (dim == DYN || offset == DYN) ? DYN : dim - offset;
-  }
-};
+template <typename TDim, typename TOffset>
+using OffsetDimHelper = metal::number<(TDim::value == DYN || TOffset::value == DYN) ? DYN : (TDim::value - TOffset::value)>;
 
 } // end of ns detail
 
@@ -129,10 +128,10 @@ struct OffsetDimHelper
 #define SuperType TensorBase< \
                                         ThisType, \
                                         mem::memorytype_v<TTensorTypeIn>::value, \
-                                        tmp::vs::map2_t< \
-                                          detail::OffsetDimHelper, \
-                                          dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TOffsetCoordSeq>::value)>, \
-                                          coordseq_make_length_t<TOffsetCoordSeq      , math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TOffsetCoordSeq>::value)> \
+                                        metal::transform< \
+                                          metal::lambda<detail::OffsetDimHelper>, \
+                                          dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TOffsetCoordSeq>::value)>, \
+                                          coordseq_make_length_t<TOffsetCoordSeq      , math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TOffsetCoordSeq>::value)> \
                                         > \
                               >
 template <typename TTensorTypeIn, typename TOffsetCoordSeq>
@@ -142,17 +141,21 @@ public:
   static_assert(is_static_v<TOffsetCoordSeq>::value, "Offset must be static");
   static_assert(
     !is_static_v<TTensorTypeIn>::value ||
-    tmp::vs::all_v<
-      tmp::vs::map2_t<
-        math::functor::lt,
-        coordseq_make_length_t<TOffsetCoordSeq      , math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TOffsetCoordSeq>::value)>,
-        dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(tmp::vs::length_v<dimseq_t<TTensorTypeIn>>::value, tmp::vs::length_v<TOffsetCoordSeq>::value)>
+    metal::apply<
+      metal::lambda<metal::and_>,
+      metal::transform<
+        metal::bind<
+          metal::lambda<metal::not_>,
+          metal::lambda<metal::greater>
+        >,
+        coordseq_make_length_t<TOffsetCoordSeq      , math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TOffsetCoordSeq>::value)>,
+        dimseq_make_length_t<dimseq_t<TTensorTypeIn>, math::max(metal::size<dimseq_t<TTensorTypeIn>>::value, metal::size<TOffsetCoordSeq>::value)>
       >
     >::value,
     "Offset must be strictly smaller than dimension");
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor");
 
-  static const size_t MAX_RANK = math::max(non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value, non_trivial_coordinates_num_v<TOffsetCoordSeq>::value);
+  static const metal::int_ MAX_RANK = math::max(non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value, non_trivial_coordinates_num_v<TOffsetCoordSeq>::value);
 
   __host__ __device__
   StaticOffsetTensor(TTensorTypeIn tensor)
@@ -172,17 +175,17 @@ public:
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<TIndex>() - nth_coordinate_v<TIndex, TOffsetCoordSeq>::value;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    return m_tensor.dim(index) - tmp::vs::getByIterating<TOffsetCoordSeq>(index, 0);
+    return m_tensor.dim(index) - getNthCoordinate(index, TOffsetCoordSeq());
   }
 
 private:
@@ -190,9 +193,9 @@ private:
 
 public:
   HD_WARNING_DISABLE
-  template <typename TThisType, size_t... TIndices, typename... TCoordArgTypes>
+  template <typename TThisType, metal::int_... TIndices, typename... TCoordArgTypes>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     util::forward<TThisType>(self).m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + nth_coordinate_v<TIndices, TOffsetCoordSeq>::value)...)
   )
@@ -226,11 +229,11 @@ public:
                                         dyn_dimseq_t<non_trivial_dimensions_num_v<TTensorTypeIn>::value> \
                               >
 
-template <typename TTensorTypeIn, size_t TOffsetRank>
+template <typename TTensorTypeIn, metal::int_ TOffsetRank>
 class DynamicOffsetTensor : public SuperType
 {
 public:
-  static const size_t MAX_RANK = math::max(non_trivial_dimensions_num_v<SuperType>::value, TOffsetRank);
+  static const metal::int_ MAX_RANK = math::max(non_trivial_dimensions_num_v<SuperType>::value, TOffsetRank);
 
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor");
 
@@ -245,17 +248,17 @@ public:
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<TIndex>() - getNthCoordinate<TIndex>(m_offset);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    return m_tensor.dim(index) - (math::lt(index, TOffsetRank) ? m_offset(index) : 0);
+    return m_tensor.dim(index) - (math::lt(index, static_cast<size_t>(TOffsetRank)) ? m_offset(index) : 0);
   }
 
 private:
@@ -266,9 +269,9 @@ private:
 
 public:
   HD_WARNING_DISABLE
-  template <typename TThisType, size_t... TIndices, typename... TCoordArgTypes>
+  template <typename TThisType, metal::int_... TIndices, typename... TCoordArgTypes>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers< TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + getNthCoordinate<TIndices>(self.m_offset))...)
   )
@@ -298,7 +301,7 @@ public:
 template <typename TTensorTypeIn, typename TOffsetCoordSeq>
 using OffsetTensor = typename std::conditional<is_static_v<TOffsetCoordSeq>::value,
   StaticOffsetTensor<TTensorTypeIn, TOffsetCoordSeq>,
-  DynamicOffsetTensor<TTensorTypeIn, tmp::vs::length_v<TOffsetCoordSeq>::value>
+  DynamicOffsetTensor<TTensorTypeIn, metal::size<TOffsetCoordSeq>::value>
 >::type;
 
 
@@ -324,7 +327,7 @@ using OffsetTensor = typename std::conditional<is_static_v<TOffsetCoordSeq>::val
  * @tparam THeadDimSeq the new dimension sequence
  * @return the sub-tensor
  */
-template <size_t... THeadDimSeq, typename TOtherTensorType>
+template <metal::int_... THeadDimSeq, typename TOtherTensorType>
 __host__ __device__
 auto head(TOtherTensorType&& tensor)
 RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<THeadDimSeq...>>
@@ -359,7 +362,7 @@ RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, THeadDimSeq>
  * @tparam TOffsetCoordSeq the offset coordinate sequence
  * @return the sub-tensor
  */
-template <size_t... TOffsetCoordSeq, ENABLE_IF(is_static_v<CoordSeq<TOffsetCoordSeq...>>::value), typename TOtherTensorType>
+template <metal::int_... TOffsetCoordSeq, ENABLE_IF(is_static_v<CoordSeq<TOffsetCoordSeq...>>::value), typename TOtherTensorType>
 __host__ __device__
 auto offset(TOtherTensorType&& tensor)
 RETURN_AUTO(StaticOffsetTensor<util::store_member_t<TOtherTensorType&&>, CoordSeq<TOffsetCoordSeq...>>
@@ -389,14 +392,6 @@ RETURN_AUTO(OffsetTensor<util::store_member_t<TOtherTensorType&&>, TOffsetCoordS
 
 
 
-template <typename TOtherTensorType, size_t... TTailDimSeq>
-using TailReturnType1 = OffsetTensor<util::store_member_t<TOtherTensorType&&>,
-    tmp::vs::map2_t<
-      detail::OffsetDimHelper,
-      dimseq_make_length_t<dimseq_t<TOtherTensorType>, math::max(tmp::vs::length_v<dimseq_t<TOtherTensorType>>::value, sizeof...(TTailDimSeq))>,
-      dimseq_make_length_t<DimSeq<TTailDimSeq...>    , math::max(tmp::vs::length_v<dimseq_t<TOtherTensorType>>::value, sizeof...(TTailDimSeq))>
-    >
-  >;
 /*!
  * \brief Returns the sub-tensor with size (TTailDimSeq...) ending at the original tensor's dimensions
  *
@@ -404,14 +399,23 @@ using TailReturnType1 = OffsetTensor<util::store_member_t<TOtherTensorType&&>,
  * @tparam TTailDimSeq the new dimension sequence
  * @return the sub-tensor
  */
-template <size_t... TTailDimSeq, typename TOtherTensorType, size_t TMaxRank = math::max(tmp::vs::length_v<dimseq_t<TOtherTensorType>>::value, sizeof...(TTailDimSeq)), ENABLE_IF(is_static_v<DimSeq<TTailDimSeq...>>::value)>
+template <metal::int_... TTailDimSeq, typename TOtherTensorType, metal::int_ TMaxRank = math::max(metal::size<dimseq_t<TOtherTensorType>>::value, (metal::int_) sizeof...(TTailDimSeq)), ENABLE_IF(is_static_v<DimSeq<TTailDimSeq...>>::value),
+  typename TResultTensor = OffsetTensor<util::store_member_t<TOtherTensorType&&>,
+    metal::transform<
+      metal::lambda<detail::OffsetDimHelper>,
+      dimseq_make_length_t<dimseq_t<TOtherTensorType>, math::max(metal::size<dimseq_t<TOtherTensorType>>::value, (metal::int_) sizeof...(TTailDimSeq))>,
+      dimseq_make_length_t<DimSeq<TTailDimSeq...>    , math::max(metal::size<dimseq_t<TOtherTensorType>>::value, (metal::int_) sizeof...(TTailDimSeq))>
+    >
+  >
+>
 __host__ __device__
-TailReturnType1<TOtherTensorType, TTailDimSeq...> tail(TOtherTensorType&& tensor)
-{
-  return TailReturnType1<TOtherTensorType, TTailDimSeq...>(
+auto tail(TOtherTensorType&& tensor)
+RETURN_AUTO(
+  TResultTensor(
     util::forward<TOtherTensorType>(tensor),
-    tensor.template dims<TMaxRank>() - toDimVector<TMaxRank>(DimSeq<TTailDimSeq...>()));
-}
+    tensor.template dims<TMaxRank>() - toDimVector<TMaxRank>(DimSeq<TTailDimSeq...>())
+  )
+)
 
 /*!
  * \brief Returns the sub-tensor with size (tail_args...) ending at the original tensor's dimensions
@@ -421,7 +425,7 @@ TailReturnType1<TOtherTensorType, TTailDimSeq...> tail(TOtherTensorType&& tensor
  * @return the sub-tensor
  */
 template <typename TOtherTensorType, typename... TTailArgTypes,
-  size_t TMaxRank = math::max(dimension_num_v<TTailArgTypes...>::value, non_trivial_dimensions_num_v<dimseq_t<TOtherTensorType>>::value)>
+  metal::int_ TMaxRank = math::max(dimension_num_v<TTailArgTypes...>::value, non_trivial_dimensions_num_v<dimseq_t<TOtherTensorType>>::value)>
 __host__ __device__
 auto tail(TOtherTensorType&& tensor, TTailArgTypes&&... tail_args)
 RETURN_AUTO(
@@ -433,20 +437,20 @@ RETURN_AUTO(
 
 template <typename TMatrixType>
 __host__ __device__
-auto row(TMatrixType&& matrix, size_t row)
+auto row(TMatrixType&& matrix, dim_t row)
 RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset(util::forward<TMatrixType>(matrix), row)));
 
 template <typename TMatrixType>
 __host__ __device__
-auto col(TMatrixType&& matrix, size_t col)
+auto col(TMatrixType&& matrix, dim_t col)
 RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset(util::forward<TMatrixType>(matrix), 0, col)));
 
-template <size_t TRow, typename TMatrixType>
+template <metal::int_ TRow, typename TMatrixType>
 __host__ __device__
 auto row(TMatrixType&& matrix)
 RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset<TRow>(util::forward<TMatrixType>(matrix))));
 
-template <size_t TCol, typename TMatrixType>
+template <metal::int_ TCol, typename TMatrixType>
 __host__ __device__
 auto col(TMatrixType&& matrix)
 RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset<0, TCol>(util::forward<TMatrixType>(matrix))));

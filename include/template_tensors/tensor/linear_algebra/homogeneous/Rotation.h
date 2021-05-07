@@ -16,8 +16,8 @@ class HomogenizedRotation : public SuperType
 public:
   static_assert(is_matrix_v<TMatrixType>::value, "TMatrixType must be a matrix");
 
-  static const size_t ROWS = rows_v<SuperType>::value;
-  static const size_t COLS = cols_v<SuperType>::value;
+  static const metal::int_ ROWS = rows_v<SuperType>::value;
+  static const metal::int_ COLS = cols_v<SuperType>::value;
 
   static_assert(ROWS == COLS, "Rotation matrix must be square");
   static_assert(ROWS == DYN || COLS == DYN || ROWS == COLS, "Must be square matrix");
@@ -34,7 +34,7 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static decay_elementtype_t<TMatrixType> getElement(TThisType&& self, size_t row, size_t col)
+  static decay_elementtype_t<TMatrixType> getElement(TThisType&& self, dim_t row, dim_t col)
   {
     if  (row == self.template dim<0>() - 1
       && col == self.template dim<1>() - 1)
@@ -51,17 +51,17 @@ public:
       return static_cast<decay_elementtype_t<TMatrixType>>(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex < 2 ? m_input.template dim<TIndex>() + 1 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < 2 ? m_input.dim(index) + 1 : 1;
   }

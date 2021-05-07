@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace template_tensors {
 
 namespace op {
@@ -5,7 +7,7 @@ namespace op {
 #ifdef __CUDACC__
 namespace detail {
 
-template <typename TKernelIndexStrategy, size_t TStep, size_t TKernelCoordsRank, size_t TCoordsRank, typename TFunctor, typename... TTensorTypes>
+template <typename TKernelIndexStrategy, metal::int_ TStep, metal::int_ TKernelCoordsRank, metal::int_ TCoordsRank, typename TFunctor, typename... TTensorTypes>
 __global__
 void kernel_for_each_element_with_coords(TFunctor func, size_t size, VectorXs<TKernelCoordsRank> kernel_dims, VectorXs<TCoordsRank> dims, TTensorTypes... tensors)
 {
@@ -16,14 +18,14 @@ void kernel_for_each_element_with_coords(TFunctor func, size_t size, VectorXs<TK
   }
 }
 // TODO: factor out DeviceForEach for_each class out of tensor folder
-template <size_t TCoordsRank>
+template <metal::int_ TCoordsRank>
 struct DeviceForEachHelper
 {
-  template <typename TKernelIndexStrategy, size_t TBlockSize, size_t TGridSize, typename TFunctor, typename... TTensorTypes>
+  template <typename TKernelIndexStrategy, metal::int_ TBlockSize, metal::int_ TGridSize, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor func, size_t size, TTensorTypes&&... tensors)
   {
-    static const size_t KERNEL_COORDS_RANK = non_trivial_dimensions_num_v<tmp::ts::get_t<0, tmp::ts::Sequence<TTensorTypes...>>>::value;
+    static const metal::int_ KERNEL_COORDS_RANK = non_trivial_dimensions_num_v<metal::front<metal::list<TTensorTypes...>>>::value;
 
     dim3 block, grid;
     block = dim3(TBlockSize);
@@ -39,7 +41,7 @@ struct DeviceForEachHelper
   }
 };
 
-template <typename TKernelIndexStrategy, size_t TStep, size_t TKernelCoordsRank, typename TFunctor, typename... TTensorTypes>
+template <typename TKernelIndexStrategy, metal::int_ TStep, metal::int_ TKernelCoordsRank, typename TFunctor, typename... TTensorTypes>
 __global__
 void kernel_for_each_element(TFunctor func, size_t size, VectorXs<TKernelCoordsRank> kernel_dims, TTensorTypes... tensors)
 {
@@ -53,11 +55,11 @@ void kernel_for_each_element(TFunctor func, size_t size, VectorXs<TKernelCoordsR
 template <>
 struct DeviceForEachHelper<DYN>
 {
-  template <typename TKernelIndexStrategy, size_t TBlockSize, size_t TGridSize, typename TFunctor, typename... TTensorTypes>
+  template <typename TKernelIndexStrategy, metal::int_ TBlockSize, metal::int_ TGridSize, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, size_t size, TTensorTypes&&... tensors)
   {
-    static const size_t KERNEL_COORDS_RANK = non_trivial_dimensions_num_v<tmp::ts::get_t<0, tmp::ts::Sequence<TTensorTypes...>>>::value;
+    static const metal::int_ KERNEL_COORDS_RANK = non_trivial_dimensions_num_v<metal::front<metal::list<TTensorTypes...>>>::value;
 
     dim3 block, grid;
     block = dim3(TBlockSize);
@@ -74,7 +76,7 @@ struct DeviceForEachHelper<DYN>
 
 } // end of ns detail
 
-template <typename TKernelIndexStrategy = template_tensors::ColMajor, size_t TBlockSize = 128, size_t TGridSize = 96> // TODO: values for TKernelIndexStrategy,  TBlockSize and TGridSize
+template <typename TKernelIndexStrategy = template_tensors::ColMajor, metal::int_ TBlockSize = 128, metal::int_ TGridSize = 96> // TODO: values for TKernelIndexStrategy,  TBlockSize and TGridSize
 struct DeviceForEach
 {
   template <bool TIsOnHost, typename... TTensorTypes>
@@ -84,14 +86,14 @@ struct DeviceForEach
   )
 
   template <bool TIsOnHost, typename TTensorDest, typename... TTensorSrcs>
-  TVALUE(bool, is_map_available_v, 
+  TVALUE(bool, is_map_available_v,
        TIsOnHost
     && mem::memorytype_v<TTensorDest>::value == mem::DEVICE
     && math::land((mem::memorytype_v<TTensorSrcs>::value != mem::HOST)...)
   )
 
   template <bool TIsOnHost, typename TTensorDest, typename TTensorSrc>
-  TVALUE(bool, is_copy_available_v, 
+  TVALUE(bool, is_copy_available_v,
        TIsOnHost
     && mem::memorytype_v<TTensorDest>::value == mem::DEVICE
     && mem::memorytype_v<TTensorSrc>::value != mem::HOST
@@ -100,7 +102,7 @@ struct DeviceForEach
   template <bool TIsOnHost, typename... TTensorTypes>
   TVALUE(bool, is_parallel_v, true)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {
@@ -120,7 +122,7 @@ struct DeviceForEach
 
 #else
 
-template <typename TKernelIndexStrategy = template_tensors::ColMajor, size_t TBlockSize = 128, size_t TGridSize = 96>  // TODO: values for TKernelIndexStrategy, TBlockSize and TGridSize
+template <typename TKernelIndexStrategy = template_tensors::ColMajor, metal::int_ TBlockSize = 128, metal::int_ TGridSize = 96>  // TODO: values for TKernelIndexStrategy, TBlockSize and TGridSize
 struct DeviceForEach
 {
   template <bool TIsOnHost, typename... TTensorTypes>
@@ -135,7 +137,7 @@ struct DeviceForEach
   template <bool TIsOnHost, typename... TTensorTypes>
   TVALUE(bool, is_parallel_v, true)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {

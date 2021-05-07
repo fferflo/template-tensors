@@ -40,7 +40,7 @@ HOST_DEVICE_TEST_CASE(tensor_index_strategy_strides)
   { \
     __VA_ARGS__; \
     using DimSeq1 = tt::dimseq_t<decltype(m1)>; \
-    const size_t RANK = tmp::vs::length_v<DimSeq1>::value; \
+    const size_t RANK = metal::size<DimSeq1>::value; \
     tt::VectorXs<RANK> strides = m1.getIndexStrategy().toStride(m1.dims()); \
     tt::AllocTensorT<double, mem::alloc::heap, tt::Stride<RANK>, RANK> m2(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tt::Stride<RANK>(strides), m1.dims()); \
     mem::copy<mem::LOCAL, mem::LOCAL>(m2.getArray().data(), m1.getArray().data(), m1.size()); \

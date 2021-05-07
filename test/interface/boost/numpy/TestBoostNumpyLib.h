@@ -12,8 +12,8 @@ struct Storage
   void store(::boost::python::object input)
   {
     auto result = tt::boost::python::dispatch::FromNumpy<
-      tmp::ts::Sequence<float>,
-      tmp::vs::Sequence<size_t, 2>
+      metal::list<float>,
+      metal::numbers<2>
     >(input)(util::functor::assign_to(data));
     if (!result)
     {

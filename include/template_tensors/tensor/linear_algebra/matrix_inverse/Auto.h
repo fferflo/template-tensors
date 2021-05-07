@@ -4,7 +4,7 @@ namespace op {
 
 namespace detail {
 
-template <size_t TRank>
+template <metal::int_ TRank>
 struct AutoInverseHelper;
 
 template <>

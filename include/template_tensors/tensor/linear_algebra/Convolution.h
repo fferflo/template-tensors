@@ -2,17 +2,17 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t TTensorDim, size_t TKernelDim>
+template <metal::int_ TTensorDim, metal::int_ TKernelDim>
 struct StaticConvDim
 {
-  static const size_t value = (TTensorDim == DYN || TKernelDim == DYN) ? DYN : (TTensorDim - TKernelDim + 1);
+  static const metal::int_ value = (TTensorDim == DYN || TKernelDim == DYN) ? DYN : (TTensorDim - TKernelDim + 1);
 };
 
 template <typename TInputType, typename TKernelType, typename TIndexSequence>
 struct StaticConvDims;
 
-template <typename TInputType, typename TKernelType, size_t... TIndices>
-struct StaticConvDims<TInputType, TKernelType, tmp::vs::IndexSequence<TIndices...>>
+template <typename TInputType, typename TKernelType, metal::int_... TIndices>
+struct StaticConvDims<TInputType, TKernelType, metal::numbers<TIndices...>>
 {
   using type = DimSeq<StaticConvDim<
     nth_dimension_v<TIndices, TInputType>::value,
@@ -23,8 +23,8 @@ struct StaticConvDims<TInputType, TKernelType, tmp::vs::IndexSequence<TIndices..
 template <typename TIndexSequence>
 struct DynamicConvDims;
 
-template <size_t... TIndices>
-struct DynamicConvDims<tmp::vs::IndexSequence<TIndices...>>
+template <metal::int_... TIndices>
+struct DynamicConvDims<metal::numbers<TIndices...>>
 {
   template <typename TInputType, typename TKernelType>
   __host__ __device__
@@ -40,8 +40,8 @@ struct DynamicConvDims<tmp::vs::IndexSequence<TIndices...>>
 #define SuperType TensorBase< \
                                         ThisType, \
                                         mem::combine<mem::memorytype_v<TInputType>::value, mem::memorytype_v<TKernelType>::value>(), \
-                                        typename detail::StaticConvDims<TInputType, TKernelType, tmp::vs::ascending_numbers_t< \
-                                          math::min(non_trivial_dimensions_num_v<TInputType>::value, non_trivial_dimensions_num_v<TKernelType>::value) \
+                                        typename detail::StaticConvDims<TInputType, TKernelType, metal::iota< \
+                                          metal::number<0>, metal::number<math::min(non_trivial_dimensions_num_v<TInputType>::value, non_trivial_dimensions_num_v<TKernelType>::value)> \
                                         >>::type \
                               >
 
@@ -51,7 +51,7 @@ class ConvolutionTensor : public SuperType
 public:
   __host__ __device__
   ConvolutionTensor(TInputType input, TKernelType kernel)
-    : SuperType(detail::DynamicConvDims<tmp::vs::ascending_numbers_t<non_trivial_dimensions_num_v<SuperType>::value>>::get(input, kernel))
+    : SuperType(detail::DynamicConvDims<metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<SuperType>::value>>>::get(input, kernel))
     , m_input(input)
     , m_kernel(kernel)
   {
@@ -74,15 +74,15 @@ public:
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_input.template dim<TIndex>() - m_kernel.template dim<TIndex>() + 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return m_input.dim(index) - m_kernel.dim(index) + 1;
   }

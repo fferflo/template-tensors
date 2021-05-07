@@ -7,7 +7,7 @@
 
 namespace template_tensors {
 
-template <typename TElementType, size_t TRank, mem::MemoryType TMemoryType>
+template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
 __host__
 FromDlPack<TElementType, TRank, TMemoryType> fromCppFlow(cppflow::tensor cppflow)
 {

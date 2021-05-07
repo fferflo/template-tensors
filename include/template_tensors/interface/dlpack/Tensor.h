@@ -124,7 +124,7 @@ struct dlpack_devicetype<mem::DEVICE>
                                         TMemoryType, \
                                         template_tensors::dyn_dimseq_t<TRank> \
                               >
-template <typename TElementType, size_t TRank, mem::MemoryType TMemoryType>
+template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
 class FromDlPack : public SuperType
 {
 public:
@@ -167,15 +167,15 @@ public:
   RETURN_AUTO(reinterpret_cast<TElementType*>(reinterpret_cast<uint8_t*>(self.m_data->dl_tensor.data) + self.m_data->dl_tensor.byte_offset))
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex < TRank ? m_data->dl_tensor.shape[TIndex] : 1;
   }
 
   __host__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < TRank ? m_data->dl_tensor.shape[index] : 1;
   }
@@ -186,7 +186,7 @@ private:
 #undef SuperType
 #undef ThisType
 
-template <typename TElementType, size_t TRank, mem::MemoryType TMemoryType>
+template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
 __host__
 FromDlPack<TElementType, TRank, TMemoryType> fromDlPack(SafeDLManagedTensor&& dl)
 {
@@ -226,7 +226,7 @@ struct DLManagedTensorContext
   DLManagedTensorContext(TTensorPtrIn&& ptr)
     : ptr(util::forward<TTensorPtrIn>(ptr))
   {
-    static const size_t RANK = non_trivial_dimensions_num_v<decltype(*ptr)>::value;
+    static const metal::int_ RANK = non_trivial_dimensions_num_v<decltype(*ptr)>::value;
     shape.resize(RANK);
     strides.resize(RANK);
     template_tensors::fromStdVector(shape) = this->ptr->template dims<RANK>();

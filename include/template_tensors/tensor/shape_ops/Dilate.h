@@ -2,22 +2,22 @@ namespace template_tensors {
 
 namespace detail {
 
-template <typename TDimSeq, typename TFactorSeq, typename TIndexSequence = tmp::vs::ascending_numbers_t<non_trivial_dimensions_num_v<TDimSeq>::value>>
+template <typename TDimSeq, typename TFactorSeq, typename TIndexSequence = metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<TDimSeq>::value>>>
 struct StaticDilatedDimSeq;
 
-template <typename TDimSeq, typename TFactorSeq, size_t... TIndices>
-struct StaticDilatedDimSeq<TDimSeq, TFactorSeq, tmp::vs::IndexSequence<TIndices...>>
+template <typename TDimSeq, typename TFactorSeq, metal::int_... TIndices>
+struct StaticDilatedDimSeq<TDimSeq, TFactorSeq, metal::numbers<TIndices...>>
 {
   using type = DimSeq<(nth_dimension_v<TIndices, TDimSeq>::value == DYN ? DYN :
     nth_dimension_v<TIndices, TDimSeq>::value + (nth_dimension_v<TIndices, TDimSeq>::value - 1) * (nth_dimension_v<TIndices, TFactorSeq>::value - 1)
   )...>;
 };
 
-template <typename TDimSeq, typename TFactorSeq, typename TIndexSequence = tmp::vs::ascending_numbers_t<non_trivial_dimensions_num_v<TDimSeq>::value>>
+template <typename TDimSeq, typename TFactorSeq, typename TIndexSequence = metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<TDimSeq>::value>>>
 struct StaticDilatedDims;
 
-template <typename TDimSeq, typename TFactorSeq, size_t... TIndices>
-struct StaticDilatedDims<TDimSeq, TFactorSeq, tmp::vs::IndexSequence<TIndices...>>
+template <typename TDimSeq, typename TFactorSeq, metal::int_... TIndices>
+struct StaticDilatedDims<TDimSeq, TFactorSeq, metal::numbers<TIndices...>>
 {
   template <typename TTensorType>
   __host__ __device__
@@ -43,7 +43,7 @@ class StaticDilatedTensor : public SuperType
 {
 public:
   static_assert(is_tensor_v<TTensorTypeOverlay>::value, "TTensorTypeOverlay must be a tensor");
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   __host__ __device__
   StaticDilatedTensor(TTensorTypeOverlay overlay, TBackgroundFunctor background)
@@ -75,18 +75,18 @@ public:
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_overlay.template dim<TIndex>() + (m_overlay.template dim<TIndex>() - 1) * (nth_dimension_v<TIndex, TFactorSeq>::value - 1);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    static const size_t rows = NON_TRIVIAL_DIMENSIONS_NUM;
-    size_t dim = m_overlay.dim(index);
+    static const metal::int_ rows = NON_TRIVIAL_DIMENSIONS_NUM;
+    dim_t dim = m_overlay.dim(index);
     return math::lt(index, rows) ? (dim + (dim - 1) * (toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(TFactorSeq())(index) - 1)) : 1;
   }
 
@@ -128,7 +128,7 @@ class DynamicDilatedTensor : public SuperType
 {
 public:
   static_assert(is_tensor_v<TTensorTypeOverlay>::value, "TTensorTypeOverlay must be a tensor");
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   __host__ __device__
   DynamicDilatedTensor(TTensorTypeOverlay overlay, TBackgroundFunctor background, TFactorVector factor)
@@ -160,19 +160,19 @@ public:
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_overlay.template dim<TIndex>() + (m_overlay.template dim<TIndex>() - 1) * (getNthDimension<TIndex>(m_factor) - 1);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
-    static const size_t rows = NON_TRIVIAL_DIMENSIONS_NUM;
-    size_t dim = m_overlay.dim(index);
-    return math::lt(index, rows) ? (dim + (dim - 1) * (m_factor(index) - 1)) : dim;
+    static const metal::int_ rows = NON_TRIVIAL_DIMENSIONS_NUM;
+    dim_t dim = m_overlay.dim(index);
+    return math::lt(index, static_cast<size_t>(rows)) ? (dim + (dim - 1) * (m_factor(index) - 1)) : dim;
   }
 
 private:
@@ -208,10 +208,10 @@ RETURN_AUTO(StaticDilatedTensor<util::store_member_t<TOtherTensorType&&>, util::
   (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
 )
 
-template <size_t TFactor, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
+template <metal::int_ TFactor, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(dilate<tmp::vs::repeat_t<size_t, TFactor, non_trivial_dimensions_num_v<TOtherTensorType>::value>>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(dilate<repeat_dimseq_t<TFactor, non_trivial_dimensions_num_v<TOtherTensorType>::value>>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
 
 
 template <typename TDummy = void, typename TFactorVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_tensor_v<TFactorVector>::value && std::is_same<TDummy, void>::value)>

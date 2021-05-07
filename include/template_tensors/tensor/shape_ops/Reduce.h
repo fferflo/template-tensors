@@ -2,39 +2,39 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t I, bool TIsCurrent>
+template <metal::int_ I, bool TIsCurrent>
 struct ReductionCoordHelper
 {
   template <typename... TCoordArgTypes>
   __host__ __device__
-  static size_t get(size_t new_coord, TCoordArgTypes&&... old_coords)
+  static dim_t get(dim_t new_coord, TCoordArgTypes&&... old_coords)
   {
     return new_coord;
   }
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct ReductionCoordHelper<I, false>
 {
   template <typename... TCoordArgTypes>
   __host__ __device__
-  static size_t get(size_t new_coord, TCoordArgTypes&&... old_coords)
+  static dim_t get(dim_t new_coord, TCoordArgTypes&&... old_coords)
   {
     return getNthCoordinate<I>(util::forward<TCoordArgTypes>(old_coords)...);
   }
 };
 
-template <bool TIsReducedDimension, size_t I>
+template <bool TIsReducedDimension, metal::int_ I>
 struct ReductionHelper
 {
-  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static void reduce(tmp::vs::Sequence<size_t, TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
+  static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
     ASSERT(getNthCoordinate<I - 1>(util::forward<TCoordArgTypes>(coords)...) == 0, "Reduced coordinate has to be zero");
-    for (size_t i = 0; i < tensor.template dim<I - 1>(); i++)
+    for (dim_t i = 0; i < tensor.template dim<I - 1>(); i++)
     {
-      ReductionHelper<tmp::vs::contains_v<size_t, TReducedDimsAsSeq, I - 2>::value, I - 1>
+      ReductionHelper<metal::contains<TReducedDimsAsSeq, metal::number<I - 2>>::value, I - 1>
         ::template reduce<TReducedDimsAsSeq>(seq, aggregator, util::forward<TTensorTypeIn>(tensor),
             ReductionCoordHelper<TIndices, TIndices == I - 1>::get(i, util::forward<TCoordArgTypes>(coords)...)...
           );
@@ -42,14 +42,14 @@ struct ReductionHelper
   }
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct ReductionHelper<false, I>
 {
-  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static void reduce(tmp::vs::Sequence<size_t, TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
+  static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
-    ReductionHelper<tmp::vs::contains_v<size_t, TReducedDimsAsSeq, I - 2>::value, I - 1>
+    ReductionHelper<metal::contains<TReducedDimsAsSeq, metal::number<I - 2>>::value, I - 1>
         ::template reduce<TReducedDimsAsSeq>(seq, aggregator, util::forward<TTensorTypeIn>(tensor),
             util::forward<TCoordArgTypes>(coords)...
           );
@@ -59,9 +59,9 @@ struct ReductionHelper<false, I>
 template <>
 struct ReductionHelper<true, 0>
 {
-  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static void reduce(tmp::vs::Sequence<size_t, TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
+  static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
     aggregator(tensor(util::forward<TCoordArgTypes>(coords)...));
   }
@@ -70,9 +70,9 @@ struct ReductionHelper<true, 0>
 template <>
 struct ReductionHelper<false, 0>
 {
-  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TReducedDimsAsSeq, typename TAggregator, typename TTensorTypeIn, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static void reduce(tmp::vs::Sequence<size_t, TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
+  static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
     aggregator(tensor(util::forward<TCoordArgTypes>(coords)...));
   }
@@ -80,16 +80,16 @@ struct ReductionHelper<false, 0>
 
 
 
-template <size_t I, typename TOriginalDimSeq, typename TReducedDimsAsSeq, bool TIsReducedDim = tmp::vs::contains_v<size_t, TReducedDimsAsSeq, I>::value>
+template <metal::int_ I, typename TOriginalDimSeq, typename TReducedDimsAsSeq, bool TIsReducedDim = metal::contains<TReducedDimsAsSeq, metal::number<I>>::value>
 struct StaticReducedDimHelper
 {
-  static const size_t value = nth_dimension_v<I, TOriginalDimSeq>::value;
+  static const metal::int_ value = nth_dimension_v<I, TOriginalDimSeq>::value;
 };
 
-template <size_t I, typename TOriginalDimSeq, typename TReducedDimsAsSeq>
+template <metal::int_ I, typename TOriginalDimSeq, typename TReducedDimsAsSeq>
 struct StaticReducedDimHelper<I, TOriginalDimSeq, TReducedDimsAsSeq, true>
 {
-  static const size_t value = 1;
+  static const metal::int_ value = 1;
 };
 
 
@@ -97,37 +97,37 @@ struct StaticReducedDimHelper<I, TOriginalDimSeq, TReducedDimsAsSeq, true>
 template <typename TOriginalDimSeq, typename TReducedDimsAsSeq, typename TIndexSeq>
 struct ReducedDimsHelper;
 
-template <typename TOriginalDimSeq, typename TReducedDimsAsSeq, size_t... TIndices>
-struct ReducedDimsHelper<TOriginalDimSeq, TReducedDimsAsSeq, tmp::vs::Sequence<size_t, TIndices...>>
+template <typename TOriginalDimSeq, typename TReducedDimsAsSeq, metal::int_... TIndices>
+struct ReducedDimsHelper<TOriginalDimSeq, TReducedDimsAsSeq, metal::numbers<TIndices...>>
 {
   using type = DimSeq<StaticReducedDimHelper<TIndices, TOriginalDimSeq, TReducedDimsAsSeq>::value...>;
 };
 
 template <typename TOriginalDimSeq, typename TReducedDimsAsSeq>
 using ReducedDimSeq = typename ReducedDimsHelper<TOriginalDimSeq, TReducedDimsAsSeq,
-                                  tmp::vs::ascending_numbers_t<non_trivial_dimensions_num_v<TOriginalDimSeq>::value>>::type;
+                                  metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<TOriginalDimSeq>::value>>>::type;
 
-static_assert(std::is_same<ReducedDimSeq<DimSeq<2, 3, 4>, tmp::vs::Sequence<size_t, 1, 5>>, DimSeq<2, 1, 4>>::value, "ReducedDimSeq not working");
+static_assert(std::is_same<ReducedDimSeq<DimSeq<2, 3, 4>, metal::numbers<1, 5>>, DimSeq<2, 1, 4>>::value, "ReducedDimSeq not working");
 
 
 
-template <size_t I, typename TOriginalDimSeq, typename TReducedDimsAsSeq, bool TIsReducedDim = tmp::vs::contains_v<size_t, TReducedDimsAsSeq, I>::value>
+template <metal::int_ I, typename TOriginalDimSeq, typename TReducedDimsAsSeq, bool TIsReducedDim = metal::contains<TReducedDimsAsSeq, metal::number<I>>::value>
 struct DynamicReducedDimHelper
 {
   template <typename TOtherTensor>
   __host__ __device__
-  static size_t get(const TOtherTensor& tensor)
+  static dim_t get(const TOtherTensor& tensor)
   {
     return tensor.template dim<I>();
   }
 };
 
-template <size_t I, typename TOriginalDimSeq, typename TReducedDimsAsSeq>
+template <metal::int_ I, typename TOriginalDimSeq, typename TReducedDimsAsSeq>
 struct DynamicReducedDimHelper<I, TOriginalDimSeq, TReducedDimsAsSeq, true>
 {
   template <typename TOtherTensor>
   __host__ __device__
-  static size_t get(const TOtherTensor& tensor)
+  static dim_t get(const TOtherTensor& tensor)
   {
     return 1;
   }
@@ -138,19 +138,19 @@ struct DynamicReducedDimHelper<I, TOriginalDimSeq, TReducedDimsAsSeq, true>
 template <typename TReducedDimsAsSeq>
 struct IsReducedDim;
 
-template <size_t TDim0>
+template <metal::int_ TDim0>
 struct IsReducedDim<DimSeq<TDim0>>
 {
-  static bool is(size_t dim)
+  static bool is(dim_t dim)
   {
     return dim == TDim0;
   }
 };
 
-template <size_t TDim0, size_t TDim1, size_t... TDimsRest>
+template <metal::int_ TDim0, metal::int_ TDim1, metal::int_... TDimsRest>
 struct IsReducedDim<DimSeq<TDim0, TDim1, TDimsRest...>>
 {
-  static bool is(size_t dim)
+  static bool is(dim_t dim)
   {
     return dim == TDim0 || IsReducedDim<DimSeq<TDim1, TDimsRest...>>::is(dim);
   }
@@ -170,14 +170,14 @@ template <typename TAggregator, typename TTensorTypeIn, typename TReducedDimsAsS
 class ReductionTensor : public SuperType
 {
 public:
-  static const size_t ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<TTensorTypeIn>::value;
-  static const size_t NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
+  static const metal::int_ ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<TTensorTypeIn>::value;
+  static const metal::int_ NON_TRIVIAL_DIMENSIONS_NUM = non_trivial_dimensions_num_v<SuperType>::value;
 
   static_assert(is_tensor_v<TTensorTypeIn>::value, "TTensorTypeIn must be a tensor");
 
   __host__ __device__
   ReductionTensor(TTensorTypeIn tensor, TAggregator aggregator)
-    : SuperType(dims_helper(tmp::vs::ascending_numbers_t<NON_TRIVIAL_DIMENSIONS_NUM>(), tensor))
+    : SuperType(dims_helper(metal::iota<metal::number<0>, metal::number<NON_TRIVIAL_DIMENSIONS_NUM>>(), tensor))
     , m_tensor(tensor)
     , m_aggregator(aggregator)
   {
@@ -190,14 +190,13 @@ public:
   static aggregator::resulttype_t<TAggregator> getElement(TThisType&& self, TCoordArgTypes&&... coords)
   {
     TAggregator aggregator = self.m_aggregator;
-    detail::ReductionHelper<tmp::vs::contains_v<
-                                                    size_t,
-                                                    TReducedDimsAsSeq,
-                                                    ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM - 1
-                                                  >::value,
+    detail::ReductionHelper<metal::contains<
+                                            TReducedDimsAsSeq,
+                                            metal::number<ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM - 1>
+                                          >::value,
                     ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM>
         ::template reduce<TReducedDimsAsSeq>(
-            tmp::vs::ascending_numbers_t<ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM>(),
+            metal::iota<metal::number<0>, metal::number<ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM>>(),
             aggregator,
             self.m_tensor,
             util::forward<TCoordArgTypes>(coords)...
@@ -206,9 +205,9 @@ public:
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return detail::DynamicReducedDimHelper<
                       TIndex,
@@ -218,7 +217,7 @@ public:
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return detail::IsReducedDim<TReducedDimsAsSeq>::is(index) ? 1 : m_tensor.dim(index);
   }
@@ -227,9 +226,9 @@ private:
   TTensorTypeIn m_tensor;
   TAggregator m_aggregator;
 
-  template <size_t... TIndices, typename TTensorType>
+  template <metal::int_... TIndices, typename TTensorType>
   __host__ __device__
-  auto dims_helper(tmp::vs::Sequence<size_t, TIndices...>, const TTensorType& tensor)
+  auto dims_helper(metal::numbers<TIndices...>, const TTensorType& tensor)
   RETURN_AUTO(VectorXs<sizeof...(TIndices)>(
       detail::DynamicReducedDimHelper<
                       TIndices,
@@ -276,7 +275,7 @@ RETURN_AUTO(
   ReductionTensor<
               util::store_member_t<TAggregator&&>,
               util::store_member_t<TTensorType&&>,
-              tmp::vs::ascending_numbers_t<non_trivial_dimensions_num_v<dimseq_t<TTensorType>>::value>
+              metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<dimseq_t<TTensorType>>::value>>
             >(util::forward<TTensorType>(tensor), util::forward<TAggregator>(aggregator))
 );
 
@@ -288,14 +287,14 @@ RETURN_AUTO(
  * @tparam TFunctor the binary accumulation operation
  * @tparam TReducedDims... a list of dimensions that will be reduced to 1
  */
-template <size_t... TReducedDims, typename TTensorType, typename TAggregator>
+template <metal::int_... TReducedDims, typename TTensorType, typename TAggregator>
 __host__ __device__
 auto reduce(TTensorType&& tensor, TAggregator&& aggregator)
 RETURN_AUTO(
   ReductionTensor<
               util::store_member_t<TAggregator&&>,
               util::store_member_t<TTensorType&&>,
-              tmp::vs::Sequence<size_t, TReducedDims...>
+              metal::numbers<TReducedDims...>
             >(util::forward<TTensorType>(tensor), util::forward<TAggregator>(aggregator))
 );
 // TODO: eval the elementtype of a tensor that is reduced if that elementtype is a tensor
@@ -379,7 +378,7 @@ namespace detail {
 struct BoolTo01
 {
   __host__ __device__
-  size_t operator()(bool el) const
+  dim_t operator()(bool el) const
   {
     return el ? 1 : 0;
   }
@@ -389,9 +388,9 @@ struct BoolTo01
 
 template <typename TTensorType>
 __host__ __device__
-size_t count(TTensorType&& t)
+dim_t count(TTensorType&& t)
 {
-  return sum<size_t>(elwise(detail::BoolTo01(), util::forward<TTensorType>(t)));
+  return sum<dim_t>(elwise(detail::BoolTo01(), util::forward<TTensorType>(t)));
 }
 
 /*!

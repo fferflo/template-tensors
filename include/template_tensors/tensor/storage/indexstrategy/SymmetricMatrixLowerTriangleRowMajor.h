@@ -13,8 +13,8 @@ struct SymmetricMatrixLowerTriangleRowMajor
   {
     ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
     ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    const size_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
-    const size_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
+    const dim_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
+    const dim_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
     if (row >= col)
     {
       return ((row + 1) * row >> 1) + col;
@@ -32,24 +32,24 @@ struct SymmetricMatrixLowerTriangleRowMajor
   constexpr size_t getSize(TDimArgTypes&&... dims) const
   {
     // TODO: ASSERT is symmetric and rest of dimension are 1
-    const size_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
     return (dim0 * dim0 + dim0) >> 1;
   }
 
   /*
   // TODO: floating sqrt not safe for big integers
-  template <size_t TDimsArg = DYN, typename TDimArgType, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgType>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename TDimArgType, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgType>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> fromIndex(TDimArgType&& dims, size_t index) const // TODO: put index arg first so that multiple dim args can be passed
   {
     VectorXs<TDims> result;
-    const size_t row = (-3 + math::sqrt<float>(9 + 8 * index)) / 2;
-    const size_t col = index - row * (row + 1) / 2;
+    const dim_t row = (-3 + math::sqrt<float>(9 + 8 * index)) / 2;
+    const dim_t col = index - row * (row + 1) / 2;
     detail::ColMajorFromIndexHelper<1, TDims>::fromIndex(result, util::forward<TDimArgType>(dims), index);
     return result;
   }
 
-  template <typename TVectorType, typename TElementType, size_t TRank>
+  template <typename TVectorType, typename TElementType, metal::int_ TRank>
   __host__ __device__
   VectorXs<TRank> fromIndex(const Vector<TVectorType, TElementType, TRank>& dims, size_t index) const
   {

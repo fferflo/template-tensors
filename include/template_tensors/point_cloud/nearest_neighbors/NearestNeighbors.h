@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace point_cloud {
 
 namespace nearest_neighbors {
@@ -47,7 +49,7 @@ public:
   }
 
   HD_WARNING_DISABLE
-  template <typename TOp, size_t TRank, typename TScalar, typename TPredicate>
+  template <typename TOp, metal::int_ TRank, typename TScalar, typename TPredicate>
   __host__ __device__
   void for_each(TOp&& op, template_tensors::VectorXT<TScalar, TRank> center, TScalar max_distance)
   {
@@ -62,7 +64,7 @@ public:
   }
 
   HD_WARNING_DISABLE
-  template <size_t TRank, typename TScalar, typename TPredicate = util::functor::True>
+  template <metal::int_ TRank, typename TScalar, typename TPredicate = util::functor::True>
   __host__ __device__
   Object* nearest(template_tensors::VectorXT<TScalar, TRank> center, TScalar max_distance, TPredicate&& pred = TPredicate())
   {

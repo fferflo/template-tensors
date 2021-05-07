@@ -1,17 +1,19 @@
 #pragma once
 
+#include <metal.hpp>
+
 namespace field {
 
 template <typename TField>
 class StaticDifferentiatedField
 {
 public:
-  static const size_t RANK = std::decay<TField>::type::RANK;
+  static const metal::int_ RANK = std::decay<TField>::type::RANK;
 
 private:
   TField m_field;
 
-  template <size_t TRow, typename TThisType, typename TCoordVector>
+  template <metal::int_ TRow, typename TThisType, typename TCoordVector>
   __host__ __device__
   static auto get_row(TThisType&& self, TCoordVector&& coords)
   RETURN_AUTO(
@@ -20,10 +22,10 @@ private:
     / 2
   )
 
-  template <size_t... TRows, typename TThisType, typename TCoordVector,
+  template <metal::int_... TRows, typename TThisType, typename TCoordVector,
     typename TElementType = decltype(get_row<0>(std::declval<TThisType&&>(), std::declval<TCoordVector&&>()))>
   __host__ __device__
-  static template_tensors::VectorXT<TElementType, RANK> get2(TThisType&& self, TCoordVector&& coords, tmp::vs::IndexSequence<TRows...>)
+  static template_tensors::VectorXT<TElementType, RANK> get2(TThisType&& self, TCoordVector&& coords, metal::numbers<TRows...>)
   {
     return template_tensors::VectorXT<TElementType, RANK>(
       get_row<TRows>(util::forward<TThisType>(self), util::forward<TCoordVector>(coords))...
@@ -35,7 +37,7 @@ private:
   __host__ __device__
   static auto get1(TThisType&& self, TCoordVector&& coords)
   RETURN_AUTO(
-    get2(util::forward<TThisType>(self), util::forward<TCoordVector>(coords), tmp::vs::ascending_numbers_t<RANK>())
+    get2(util::forward<TThisType>(self), util::forward<TCoordVector>(coords), metal::iota<metal::number<0>, metal::number<RANK>>())
   )
 
 public:

@@ -66,7 +66,7 @@ RETURN_AUTO(
 
 namespace detail {
 
-template <size_t TRank, typename TIntType = int32_t, typename TTensorType, typename TDims>
+template <metal::int_ TRank, typename TIntType = int32_t, typename TTensorType, typename TDims>
 __host__ __device__
 auto repeat(TTensorType&& tensor, TDims&& dims)
 RETURN_AUTO(
@@ -75,7 +75,7 @@ RETURN_AUTO(
 
 } // end of ns detail
 
-template <size_t TRank, typename TIntType = int32_t, typename TTensorType, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
+template <metal::int_ TRank, typename TIntType = int32_t, typename TTensorType, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
 __host__ __device__
 auto repeat(TTensorType&& tensor)
 RETURN_AUTO(
@@ -93,7 +93,7 @@ RETURN_AUTO(
 
 namespace detail {
 
-template <size_t TRank, typename TTensorType, typename TDims>
+template <metal::int_ TRank, typename TTensorType, typename TDims>
 __host__ __device__
 auto clamp(TTensorType&& tensor, TDims&& dims)
 RETURN_AUTO(
@@ -102,7 +102,7 @@ RETURN_AUTO(
 
 } // end of ns detail
 
-template <size_t TRank, typename TTensorType, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
+template <metal::int_ TRank, typename TTensorType, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
 __host__ __device__
 auto clamp(TTensorType&& tensor)
 RETURN_AUTO(
@@ -134,7 +134,7 @@ private:
   }
 
 public:
-  static const size_t RANK = std::decay<TField>::type::RANK;
+  static const metal::int_ RANK = std::decay<TField>::type::RANK;
 
   __host__ __device__
   Constant(TField field, TSize size, TConstant constant)
@@ -157,7 +157,7 @@ RETURN_AUTO(
 
 namespace detail {
 
-template <size_t TRank, typename TTensorType, typename TDims, typename TConstant>
+template <metal::int_ TRank, typename TTensorType, typename TDims, typename TConstant>
 __host__ __device__
 auto constant_helper(TTensorType&& tensor, TDims&& dims, TConstant&& constant)
 RETURN_AUTO(
@@ -166,7 +166,7 @@ RETURN_AUTO(
 
 } // end of ns detail
 
-template <size_t TRank, typename TTensorType, typename TConstant, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
+template <metal::int_ TRank, typename TTensorType, typename TConstant, ENABLE_IF(template_tensors::is_tensor_v<TTensorType>::value)>
 __host__ __device__
 auto constant(TTensorType&& tensor, TConstant&& constant)
 RETURN_AUTO(

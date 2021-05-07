@@ -2,7 +2,7 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t I>
+template <metal::int_ I>
 struct StrideToIndexHelper
 {
   template <typename TStrideVector, typename... TCoordArgTypes>
@@ -27,22 +27,22 @@ struct StrideToIndexHelper<0>
 
 
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct StrideGetSizeHelper
 {
-  template <size_t TStrideRank, typename... TDimArgTypes>
+  template <metal::int_ TStrideRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t getSize(const VectorXs<TStrideRank>& stride, TDimArgTypes&&... dims)
   {
-    const size_t dim = getNthDimension<I>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I>(util::forward<TDimArgTypes>(dims)...);
     return stride(I) * (dim - 1) + StrideGetSizeHelper<I + 1, N>::getSize(stride, util::forward<TDimArgTypes>(dims)...);
   }
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct StrideGetSizeHelper<I, I>
 {
-  template <size_t TStrideRank, typename... TDimArgTypes>
+  template <metal::int_ TStrideRank, typename... TDimArgTypes>
   __host__ __device__
   static size_t getSize(const VectorXs<TStrideRank>& stride, TDimArgTypes&&... dims)
   {
@@ -61,7 +61,7 @@ struct StrideGetSizeHelper<I, I>
  *
  * Strides that are not given default to zero.
  */
-template <size_t TRank>
+template <metal::int_ TRank>
 class Stride
 {
 public:
@@ -106,61 +106,61 @@ public:
     return detail::StrideGetSizeHelper<0, TRank>::getSize(m_stride, util::forward<TDimArgTypes>(dims)...);
   }
 
-  template <size_t TRank2>
+  template <metal::int_ TRank2>
   __host__ __device__
   VectorXs<TRank2> toStride() const
   {
     return toCoordVector<TRank2>(m_stride);
   }
 
-  template <size_t TRank2>
+  template <metal::int_ TRank2>
   __host__ __device__
   VectorXs<TRank2> toStride() const volatile
   {
     return toCoordVector<TRank2>(m_stride);
   }
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> toStride(TDimArgTypes&&... dims) const
   {
     return toStride<TDims>();
   }
 
-  template <size_t TDimsArg = DYN, typename... TDimArgTypes, size_t TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
+  template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
   __host__ __device__
   VectorXs<TDims> toStride(TDimArgTypes&&... dims) const volatile
   {
     return toStride<TDims>();
   }
 
-  template <size_t TRank2>
+  template <metal::int_ TRank2>
   __host__ __device__
   friend bool operator==(const Stride<TRank2>& left, const Stride<TRank2>& right);
-  template <size_t TRank2>
+  template <metal::int_ TRank2>
   __host__ __device__
   friend bool operator==(const Stride<TRank2>& left, const volatile Stride<TRank2>& right);
-  template <size_t TRank2>
+  template <metal::int_ TRank2>
   __host__ __device__
   friend bool operator==(const volatile Stride<TRank2>& left, const Stride<TRank2>& right);
-  template <typename TStreamType, size_t TRank2>
+  template <typename TStreamType, metal::int_ TRank2>
   __host__ __device__
   friend TStreamType&& operator<<(TStreamType&& stream, const Stride<TRank2>& index_strategy);
 
-  template <typename TArchive, size_t TRank2>
+  template <typename TArchive, metal::int_ TRank2>
   friend void save(TArchive& archive, const Stride<TRank2>& m);
-  template <typename TArchive, size_t TRank2>
+  template <typename TArchive, metal::int_ TRank2>
   friend void load(TArchive& archive, Stride<TRank2>& m);
 
 private:
   VectorXs<TRank> m_stride;
 };
 
-template <size_t TRank>
+template <metal::int_ TRank>
 __host__ __device__
 bool operator==(const Stride<TRank>& left, const Stride<TRank>& right)
 {
-  for (size_t i = 0; i < TRank; i++)
+  for (auto i = 0; i < TRank; i++)
   {
     if (left.m_stride(i) != right.m_stride(i))
     {
@@ -170,11 +170,11 @@ bool operator==(const Stride<TRank>& left, const Stride<TRank>& right)
   return true;
 }
 
-template <size_t TRank>
+template <metal::int_ TRank>
 __host__ __device__
 bool operator==(const Stride<TRank>& left, const volatile Stride<TRank>& right)
 {
-  for (size_t i = 0; i < TRank; i++)
+  for (auto i = 0; i < TRank; i++)
   {
     if (left.m_stride(i) != right.m_stride(i))
     {
@@ -184,11 +184,11 @@ bool operator==(const Stride<TRank>& left, const volatile Stride<TRank>& right)
   return true;
 }
 
-template <size_t TRank>
+template <metal::int_ TRank>
 __host__ __device__
 bool operator==(const volatile Stride<TRank>& left, const Stride<TRank>& right)
 {
-  for (size_t i = 0; i < TRank; i++)
+  for (auto i = 0; i < TRank; i++)
   {
     if (left.m_stride(i) != right.m_stride(i))
     {
@@ -199,7 +199,7 @@ bool operator==(const volatile Stride<TRank>& left, const Stride<TRank>& right)
 }
 
 HD_WARNING_DISABLE
-template <typename TStreamType, size_t TRank>
+template <typename TStreamType, metal::int_ TRank>
 __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const Stride<TRank>& index_strategy)
 {
@@ -208,14 +208,14 @@ TStreamType&& operator<<(TStreamType&& stream, const Stride<TRank>& index_strate
 }
 
 #ifdef CEREAL_INCLUDED
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void save(TArchive& archive, const Stride<TRank>& m)
 {
   archive(m.getArray());
   archive(m.getIndexStrategy());
 }
 
-template <typename TArchive, size_t TRank>
+template <typename TArchive, metal::int_ TRank>
 void load(TArchive& archive, Stride<TRank>& m)
 {
   archive(m.template toStride<TRank>);
@@ -224,5 +224,5 @@ void load(TArchive& archive, Stride<TRank>& m)
 
 } // end of ns tensor
 
-template <size_t TRank>
+template <metal::int_ TRank>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::Stride<TRank>));

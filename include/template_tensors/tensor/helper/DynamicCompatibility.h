@@ -2,7 +2,7 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct AreSameDimensions
 {
   template <typename TVectorType1, typename... TDimArgTypes>
@@ -13,7 +13,7 @@ struct AreSameDimensions
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct AreSameDimensions<N, N>
 {
   template <typename TVectorType1, typename... TDimArgTypes>
@@ -24,7 +24,7 @@ struct AreSameDimensions<N, N>
   }
 };
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct AreSameCoordinates
 {
   template <typename TVectorType1, typename... TCoordArgTypes>
@@ -35,7 +35,7 @@ struct AreSameCoordinates
   }
 };
 
-template <size_t N>
+template <metal::int_ N>
 struct AreSameCoordinates<N, N>
 {
   template <typename TVectorType1, typename... TCoordArgTypes>
@@ -46,7 +46,7 @@ struct AreSameCoordinates<N, N>
   }
 };
 
-template <size_t TMax, size_t I>
+template <metal::int_ TMax, metal::int_ I>
 struct AreCompatibleDimensions
 {
   template <typename TDimSeq, typename... TDimArgTypes>
@@ -58,7 +58,7 @@ struct AreCompatibleDimensions
   }
 };
 
-template <size_t TMax>
+template <metal::int_ TMax>
 struct AreCompatibleDimensions<TMax, TMax>
 {
   template <typename TDimSeq, typename... TDimArgTypes>
@@ -69,7 +69,7 @@ struct AreCompatibleDimensions<TMax, TMax>
   }
 };
 
-template <size_t TMax, size_t I>
+template <metal::int_ TMax, metal::int_ I>
 struct AreCompatibleCoordinates
 {
   template <typename TCoordSeq, typename... TCoordArgTypes>
@@ -81,7 +81,7 @@ struct AreCompatibleCoordinates
   }
 };
 
-template <size_t TMax>
+template <metal::int_ TMax>
 struct AreCompatibleCoordinates<TMax, TMax>
 {
   template <typename TCoordSeq, typename... TCoordArgTypes>
@@ -158,7 +158,7 @@ template <typename TDimSeq, typename... TDimArgTypes>
 __host__ __device__
 bool areCompatibleDimensions(TDimArgTypes&&... dim_args)
 {
-  const size_t MAX = math::max(dimension_num_v<TDimArgTypes...>::value, non_trivial_dimensions_num_v<TDimSeq>::value);
+  const metal::int_ MAX = math::max(dimension_num_v<TDimArgTypes...>::value, non_trivial_dimensions_num_v<TDimSeq>::value);
   return detail::AreCompatibleDimensions<MAX, 0>::template check<TDimSeq>(util::forward<TDimArgTypes>(dim_args)...);
 }
 
@@ -166,7 +166,7 @@ template <typename TCoordSeq, typename... TCoordArgTypes>
 __host__ __device__
 bool areCompatibleCoordinates(TCoordArgTypes&&... coord_args)
 {
-  const size_t MAX = math::max(coordinate_num_v<TCoordArgTypes...>::value, non_trivial_coordinates_num_v<TCoordSeq>::value);
+  const metal::int_ MAX = math::max(coordinate_num_v<TCoordArgTypes...>::value, non_trivial_coordinates_num_v<TCoordSeq>::value);
   return detail::AreCompatibleCoordinates<MAX, 0>::template check<TCoordSeq>(util::forward<TCoordArgTypes>(coord_args)...);
 }
 
@@ -176,7 +176,7 @@ bool areCompatibleCoordinates(TCoordArgTypes&&... coord_args)
 
 namespace detail {
 
-template <size_t I>
+template <metal::int_ I>
 struct CoordsAreInRange
 {
   template <typename TDimArgType, typename... TCoordArgTypes>

@@ -376,19 +376,6 @@ std::string to_string(TType object)
 
 
 
-template <typename T>
-struct Type
-{
-  using type = T;
-};
-
-template <typename T, T TValue>
-struct Value
-{
-  static const T value = TValue;
-};
-
-
 namespace detail {
 
 struct StoreMemberHelper

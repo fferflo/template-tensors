@@ -4,12 +4,12 @@
 
 namespace template_tensors {
 
-constexpr size_t fromEigenDim(int eigen_dim)
+constexpr metal::int_ fromEigenDim(int eigen_dim)
 {
   return eigen_dim == Eigen::Dynamic ? template_tensors::DYN : eigen_dim;
 }
 
-constexpr int toEigenDim(size_t dim)
+constexpr int toEigenDim(metal::int_ dim)
 {
   return dim == template_tensors::DYN ? Eigen::Dynamic : static_cast<int>(dim);
 }
@@ -70,21 +70,21 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TSizeTCoords>
   __host__
-  static auto getElement(TThisType&& self, size_t rows, size_t cols)
+  static auto getElement(TThisType&& self, dim_t rows, dim_t cols)
   RETURN_AUTO(
     self.m_eigen_matrix(rows, cols)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2) // TODO: overhead for eigen vectors
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2) // TODO: overhead for eigen vectors
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_eigen_matrix.rows() : TIndex == 1 ? m_eigen_matrix.cols() : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     switch (index)
     {

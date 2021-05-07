@@ -2,21 +2,21 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t I, size_t TFlipDim>
+template <metal::int_ I, metal::int_ TFlipDim>
 struct FlipIndexHelper
 {
   __host__ __device__
-  static size_t get(size_t index, size_t dim)
+  static dim_t get(dim_t index, dim_t dim)
   {
     return index;
   }
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct FlipIndexHelper<I, I>
 {
   __host__ __device__
-  static size_t get(size_t index, size_t dim)
+  static dim_t get(dim_t index, dim_t dim)
   {
     return dim - 1 - index;
   }
@@ -30,7 +30,7 @@ struct FlipIndexHelper<I, I>
                                         mem::memorytype_v<TTensorTypeIn>::value, \
                                         dimseq_t<TTensorTypeIn> \
                               >
-template <typename TTensorTypeIn, size_t TFlipDim>
+template <typename TTensorTypeIn, metal::int_ TFlipDim>
 class FlipTensor : public SuperType
 {
 public:
@@ -46,23 +46,23 @@ public:
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
-  template <typename TThisType, typename... TCoordArgTypes, size_t... TIndices>
+  template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
   __host__ __device__
-  static auto getElement(TThisType&& self, tmp::vs::Sequence<size_t, TIndices...>, TCoordArgTypes&&... coords)
+  static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor(detail::FlipIndexHelper<TIndices, TFlipDim>::get(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), self.m_tensor.template dim<TIndices>())...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return m_tensor.template dim<TIndex>();
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return m_tensor.dim(index);
   }
@@ -91,7 +91,7 @@ public:
 #undef ThisType
 
 
-template <size_t TFlipDim, typename TOtherTensorType>
+template <metal::int_ TFlipDim, typename TOtherTensorType>
 __host__ __device__
 auto flip(TOtherTensorType&& tensor)
 RETURN_AUTO(FlipTensor<util::store_member_t<TOtherTensorType&&>, TFlipDim>
@@ -100,7 +100,7 @@ RETURN_AUTO(FlipTensor<util::store_member_t<TOtherTensorType&&>, TFlipDim>
 
 namespace functor {
 
-template <size_t TFlipDim> // TODO: add functors to all tensor class helpers, #define macro for FORWARD_FUNCTOR
+template <metal::int_ TFlipDim> // TODO: add functors to all tensor class helpers, #define macro for FORWARD_FUNCTOR
 struct flip
 {
   template <typename TOtherTensorType>

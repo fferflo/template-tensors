@@ -29,7 +29,7 @@ public:
   template <typename TThisType,
     typename TElementType = decltype(std::declval<TThisType&&>().m_left() * std::declval<TThisType&&>().m_right())>
   __host__ __device__
-  static TElementType getElement(TThisType&& self, size_t row)
+  static TElementType getElement(TThisType&& self, dim_t row)
   {
     switch (row)
     {
@@ -39,17 +39,17 @@ public:
       default: return 0;
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? 3 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? 3 : 1;
   }
@@ -122,7 +122,7 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType, typename TElementType = typename std::decay<decltype(std::declval<TThisType&&>().m_vector())>::type>
   __host__ __device__
-  static TElementType getElement(TThisType&& self, size_t row, size_t col)
+  static TElementType getElement(TThisType&& self, dim_t row, dim_t col)
   {
     if (row == col)
     {
@@ -142,17 +142,17 @@ public:
       return row > col ? self.m_vector(0) : -self.m_vector(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex < 2 ? 3 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < 2 ? 3 : 1;
   }

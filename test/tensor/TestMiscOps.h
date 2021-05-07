@@ -50,7 +50,7 @@ HOST_DEVICE_TEST_CASE(tensor_streamop)
 HOST_DEVICE_TEST_CASE(tensor_tuple_conversion)
 {
   tt::Vector3s v(1, 2, 3);
-  CHECK(tt::eq(v, tt::fromTuple(tt::toTuple<size_t>(v))));
+  CHECK(tt::eq(v, tt::fromTuple(tt::toTuple(v))));
 }
 
 HOST_DEVICE_TEST_CASE(tensor_ordering)

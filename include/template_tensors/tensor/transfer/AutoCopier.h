@@ -8,9 +8,9 @@ template <bool TIsOnHost, typename TCopierSeq, typename TTensorDest, typename TT
 struct CopierDeciderHD;
 
 template <bool TIsOnHost, typename TTensorDest, typename TTensorSrc, typename TCopier1, typename... TCopiers>
-struct CopierDeciderHD<TIsOnHost, tmp::ts::Sequence<TCopier1, TCopiers...>, TTensorDest, TTensorSrc>
+struct CopierDeciderHD<TIsOnHost, metal::list<TCopier1, TCopiers...>, TTensorDest, TTensorSrc>
 {
-  using Next = CopierDeciderHD<TIsOnHost, tmp::ts::Sequence<TCopiers...>, TTensorDest, TTensorSrc>;
+  using Next = CopierDeciderHD<TIsOnHost, metal::list<TCopiers...>, TTensorDest, TTensorSrc>;
   static const bool this_is_valid = TCopier1::template is_copy_available_v<TIsOnHost, TTensorDest, TTensorSrc>::value;
 
   static const bool is_valid = this_is_valid || Next::is_valid;
@@ -18,7 +18,7 @@ struct CopierDeciderHD<TIsOnHost, tmp::ts::Sequence<TCopier1, TCopiers...>, TTen
 };
 
 template <bool TIsOnHost, typename TTensorDest, typename TTensorSrc>
-struct CopierDeciderHD<TIsOnHost, tmp::ts::Sequence<>, TTensorDest, TTensorSrc>
+struct CopierDeciderHD<TIsOnHost, metal::list<>, TTensorDest, TTensorSrc>
 {
   static const bool is_valid = false;
   using Copier = ErrorCopier;
@@ -47,8 +47,8 @@ template <typename... TCopiers>
 struct AutoCopier
 {
   using CopierSeq = typename std::conditional<sizeof...(TCopiers) != 0,
-    tmp::ts::Sequence<TCopiers...>,
-    tmp::ts::Sequence<StorageArrayCopier, AutoForEach<>, AssignToTempMemCopyToDestCopier, MemCopyToTempAssignToDestCopier, AssignToTempMemCopyToTempAssignToDestCopier<>>
+    metal::list<TCopiers...>,
+    metal::list<StorageArrayCopier, AutoForEach<>, AssignToTempMemCopyToDestCopier, MemCopyToTempAssignToDestCopier, AssignToTempMemCopyToTempAssignToDestCopier<>>
   >::type;
 
   template <bool TIsOnHost, typename TTensorDest, typename TTensorSrc>

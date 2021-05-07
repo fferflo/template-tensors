@@ -2,7 +2,7 @@ namespace template_tensors {
 
 namespace op {
 
-template <size_t TRank>
+template <metal::int_ TRank>
 class ClosedFormInverse;
 // TODO: memory types
 template <>

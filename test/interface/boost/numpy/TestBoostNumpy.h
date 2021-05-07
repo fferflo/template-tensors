@@ -1,8 +1,6 @@
 #include <HostDeviceTest.h>
 #include <template_tensors/TemplateTensors.h>
 
-namespace tt = template_tensors;
-
 BOOST_AUTO_TEST_CASE(numpy_conversions)
 {
   Py_Initialize(); // TODO: wrap these in class

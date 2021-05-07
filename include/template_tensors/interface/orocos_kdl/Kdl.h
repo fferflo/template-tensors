@@ -12,9 +12,9 @@ __host__
 MatrixXXT<TScalar, 3, 3> fromKdl(const KDL::Rotation& kdl)
 {
   MatrixXXT<TScalar, 3, 3> result;
-  for (size_t r = 0; r < 3; r++)
+  for (dim_t r = 0; r < 3; r++)
   {
-    for (size_t c = 0; c < 3; c++)
+    for (dim_t c = 0; c < 3; c++)
     {
       result(r, c) = kdl(r, c);
     }
@@ -27,7 +27,7 @@ __host__
 VectorXT<TScalar, 3> fromKdl(const KDL::Vector& kdl)
 {
   VectorXT<TScalar, 3> result;
-  for (size_t r = 0; r < 3; r++)
+  for (dim_t r = 0; r < 3; r++)
   {
     result(r) = kdl[r];
   }
@@ -47,9 +47,9 @@ KDL::Rotation toKdlRot(TTensor&& rotation)
 {
   ASSERT(areSameDimensions(rotation.dims(), Vector2s(3, 3)), "Invalid dimensions");
   KDL::Rotation result;
-  for (size_t r = 0; r < 3; r++)
+  for (dim_t r = 0; r < 3; r++)
   {
-    for (size_t c = 0; c < 3; c++)
+    for (dim_t c = 0; c < 3; c++)
     {
       result(r, c) = rotation(r, c);
     }
@@ -63,7 +63,7 @@ KDL::Vector toKdlVec(TTensor&& vector)
 {
   ASSERT(areSameDimensions(vector.dims(), Vector1s(3)), "Invalid dimensions");
   KDL::Vector result;
-  for (size_t r = 0; r < 3; r++)
+  for (dim_t r = 0; r < 3; r++)
   {
     result(r) = vector(r);
   }

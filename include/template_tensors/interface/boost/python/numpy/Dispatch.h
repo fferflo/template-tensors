@@ -27,7 +27,7 @@ struct FromNumpy
   {
     ::boost::python::numpy::ndarray& array;
 
-    template <typename, size_t TRank>
+    template <metal::int_ TRank>
     bool operator()()
     {
       template_tensors::boost::python::with_gil guard;
@@ -42,7 +42,7 @@ struct FromNumpy
   RETURN_AUTO(
     ::dispatch::all(
       ::dispatch::first_type<TElementTypes>(ElementTypeMatches{ndarray}, ELEMENT_TYPE_STR),
-      ::dispatch::first_value<TRanks>(RankMatches{ndarray}, RANK_STR)
+      ::dispatch::first_value<metal::int_, TRanks>(RankMatches{ndarray}, RANK_STR)
     )
   )
 
@@ -84,8 +84,8 @@ struct FromNumpy
     ::boost::python::numpy::ndarray& ndarray;
     TFunctor functor;
 
-    template <typename TElementType, size_t TRank>
-    void operator()(util::Type<TElementType>, util::Value<size_t, TRank>)
+    template <typename TElementType, metal::int_ TRank>
+    void operator()(metal::value<TElementType>, std::integral_constant<metal::int_, TRank>)
     {
       functor(template_tensors::boost::python::fromNumpy<TElementType, TRank>(ndarray));
     }

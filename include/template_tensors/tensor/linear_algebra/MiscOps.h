@@ -32,9 +32,9 @@ bool isSymmetric(const TMatrixType& m)
     return false;
   }
 
-  for (size_t r = 0; r < m.template dim<0>(); r++)
+  for (dim_t r = 0; r < m.template dim<0>(); r++)
   {
-    for (size_t c = r + 1; c < m.template dim<1>(); c++)
+    for (dim_t c = r + 1; c < m.template dim<1>(); c++)
     {
       if (m(r, c) != m(c, r))
       {

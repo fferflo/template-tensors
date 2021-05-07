@@ -27,33 +27,33 @@ public:
   {
   }
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return getNthDimension<TIndex>(m_dims);
   }
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const volatile
+  dim_t getDynDim() const volatile
   {
     return getNthDimension<TIndex>(m_dims);
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     // Compile-time constant to run-time constant conversion
-    static const size_t non_trivial_dimensions_num = non_trivial_dimensions_num_v<TDimSeq>::value;
-    return math::lt(index, non_trivial_dimensions_num) ? m_dims(index) : 1;
+    static const metal::int_ non_trivial_dimensions_num = non_trivial_dimensions_num_v<TDimSeq>::value;
+    return math::lt(index, static_cast<size_t>(non_trivial_dimensions_num)) ? m_dims(index) : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const volatile
+  dim_t getDynDim(size_t index) const volatile
   {
     // Compile-time constant to run-time constant conversion
-    static const size_t non_trivial_dimensions_num = non_trivial_dimensions_num_v<TDimSeq>::value;
+    static const metal::int_ non_trivial_dimensions_num = non_trivial_dimensions_num_v<TDimSeq>::value;
     return math::lt(index, non_trivial_dimensions_num) ? m_dims(index) : 1;
   }
 

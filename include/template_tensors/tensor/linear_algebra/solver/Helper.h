@@ -1,11 +1,11 @@
 namespace template_tensors {
 
 #define TT_SOLVER_CHECK_X_AB_DIMS \
-  static const size_t RANK = rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value \
+  static const metal::int_ RANK = rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value \
                            : rows_v<TMatrixTypeAb>::value != DYN ? rows_v<TMatrixTypeAb>::value \
                            : (cols_v<TMatrixTypeAb>::value && cols_v<TMatrixTypeX>::value != DYN) != DYN ? cols_v<TMatrixTypeAb>::value - cols_v<TMatrixTypeX>::value \
                            : DYN; \
-  static const size_t COLS_TOTAL = \
+  static const metal::int_ COLS_TOTAL = \
                              (RANK != DYN && cols_v<TMatrixTypeX>::value != DYN) ? (RANK + cols_v<TMatrixTypeX>::value) \
                            : cols_v<TMatrixTypeAb>::value != DYN ? cols_v<TMatrixTypeAb>::value \
                            : DYN; \
@@ -17,13 +17,13 @@ namespace template_tensors {
   ASSERT(x.rows() == Ab.rows(), "Incompatible dimensions");
 
 #define TT_SOLVER_CHECK_X_A_B_DIMS \
-  static const size_t RANK = \
+  static const metal::int_ RANK = \
                       rows_v<TMatrixTypeX>::value != DYN ? rows_v<TMatrixTypeX>::value \
                     : rows_v<TMatrixTypeA>::value != DYN ? rows_v<TMatrixTypeA>::value \
                     : cols_v<TMatrixTypeA>::value != DYN ? cols_v<TMatrixTypeA>::value \
                     : rows_v<TMatrixTypeB>::value != DYN ? rows_v<TMatrixTypeB>::value \
                     : DYN; \
-  static const size_t COLS_RIGHT \
+  static const metal::int_ COLS_RIGHT \
                     = cols_v<TMatrixTypeX>::value != DYN ? cols_v<TMatrixTypeX>::value \
                     : cols_v<TMatrixTypeB>::value != DYN ? cols_v<TMatrixTypeB>::value \
                     : DYN; \

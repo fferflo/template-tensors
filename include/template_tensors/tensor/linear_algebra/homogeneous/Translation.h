@@ -16,7 +16,7 @@ class HomogenizedTranslation : public SuperType
 public:
   static_assert(is_vector_v<TVectorType>::value, "TVectorType must be a vector");
 
-  static const size_t COLS = cols_v<SuperType>::value;
+  static const metal::int_ COLS = cols_v<SuperType>::value;
 
   __host__ __device__
   HomogenizedTranslation(TVectorType input)
@@ -30,7 +30,7 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static decay_elementtype_t<TVectorType> getElement(TThisType&& self, size_t row, size_t col)
+  static decay_elementtype_t<TVectorType> getElement(TThisType&& self, dim_t row, dim_t col)
   {
     if (row == col)
     {
@@ -45,17 +45,17 @@ public:
       return static_cast<decay_elementtype_t<TVectorType>>(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 2)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex < 2 ? m_input.template dim<0>() + 1 : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index < 2 ? m_input.template dim<0>() + 1 : 1;
   }

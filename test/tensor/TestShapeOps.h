@@ -36,7 +36,6 @@ HOST_DEVICE_TEST_CASE(tensor_headtail)
   CHECK(tt::eq(tt::MatrixXXd<1, 2, tt::ColMajor>(3.0, 6.0), tt::offset(m2, 2, 0)));
   CHECK(tt::eq(tt::MatrixXXd<3, 1, tt::ColMajor>(4.0, 5.0, 6.0), tt::offset(m2, 0, 1)));
 
-
   CHECK(tt::eq(tt::MatrixXXd<2, 1, tt::ColMajor>(5.0, 6.0), tt::tail<2>(m)));
   CHECK(tt::eq(tt::MatrixXXd<2, 2, tt::ColMajor>(2.0, 3.0, 5.0, 6.0), tt::tail<2, 2>(m)));
   CHECK(tt::eq(tt::MatrixXXd<3, 1, tt::ColMajor>(4.0, 5.0, 6.0), tt::tail<3, 1>(m)));

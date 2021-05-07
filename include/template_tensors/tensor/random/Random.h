@@ -53,7 +53,7 @@ private:
 #undef SuperType
 #undef ThisType
 
-template <size_t... TDims, typename TGenerator, typename TDistribution>
+template <metal::int_... TDims, typename TGenerator, typename TDistribution>
 __host__ __device__
 auto random(TGenerator&& generator, TDistribution&& distribution)
 RETURN_AUTO(RandomTensor<util::store_member_t<TGenerator&&>, util::store_member_t<TDistribution&&>, DimSeq<TDims...>>

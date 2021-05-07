@@ -69,7 +69,7 @@ RETURN_AUTO(aggregator::elwise(
   util::forward<TDimArgs>(dim_args)...
 ))
 
-template <size_t... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,
+template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,
   ENABLE_IF(math::gt(sizeof...(TDims), 0UL))>
 __host__ __device__
 auto elwise(TElwiseAggregator aggregator, TIndexStrategy index_strategy)
@@ -78,7 +78,7 @@ RETURN_AUTO(detail::elwise_helper<typename std::decay<TElwiseAggregator>::type, 
   index_strategy
 ))
 
-template <size_t... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,
+template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,
   ENABLE_IF(math::gt(sizeof...(TDims), 0UL))>
 __host__ __device__
 auto elwise(TElwiseAggregator aggregator)

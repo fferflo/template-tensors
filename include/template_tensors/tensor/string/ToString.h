@@ -2,7 +2,7 @@
 
 namespace template_tensors {
 
-template <size_t TMaxLen = 64, typename TIntegral>
+template <metal::int_ TMaxLen = 64, typename TIntegral>
 __host__ __device__
 auto itoa(TIntegral i)
 {
@@ -33,7 +33,7 @@ auto itoa(TIntegral i)
   return template_tensors::tail(util::move(result), TMaxLen - 1 - index);
 }
 
-template <size_t TMaxLen = 64, typename TFloat>
+template <metal::int_ TMaxLen = 64, typename TFloat>
 __host__ __device__
 auto ftoa(TFloat f, size_t max_significant_digits = 8)
 {

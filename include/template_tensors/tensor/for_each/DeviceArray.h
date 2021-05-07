@@ -1,3 +1,5 @@
+#include <metal.hpp>
+
 namespace template_tensors {
 
 namespace op {
@@ -5,7 +7,7 @@ namespace op {
 #ifdef __CUDACC__
 namespace detail {
 
-template <size_t TStep, typename TIndexStrategy, size_t TCoordsRank, typename TFunctor, typename... TElementTypes>
+template <metal::int_ TStep, typename TIndexStrategy, metal::int_ TCoordsRank, typename TFunctor, typename... TElementTypes>
 __global__
 void kernel_for_each_array_element_with_coords(TFunctor func, TIndexStrategy index_strategy, VectorXs<TCoordsRank> dims, size_t size, TElementTypes*... arrays)
 {
@@ -15,14 +17,14 @@ void kernel_for_each_array_element_with_coords(TFunctor func, TIndexStrategy ind
   }
 }
 
-template <size_t TCoordsRank>
+template <metal::int_ TCoordsRank>
 struct DeviceArrayForEachHelper
 {
-  template <size_t TBlockSize, size_t TGridSize, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TBlockSize, metal::int_ TGridSize, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, size_t size, TTensorTypes&&... tensors)
   {
-    using IndexStrategy = indexstrategy_t<tmp::ts::get_t<0, tmp::ts::Sequence<TTensorTypes...>>>;
+    using IndexStrategy = indexstrategy_t<metal::front<metal::list<TTensorTypes...>>>;
 
     dim3 block, grid;
     block = dim3(TBlockSize);
@@ -38,7 +40,7 @@ struct DeviceArrayForEachHelper
   }
 };
 
-template <size_t TStep, typename TFunctor, typename... TElementTypes>
+template <metal::int_ TStep, typename TFunctor, typename... TElementTypes>
 __global__
 void kernel_for_each_array_element(TFunctor func, size_t size, TElementTypes*... arrays)
 {
@@ -51,7 +53,7 @@ void kernel_for_each_array_element(TFunctor func, size_t size, TElementTypes*...
 template <>
 struct DeviceArrayForEachHelper<DYN>
 {
-  template <size_t TBlockSize, size_t TGridSize, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TBlockSize, metal::int_ TGridSize, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, size_t size, TTensorTypes&&... tensors)
   {
@@ -71,7 +73,7 @@ struct DeviceArrayForEachHelper<DYN>
 
 } // end of ns detail
 
-template <size_t TBlockSize = 128, size_t TGridSize = 96> // TODO: values for TBlockSize and TGridSize
+template <metal::int_ TBlockSize = 128, metal::int_ TGridSize = 96> // TODO: values for TBlockSize and TGridSize
 struct DeviceArrayForEach
 {
   template <bool TIsOnHost, typename... TTensorTypes>
@@ -91,7 +93,7 @@ struct DeviceArrayForEach
   template <bool TIsOnHost, typename... TTensorTypes>
   TVALUE(bool, is_parallel_v, true)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {
@@ -99,8 +101,7 @@ struct DeviceArrayForEach
     ASSERT(math::eq(tensors.getIndexStrategy()...), "Storages must have the same indexing strategy");
     ASSERT(template_tensors::all(template_tensors::elwise(math::functor::eq(), tensors.dims()...)), "Incompatible runtime dimensions");
     static_assert(are_compatible_dimseqs_v<dimseq_t<TTensorTypes>...>::value, "Incompatible static dimensions");
-    static_assert(tmp::ts::are_same_v<tmp::ts::Sequence<indexstrategy_t<TTensorTypes>...>>::value,
-      "Storages must have the same indexing strategy");
+    static_assert(metal::same<indexstrategy_t<TTensorTypes>...>::value, "Storages must have the same indexing strategy");
 
     detail::DeviceArrayForEachHelper<TCoordsRank>::template for_each<TBlockSize, TGridSize>(
       util::forward<TFunctor>(func),
@@ -114,7 +115,7 @@ struct DeviceArrayForEach
 
 #else
 
-template <size_t TBlockSize = 128, size_t TGridSize = 96> // TODO: values for TBlockSize and TGridSize
+template <metal::int_ TBlockSize = 128, metal::int_ TGridSize = 96> // TODO: values for TBlockSize and TGridSize
 struct DeviceArrayForEach
 {
   template <bool TIsOnHost, typename... TTensorTypes>
@@ -129,7 +130,7 @@ struct DeviceArrayForEach
   template <bool TIsOnHost, typename... TTensorTypes>
   TVALUE(bool, is_parallel_v, true)
 
-  template <size_t TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
+  template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorTypes>
   __host__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors)
   {

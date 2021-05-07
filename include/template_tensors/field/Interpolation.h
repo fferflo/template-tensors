@@ -4,7 +4,7 @@ namespace interpolate {
 
 namespace detail {
 
-template <size_t I, size_t N>
+template <metal::int_ I, metal::int_ N>
 struct SeparableInterpolatorHelper
 {
   template <typename TMonoInterpolator, typename TScalar>
@@ -32,7 +32,7 @@ struct SeparableInterpolatorHelper
   )
 };
 
-template <size_t I>
+template <metal::int_ I>
 struct SeparableInterpolatorHelper<I, I>
 {
   template <typename TMonoInterpolator, typename TTensorType, typename TWeightsVector>
@@ -50,7 +50,7 @@ private:
   TMonoInterpolator m_mono_interpolator;
 
 public:
-  static const size_t ARG_NUM = std::decay<TMonoInterpolator>::type::ARG_NUM;
+  static const metal::int_ ARG_NUM = std::decay<TMonoInterpolator>::type::ARG_NUM;
 
   __host__ __device__
   Separable(TMonoInterpolator mono_interpolator = TMonoInterpolator())
@@ -67,7 +67,7 @@ public:
 
 struct Linear
 {
-  static const size_t ARG_NUM = 2;
+  static const metal::int_ ARG_NUM = 2;
 
   template <typename TValuesVector, typename TScalar>
   __host__ __device__
@@ -77,7 +77,7 @@ struct Linear
 
 struct Nearest
 {
-  static const size_t ARG_NUM = 2;
+  static const metal::int_ ARG_NUM = 2;
 
   template <typename TValuesVector, typename TScalar>
   __host__ __device__
@@ -89,17 +89,17 @@ struct Nearest
 
 namespace field {
 
-template <typename TDiscreteField, typename TInterpolator, size_t TRank = std::decay<TDiscreteField>::type::RANK>
+template <typename TDiscreteField, typename TInterpolator, metal::int_ TRank = std::decay<TDiscreteField>::type::RANK>
 class InterpolatedField
 {
 public:
-  static const size_t RANK = TRank;
+  static const metal::int_ RANK = TRank;
 
 private:
   TDiscreteField m_discrete_field;
   TInterpolator m_interpolator;
 
-  static const size_t ARG_NUM = std::decay<TInterpolator>::type::ARG_NUM;
+  static const metal::int_ ARG_NUM = std::decay<TInterpolator>::type::ARG_NUM;
 
   struct ShiftCoordinates
   {
@@ -117,7 +117,7 @@ private:
   static auto get2(TThisType&& self, TCoordVector&& coords, template_tensors::VectorXi<RANK> grid_coords)
   RETURN_AUTO(
     util::forward<TThisType>(self).m_interpolator(
-      template_tensors::fromSupplier<tmp::vs::repeat_t<size_t, ARG_NUM, TRank>, TRank>(
+      template_tensors::fromSupplier<template_tensors::repeat_dimseq_t<ARG_NUM, TRank>, TRank>(
         field::transform(util::forward<TThisType>(self).m_discrete_field, ShiftCoordinates{grid_coords})
       ),
       coords - grid_coords
@@ -142,16 +142,16 @@ public:
 
 namespace detail {
 
-template <size_t TInRank, typename TDiscreteField>
+template <metal::int_ TInRank, typename TDiscreteField>
 struct InterpolateRank
 {
-  static const size_t value = TInRank;
+  static const metal::int_ value = TInRank;
 };
 
 template <typename TDiscreteField>
 struct InterpolateRank<template_tensors::DYN, TDiscreteField>
 {
-  static const size_t value = std::decay<TDiscreteField>::type::RANK;
+  static const metal::int_ value = std::decay<TDiscreteField>::type::RANK;
 };
 
 } // end of ns detail

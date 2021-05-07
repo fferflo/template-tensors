@@ -25,21 +25,21 @@ public:
   HD_WARNING_DISABLE
   template <typename TThisType>
   __host__ __device__
-  static auto getElement(TThisType&& self, size_t row)
+  static auto getElement(TThisType&& self, dim_t row)
   RETURN_AUTO(
     self.m_matrix(row, row)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SIZE_T_N(getElement, 1)
+  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
-  template <size_t TIndex>
+  template <metal::int_ TIndex>
   __host__ __device__
-  size_t getDynDim() const
+  dim_t getDynDim() const
   {
     return TIndex == 0 ? m_matrix.rows() : 1;
   }
 
   __host__ __device__
-  size_t getDynDim(size_t index) const
+  dim_t getDynDim(size_t index) const
   {
     return index == 0 ? m_matrix.rows() : 1;
   }

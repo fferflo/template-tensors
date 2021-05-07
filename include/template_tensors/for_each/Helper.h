@@ -4,7 +4,7 @@
 
 namespace for_each {
 
-static const size_t DYN = static_cast<size_t>(-1);
+static const metal::int_ DYN = static_cast<metal::int_>(-1);
 
 namespace detail {
 

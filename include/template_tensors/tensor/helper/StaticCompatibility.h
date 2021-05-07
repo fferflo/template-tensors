@@ -2,50 +2,50 @@ namespace template_tensors {
 
 namespace detail {
 
-template <size_t... TDims>
+template <metal::int_... TDims>
 struct CombineDims;
 
-template <size_t TDim>
+template <metal::int_ TDim>
 struct CombineDims<TDim>
 {
-  static const size_t value = TDim;
+  static const metal::int_ value = TDim;
 };
 
-template <size_t TDim0, size_t TDim1, size_t... TRestDims>
+template <metal::int_ TDim0, metal::int_ TDim1, metal::int_... TRestDims>
 struct CombineDims<TDim0, TDim1, TRestDims...>
 {
   static_assert(TDim0 == DYN || TDim1 == DYN || TDim0 == TDim1, "Incompatible dimensions");
-  static const size_t value = TDim0 != DYN ? CombineDims<TDim0, TRestDims...>::value : CombineDims<TDim1, TRestDims...>::value;
+  static const metal::int_ value = TDim0 != DYN ? CombineDims<TDim0, TRestDims...>::value : CombineDims<TDim1, TRestDims...>::value;
 };
 
 template <typename... TDimSeqs>
 struct CombineDimSeqs
 {
-  static const size_t MAX_RANK = math::max(non_trivial_dimensions_num_v<TDimSeqs>::value...);
+  static const metal::int_ MAX_RANK = math::max(non_trivial_dimensions_num_v<TDimSeqs>::value...);
 
-  template <size_t TRank>
-  static constexpr size_t combine_at()
+  template <metal::int_ TRank>
+  static constexpr metal::int_ combine_at()
   {
     return CombineDims<nth_dimension_v<TRank, TDimSeqs>::value...>::value;
   }
 
-  template <size_t... TIndices>
-  static auto deduce(tmp::vs::IndexSequence<TIndices...>)
+  template <metal::int_... TIndices>
+  static auto deduce(metal::numbers<TIndices...>)
   RETURN_AUTO(DimSeq<combine_at<TIndices>()...>())
 
-  using type = decltype(deduce(tmp::vs::ascending_numbers_t<MAX_RANK>()));
+  using type = decltype(deduce(metal::iota<metal::number<0>, metal::number<MAX_RANK>>()));
 };
 
-template <size_t... TDims>
+template <metal::int_... TDims>
 struct AreCompatibleDims;
 
-template <size_t TDim>
+template <metal::int_ TDim>
 struct AreCompatibleDims<TDim>
 {
   static const bool value = true;
 };
 
-template <size_t TDim0, size_t TDim1, size_t... TRestDims>
+template <metal::int_ TDim0, metal::int_ TDim1, metal::int_... TRestDims>
 struct AreCompatibleDims<TDim0, TDim1, TRestDims...>
 {
   static const bool value = (TDim0 == DYN || TDim1 == DYN || TDim0 == TDim1)
@@ -55,21 +55,21 @@ struct AreCompatibleDims<TDim0, TDim1, TRestDims...>
 template <typename... TDimSeqs>
 struct AreCompatibleDimSeqs
 {
-  static const size_t MAX_RANK = math::max(non_trivial_dimensions_num_v<TDimSeqs>::value...);
+  static const metal::int_ MAX_RANK = math::max(non_trivial_dimensions_num_v<TDimSeqs>::value...);
 
-  template <size_t TRank>
+  template <metal::int_ TRank>
   static constexpr bool compatible_at()
   {
     return AreCompatibleDims<nth_dimension_v<TRank, TDimSeqs>::value...>::value;
   }
 
-  template <size_t... TIndices>
-  static constexpr bool get(tmp::vs::IndexSequence<TIndices...>)
+  template <metal::int_... TIndices>
+  static constexpr bool get(metal::numbers<TIndices...>)
   {
     return math::landsc(compatible_at<TIndices>()...);
   }
 
-  static const bool value = get(tmp::vs::ascending_numbers_t<MAX_RANK>());
+  static const bool value = get(metal::iota<metal::number<0>, metal::number<MAX_RANK>>());
 };
 
 } // end of ns detail
@@ -78,15 +78,15 @@ struct AreCompatibleDimSeqs
 
 
 
-template <size_t... TDims>
-TVALUE(size_t, combine_dims_v, detail::CombineDims<TDims...>::value);
+template <metal::int_... TDims>
+TVALUE(metal::int_, combine_dims_v, detail::CombineDims<TDims...>::value);
 template <typename... TDimSeqOrTensors>
 using combine_dimseqs_t = typename detail::CombineDimSeqs<dimseq_t<TDimSeqOrTensors>...>::type;
 
-template <size_t... TDims>
-TVALUE(size_t, are_compatible_dims_v, detail::AreCompatibleDims<TDims...>::value);
+template <metal::int_... TDims>
+TVALUE(metal::int_, are_compatible_dims_v, detail::AreCompatibleDims<TDims...>::value);
 template <typename... TDimSeqOrTensors>
-TVALUE(size_t, are_compatible_dimseqs_v, detail::AreCompatibleDimSeqs<TDimSeqOrTensors...>::value);
+TVALUE(metal::int_, are_compatible_dimseqs_v, detail::AreCompatibleDimSeqs<TDimSeqOrTensors...>::value);
 
 
 

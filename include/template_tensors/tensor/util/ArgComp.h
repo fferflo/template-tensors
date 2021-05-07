@@ -1,6 +1,6 @@
 namespace template_tensors {
 
-template <size_t TRank2 = DYN, typename TTensorType, typename TCompareFunctor, size_t TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
+template <metal::int_ TRank2 = DYN, typename TTensorType, typename TCompareFunctor, metal::int_ TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
 __host__ __device__
 VectorXs<TRank> argcomp(TTensorType&& tensor, TCompareFunctor compare)
 {
@@ -16,7 +16,7 @@ VectorXs<TRank> argcomp(TTensorType&& tensor, TCompareFunctor compare)
   return best_pos;
 }
 
-template <size_t TRank2, typename TTensorType, size_t TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
+template <metal::int_ TRank2, typename TTensorType, metal::int_ TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
 __host__ __device__
 VectorXs<TRank> argmax(TTensorType&& tensor)
 {
@@ -24,7 +24,7 @@ VectorXs<TRank> argmax(TTensorType&& tensor)
 }
 
 namespace functor {
-  template <size_t TRank = DYN>
+  template <metal::int_ TRank = DYN>
   struct argmax
   {
     template <typename TTensorType>
@@ -34,7 +34,7 @@ namespace functor {
   };
 }
 
-template <size_t TRank2, typename TTensorType, size_t TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
+template <metal::int_ TRank2, typename TTensorType, metal::int_ TRank = TRank2 != DYN ? TRank2 : non_trivial_dimensions_num_v<TTensorType>::value>
 __host__ __device__
 VectorXs<TRank> argmin(TTensorType&& tensor)
 {
@@ -42,7 +42,7 @@ VectorXs<TRank> argmin(TTensorType&& tensor)
 }
 
 namespace functor {
-  template <size_t TRank = DYN>
+  template <metal::int_ TRank = DYN>
   struct argmin
   {
     template <typename TTensorType>
