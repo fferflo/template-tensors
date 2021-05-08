@@ -459,4 +459,4 @@ RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tenso
  * @}
  */
 
-} // end of ns tensor
+} // end of ns template_tensors

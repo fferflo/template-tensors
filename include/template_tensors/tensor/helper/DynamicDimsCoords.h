@@ -275,4 +275,4 @@ constexpr size_t getNonTrivialDimensionsNum(TDimArgTypes&&... dims)
   return detail::GetNonTrivialDimensionsNumHelper<dimension_num_v<TDimArgTypes&&...>::value>::getNonTrivialDimensionsNum(util::forward<TDimArgTypes>(dims)...);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

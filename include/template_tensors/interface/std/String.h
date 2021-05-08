@@ -107,4 +107,4 @@ std::basic_string<decay_elementtype_t<TVectorType>, TAllocator> toStdstring(TVec
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

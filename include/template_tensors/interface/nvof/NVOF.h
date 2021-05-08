@@ -264,6 +264,6 @@ struct decode_flow
 
 } // end of ns nvof
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

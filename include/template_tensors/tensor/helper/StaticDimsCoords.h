@@ -220,4 +220,4 @@ using dimseq_make_length_t = typename detail::DimSeqMakeLength<dimseq_t<TDimSeqO
 template <typename TCoordSeq, metal::int_ TLength>
 using coordseq_make_length_t = typename detail::CoordSeqMakeLength<TCoordSeq, metal::iota<metal::number<0>, metal::number<TLength>>>::type;
 
-} // end of ns tensor
+} // end of ns template_tensors

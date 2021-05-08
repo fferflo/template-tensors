@@ -103,6 +103,6 @@ std::vector<std::string> getAttributes(::boost::python::object object)
 
 } // end of ns boost
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

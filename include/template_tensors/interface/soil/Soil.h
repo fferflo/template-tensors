@@ -109,6 +109,6 @@ auto fromSoil(soil::Image& image)
   );
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

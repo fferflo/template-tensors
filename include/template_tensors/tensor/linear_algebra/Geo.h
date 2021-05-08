@@ -54,4 +54,4 @@ template_tensors::VectorXT<TScalar, 2> toLatLon(TVectorType&& mercator)
 
 } // end of ns geo
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -40,6 +40,6 @@ __host__
 
 } // end of ns boost
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

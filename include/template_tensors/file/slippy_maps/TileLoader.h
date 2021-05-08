@@ -84,6 +84,6 @@ private:
 
 } // end of ns slippy_maps
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

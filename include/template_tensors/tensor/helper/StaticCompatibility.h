@@ -98,4 +98,4 @@ static_assert(!are_compatible_dimseqs_v<DimSeq<1, 3>, DimSeq<1>>::value, "are_co
 static_assert(are_compatible_dimseqs_v<DimSeq<>, DimSeq<1, 1, 1>>::value, "are_compatible_dimseqs_v not working");
 static_assert(!are_compatible_dimseqs_v<DimSeq<0>, DimSeq<>>::value, "are_compatible_dimseqs_v not working");
 
-} // end of ns tensor
+} // end of ns template_tensors

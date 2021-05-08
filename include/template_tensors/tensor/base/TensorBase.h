@@ -69,4 +69,4 @@ static_assert(sizeof(template_tensors::Matrix34f) == 3 * 4 * sizeof(float), "Inv
 
 } // end of ns detail
 
-} // end of ns tensor
+} // end of ns template_tensors

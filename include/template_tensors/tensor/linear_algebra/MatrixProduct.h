@@ -183,4 +183,4 @@ RETURN_AUTO(matmul_eval(
   util::forward<TMatrixTypeRest>(rest)...
 ))
 
-} // end of ns tensor
+} // end of ns template_tensors

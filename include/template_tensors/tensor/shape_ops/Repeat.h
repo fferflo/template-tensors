@@ -201,4 +201,4 @@ __host__ __device__
 auto repeat(TOtherTensorType&& tensor, TRepetitionsScalar&& repetitions)
 RETURN_AUTO(repeat(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TRepetitionsScalar>(repetitions))))
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -120,4 +120,4 @@ __host__ __device__
 auto eye(TDimArgTypes&&... dim_args)
 RETURN_AUTO(IdentityMatrix<TElementType, TRank>(util::forward<TDimArgTypes>(dim_args)...))
 
-} // end of ns tensor
+} // end of ns template_tensors

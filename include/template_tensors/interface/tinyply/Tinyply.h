@@ -375,6 +375,6 @@ void write(const boost::filesystem::path& path, bool binary, TElements&&... elem
 
 } // end of ns tinyply
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

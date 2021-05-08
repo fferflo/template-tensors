@@ -179,4 +179,4 @@ private:
   TScalar m_scale;
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

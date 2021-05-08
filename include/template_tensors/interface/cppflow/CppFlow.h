@@ -27,6 +27,6 @@ cppflow::tensor toCppFlow(TTensorType&& tensor)
   return cppflow::tensor(tfe_handle);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

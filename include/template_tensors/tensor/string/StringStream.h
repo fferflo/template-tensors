@@ -96,4 +96,4 @@ __host__ __device__
 auto operator<<(stringstream<TChar>& stream, T&& object)
 RETURN_AUTO(stream.append(to_string<TChar>(util::forward<T>(object))))
 
-} // end of ns tensor
+} // end of ns template_tensors

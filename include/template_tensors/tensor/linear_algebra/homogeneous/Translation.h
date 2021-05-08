@@ -90,4 +90,4 @@ RETURN_AUTO(
   HomogenizedTranslation<util::store_member_t<TVectorType&&>>(util::forward<TVectorType>(translation))
 )
 
-} // end of ns tensor
+} // end of ns template_tensors

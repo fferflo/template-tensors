@@ -275,6 +275,6 @@ SafeDLManagedTensor toDlPack(TTensorType&& tensor)
   return toDlPack(::boost::make_unique<typename std::decay<TTensorType>::type>(util::forward<TTensorType>(tensor)));
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

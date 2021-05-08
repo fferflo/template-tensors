@@ -41,4 +41,4 @@ PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object)
   return util::move(stream);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

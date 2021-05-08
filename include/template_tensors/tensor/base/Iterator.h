@@ -74,4 +74,4 @@ public:
   FORWARD_ALL_QUALIFIERS(end, end1)
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

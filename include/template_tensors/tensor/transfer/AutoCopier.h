@@ -86,4 +86,4 @@ void copy(TTensorDest&& dest, TTensorSrc&& src)
   op::AutoCopier<>::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

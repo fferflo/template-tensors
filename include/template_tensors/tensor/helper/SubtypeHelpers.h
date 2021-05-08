@@ -129,4 +129,4 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElementForwardSizeT__)
 
-} // end of ns tensor
+} // end of ns template_tensors

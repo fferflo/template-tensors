@@ -397,4 +397,4 @@ dim_t count(TTensorType&& t)
  * @}
  */
 
-} // end of ns tensor
+} // end of ns template_tensors

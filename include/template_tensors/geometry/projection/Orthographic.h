@@ -82,4 +82,4 @@ std::ostream& operator<<(std::ostream& stream, const Orthographic<TScalar, TRank
 
 } // end of ns geometry
 
-} // end of ns tensor
+} // end of ns template_tensors

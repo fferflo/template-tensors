@@ -244,7 +244,7 @@ void load(TArchive& archive, MortonDivideAndConquer<TRank>& m)
 template <metal::int_ TRank>
 using Morton = MortonDivideAndConquer<TRank>;
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 template <metal::int_ TRank>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::MortonDivideAndConquer<TRank>));

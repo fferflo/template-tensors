@@ -43,4 +43,4 @@ RETURN_AUTO(::tuple::for_all(
   util::forward<TTuple>(tuple)
 ))
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -224,4 +224,4 @@ public:
 };
 #undef SuperType
 
-} // end of ns tensor
+} // end of ns template_tensors

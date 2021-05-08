@@ -43,4 +43,4 @@ struct is_vector_v
   TMP_DEDUCE_VALUE(TArg);
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

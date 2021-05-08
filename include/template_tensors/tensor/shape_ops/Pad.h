@@ -435,4 +435,4 @@ RETURN_AUTO(pad_front(
   util::forward<TPaddingScalar>(padding), util::forward<TBackgroundFunctor>(background)
 ))
 
-} // end of ns tensor
+} // end of ns template_tensors

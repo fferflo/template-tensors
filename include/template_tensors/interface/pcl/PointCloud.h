@@ -124,6 +124,6 @@ FromPCLWrapperTensor<pcl::PointCloud<TPointType>> fromPcl(const pcl::PointCloud<
   return FromPCLWrapperTensor<pcl::PointCloud<TPointType>>(pcl);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

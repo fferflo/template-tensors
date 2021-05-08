@@ -65,7 +65,7 @@ struct print_duration<metal::list<TFirst, TRest...>>
 
 } // end of ns detail
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 template <typename TRep, typename TPeriod>
 std::ostream& operator<<(std::ostream& stream, const std::chrono::duration<TRep, TPeriod>& duration)

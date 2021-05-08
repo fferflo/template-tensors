@@ -36,4 +36,4 @@ struct tensor_indexstrategy_can_convert_from_index_v
 
 } // end of ns op
 
-} // end of ns tensor
+} // end of ns template_tensors

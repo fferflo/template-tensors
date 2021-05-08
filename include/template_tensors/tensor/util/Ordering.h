@@ -173,4 +173,4 @@ ORDER_COMPARE(gte, >=)
 
 #undef ORDER_COMPARE
 
-} // end of ns tensor
+} // end of ns template_tensors

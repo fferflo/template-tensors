@@ -116,4 +116,4 @@ RETURN_AUTO(ConvolutionTensor<util::store_member_t<TInputType&&>, util::store_me
   (util::forward<TInputType>(input), util::forward<TKernelType>(kernel))
 );
 
-} // end of ns tensor
+} // end of ns template_tensors

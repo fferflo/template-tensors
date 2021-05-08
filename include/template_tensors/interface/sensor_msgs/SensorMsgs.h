@@ -25,6 +25,6 @@ geometry::projection::Pinhole<TScalar, 3> fromSensorMsgs(const sensor_msgs::Came
   return fromSensorMsgs<TScalar>(*camera_info);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

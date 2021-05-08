@@ -132,4 +132,4 @@ using Iterable = IterableEx<TElementType, TIterable, sizeof...(TDims), DimSeq<TD
 
 } // end of ns sparse
 */
-} // end of ns tensor
+} // end of ns template_tensors

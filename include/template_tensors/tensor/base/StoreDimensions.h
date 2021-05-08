@@ -69,4 +69,4 @@ class StoreDimensions : public detail::StoreDimensionsImpl<is_static_v<TDimSeq>:
   using detail::StoreDimensionsImpl<is_static_v<TDimSeq>::value, TDimSeq>::StoreDimensionsImpl;
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

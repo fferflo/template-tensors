@@ -34,6 +34,6 @@ void save(const boost::filesystem::path& path, TTensorType&& tensor)
 
 } // end of ns opencv
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

@@ -128,4 +128,4 @@ __host__ __device__
 auto coordinates()
 RETURN_AUTO(fromSupplier<TDimSeq, TSupplierDims>(math::functor::id()))
 
-} // end of ns tensor
+} // end of ns template_tensors

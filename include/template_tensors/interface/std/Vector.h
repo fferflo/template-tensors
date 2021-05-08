@@ -194,4 +194,4 @@ std::vector<decay_elementtype_t<TVectorType>, TAllocator> toStdVector(TVectorTyp
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

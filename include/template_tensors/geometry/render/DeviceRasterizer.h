@@ -98,6 +98,6 @@ public:
 
 } // end of ns geometry
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

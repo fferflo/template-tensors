@@ -53,6 +53,6 @@ tf::Transform toTf(const transform::Rigid<TScalar, 3>& t)
 
 } // end of ns geometry
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

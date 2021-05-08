@@ -89,6 +89,6 @@ void load(TArchive& archive, SymmetricMatrixLowerTriangleRowMajor& m)
 }
 #endif
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE_NOTEMPLATE((template_tensors::SymmetricMatrixLowerTriangleRowMajor));

@@ -104,4 +104,4 @@ struct have_same_indexstrategy_v<>
   static const bool value = true;
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

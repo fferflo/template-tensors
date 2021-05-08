@@ -219,6 +219,6 @@ __host__
 auto fromFreeImageRgb(TFreeImage&& freeimage)
 RETURN_AUTO(detail::fromFreeImage(detail::FreeImageRgbaUnpacker<false, TElementType>(freeimage), util::forward<TFreeImage>(freeimage)))
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

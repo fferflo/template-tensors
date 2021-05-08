@@ -66,4 +66,4 @@ Quaternion<T> inverse(Quaternion<T> quaternion)
 
 } // end of ns quaternion
 
-} // end of ns tensor
+} // end of ns template_tensors

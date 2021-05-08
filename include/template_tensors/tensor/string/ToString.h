@@ -151,4 +151,4 @@ __host__ __device__
 auto to_string(TCharIn* ptr)
 RETURN_AUTO(template_tensors::ref<template_tensors::ColMajor, mem::LOCAL>(ptr, count_null_terminated_length(ptr)))
 
-} // end of ns tensor
+} // end of ns template_tensors

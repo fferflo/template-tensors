@@ -82,4 +82,4 @@ RETURN_AUTO(TransposedTensor<util::store_member_t<TOtherTensorType&&>, TTranspos
   (util::forward<TOtherTensorType>(tensor))
 );
 
-} // end of ns tensor
+} // end of ns template_tensors

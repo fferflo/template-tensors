@@ -153,4 +153,4 @@ RETURN_AUTO(
   (util::forward<TTensorType>(tensor), util::forward<TMaskIterator>(mask))
 )
 
-} // end of ns tensor
+} // end of ns template_tensors

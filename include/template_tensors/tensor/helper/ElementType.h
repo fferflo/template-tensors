@@ -31,4 +31,4 @@ using decay_elementtype_t = typename std::decay<decltype(std::declval<TTensorRef
 template <typename... TTensorTypes>
 using common_elementtype_t = typename detail::CombineTensorMemberElementTypesHelper<TTensorTypes...>::type;
 
-} // end of ns tensor
+} // end of ns template_tensors

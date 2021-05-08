@@ -167,4 +167,4 @@ inline std::map<uint32_t, ImageMetaData> readImageMetaData(const boost::filesyst
 
 } // end of ns colmap
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -211,4 +211,4 @@ bool coordsAreInRange(TDimArgType&& dim_arg, TCoordArgTypes&&... coords)
             (util::forward<TDimArgType>(dim_arg), util::forward<TCoordArgTypes>(coords)...);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

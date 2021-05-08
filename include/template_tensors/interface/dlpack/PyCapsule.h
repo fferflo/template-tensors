@@ -50,7 +50,7 @@ inline SafeDLManagedTensor toDlPack(::boost::python::object capsule, const char*
 
 } // end of ns boost
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif
 #endif

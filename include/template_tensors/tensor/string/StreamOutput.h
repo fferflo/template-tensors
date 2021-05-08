@@ -59,4 +59,4 @@ TStreamType&& operator<<(TStreamType&& stream, const TTensorType& tensor)
   return util::forward<TStreamType>(stream);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -222,7 +222,7 @@ void load(TArchive& archive, Stride<TRank>& m)
 }
 #endif
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 template <metal::int_ TRank>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::Stride<TRank>));

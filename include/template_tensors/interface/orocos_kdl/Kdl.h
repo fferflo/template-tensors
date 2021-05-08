@@ -77,6 +77,6 @@ KDL::Frame toKdlFrame(const geometry::transform::Rigid<TScalar, 3>& transform)
   return KDL::Frame(toKdlRot(transform.getRotation()), toKdlVec(transform.getTranslation()));
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

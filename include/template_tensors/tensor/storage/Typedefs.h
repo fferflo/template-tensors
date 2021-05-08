@@ -297,4 +297,4 @@ using LocalOrAllocTensorT = typename detail::LocalOrAllocTensorTHelper<TElementT
   is_static_v<TDimSeq>::value && mem::isOnLocal<TAllocator::MEMORY_TYPE>()
 >::type;
 
-} // end of ns tensor
+} // end of ns template_tensors

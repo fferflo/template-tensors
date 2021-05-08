@@ -18,4 +18,4 @@ struct is_string_v
 static_assert(is_string_v<template_tensors::AllocVectorT<char, mem::alloc::heap, template_tensors::ColMajor>, char>::value, "is_string_v not working");
 static_assert(!is_string_v<double, char>::value, "is_string_v not working");
 
-} // end of ns tensor
+} // end of ns template_tensors

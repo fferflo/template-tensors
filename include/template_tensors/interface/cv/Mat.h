@@ -191,6 +191,6 @@ __host__
 auto toCv(TTensorType&& tensor)
 RETURN_AUTO(toCv(template_tensors::eval<RowMajor>(tensor)))
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

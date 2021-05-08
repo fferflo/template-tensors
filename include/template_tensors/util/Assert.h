@@ -13,7 +13,7 @@ template <typename TDummy, typename T>
 __host__ __device__
 PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object);
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 
 

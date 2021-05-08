@@ -192,4 +192,4 @@ struct toCartesian
 };
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

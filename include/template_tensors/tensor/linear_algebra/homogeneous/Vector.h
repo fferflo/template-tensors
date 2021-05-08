@@ -187,4 +187,4 @@ RETURN_AUTO(
   DehomogenizedVector<util::store_member_t<TVectorType&&>>(util::forward<TVectorType>(vector))
 )
 
-} // end of ns tensor
+} // end of ns template_tensors

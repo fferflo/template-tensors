@@ -12,4 +12,4 @@ TResultType eval(TTensorType&& tensor, TIndexStrategy index_strategy = TIndexStr
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

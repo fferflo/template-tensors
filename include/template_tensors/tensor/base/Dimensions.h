@@ -192,4 +192,4 @@ private:
 
 } // end of ns detail
 
-} // end of ns tensor
+} // end of ns template_tensors

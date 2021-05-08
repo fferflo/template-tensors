@@ -76,4 +76,4 @@ template <typename TTensorType,
 auto dummy_like()
 RETURN_AUTO(DummyTensor<TElementType, TMemoryType, TDimSeq>())
 
-} // end of ns tensor
+} // end of ns template_tensors

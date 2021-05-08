@@ -37,4 +37,4 @@ struct indexstrategy_can_convert_from_index_v
   TMP_DEDUCE_VALUE(TArg);
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

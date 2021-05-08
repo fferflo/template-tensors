@@ -301,4 +301,4 @@ ELWISE_OP_ASSIGN(operator-=, math::functor::subtractassign);
 ELWISE_OP_ASSIGN(operator*=, math::functor::multiplyassign);
 ELWISE_OP_ASSIGN(operator/=, math::functor::divideassign);
 
-} // end of ns tensor
+} // end of ns template_tensors

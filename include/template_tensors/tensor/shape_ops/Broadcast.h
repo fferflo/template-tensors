@@ -133,4 +133,4 @@ void fill(TTensorType&& tensor, TElementType&& fill)
  * @}
  */
 
-} // end of ns tensor
+} // end of ns template_tensors

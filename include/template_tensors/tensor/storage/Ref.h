@@ -92,4 +92,4 @@ RETURN_AUTO(template_tensors::refEx<dimseq_t<TTensorType&&>>(
   tensor.dims()
 ))
 
-} // end of ns tensor
+} // end of ns template_tensors

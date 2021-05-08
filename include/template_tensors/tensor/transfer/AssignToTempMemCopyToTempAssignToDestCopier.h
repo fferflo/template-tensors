@@ -41,4 +41,4 @@ struct AssignToTempMemCopyToTempAssignToDestCopier
 
 } // end of ns op
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -225,4 +225,4 @@ bool neq(const geometry::transform::Rigid<TScalar, TRank>& left, const geometry:
   return !eq(left, right, elwise_equals_op);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

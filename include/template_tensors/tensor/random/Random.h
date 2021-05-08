@@ -71,4 +71,4 @@ auto random(TGenerator&& generator, TDistribution&& distribution)
 RETURN_AUTO(RandomTensor<util::store_member_t<TGenerator&&>, util::store_member_t<TDistribution&&>, TDimSeq>
   (util::forward<TGenerator>(generator), util::forward<TDistribution>(distribution)));
 
-} // end of ns tensor
+} // end of ns template_tensors

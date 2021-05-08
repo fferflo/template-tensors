@@ -64,4 +64,4 @@ namespace template_tensors {
     ); \
   }
 // TODO: template_tensors::head and template_tensors::tail don't consider static dims
-} // end of ns tensor
+} // end of ns template_tensors

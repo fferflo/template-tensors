@@ -187,4 +187,4 @@ bool neq(const geometry::transform::ScaledRigid<TScalar, TRank>& left, const geo
   return !eq(left, right, elwise_equals_op);
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

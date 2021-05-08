@@ -61,4 +61,4 @@ TResultType inverse(TMatrixType&& matrix, TIndexStrategy index_strategy = TIndex
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

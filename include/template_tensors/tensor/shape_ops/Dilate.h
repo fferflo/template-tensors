@@ -226,4 +226,4 @@ __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TFactorScalar&& scalar, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(dilate(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TFactorScalar>(scalar)), util::forward<TBackgroundFunctor>(background)))
 
-} // end of ns tensor
+} // end of ns template_tensors

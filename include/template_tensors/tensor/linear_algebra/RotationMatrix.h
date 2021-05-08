@@ -214,4 +214,4 @@ __host__ __device__
 auto euler_rotation_3d(TArgs&&... angles)
 RETURN_AUTO(eval(detail::EulerRotationHelper3<TElementType, TAxes...>::template make(util::forward<TArgs>(angles)...)))
 
-} // end of ns tensor
+} // end of ns template_tensors

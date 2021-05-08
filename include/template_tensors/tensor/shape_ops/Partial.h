@@ -331,4 +331,4 @@ __host__ __device__
 auto cols(TMatrixType&& matrix)
 RETURN_AUTO(partial<0>(util::forward<TMatrixType>(matrix)))
 
-} // end of ns tensor
+} // end of ns template_tensors

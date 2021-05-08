@@ -96,4 +96,4 @@ RETURN_AUTO(
   HomogenizedRotation<util::store_member_t<TMatrixType&&>>(util::forward<TMatrixType>(rotation))
 )
 
-} // end of ns tensor
+} // end of ns template_tensors

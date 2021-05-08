@@ -13,4 +13,4 @@ public:
   FORWARD_ALL_QUALIFIERS(operator[], mask_with)
 };
 
-} // end of ns tensor
+} // end of ns template_tensors

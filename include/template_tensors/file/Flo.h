@@ -34,4 +34,4 @@ inline template_tensors::AllocMatrixT<template_tensors::Vector2f, mem::alloc::ho
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors

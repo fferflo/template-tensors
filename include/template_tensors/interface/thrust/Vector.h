@@ -256,6 +256,6 @@ thrust::device_vector<TElementType> toThrust(TTensorType&& tensor)
   return result;
 }
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 #endif

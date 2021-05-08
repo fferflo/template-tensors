@@ -166,4 +166,4 @@ bool find_unique_solution(TMatrixTypeX&& x, const TMatrixTypeAb& Ab, decay_eleme
 
 } // end of ns op
 
-} // end of ns tensor
+} // end of ns template_tensors

@@ -243,7 +243,7 @@ private:
 
 } // end of ns geometry
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 template <typename TScalar, typename TIndexType>
 TT_PROCLAIM_TRIVIALLY_RELOCATABLE((template_tensors::geometry::render::VertexIndexTriangle<TScalar, TIndexType>),

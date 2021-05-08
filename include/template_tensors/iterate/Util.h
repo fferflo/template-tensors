@@ -9,7 +9,7 @@ struct eq;
 
 } // end of ns functor
 
-} // end of ns tensor
+} // end of ns template_tensors
 
 namespace iterable {
 
