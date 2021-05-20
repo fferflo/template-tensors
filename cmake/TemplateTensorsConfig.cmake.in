@@ -52,7 +52,12 @@ if(NOT TARGET TemplateTensors::base)
   endif()
 
   if(CMAKE_CUDA_FLAGS)
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ftemplate-backtrace-limit=0 --expt-extended-lambda --extended-lambda --expt-relaxed-constexpr")
+    if(CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 11)
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+    else()
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
+    endif()
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ftemplate-backtrace-limit=0 --expt-relaxed-constexpr")
     set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -DDEBUG")
 
     set(CMAKE_CUDA_ARCHITECTURES OFF)

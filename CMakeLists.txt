@@ -20,7 +20,12 @@ find_program(NVCC_PATH nvcc)
 if(NOT ${NVCC_PATH} STREQUAL "NVCC_PATH-NOTFOUND")
   enable_language(CUDA)
 
-  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ftemplate-backtrace-limit=0 --extended-lambda --expt-extended-lambda --expt-relaxed-constexpr")
+  if(CMAKE_CUDA_COMPILER_VERSION VERSION_LESS 11)
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --expt-extended-lambda")
+  else()
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
+  endif()
+  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -ftemplate-backtrace-limit=0 --expt-relaxed-constexpr")
   set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -DDEBUG -g -G")
 
   set(CMAKE_CUDA_ARCHITECTURES OFF)
