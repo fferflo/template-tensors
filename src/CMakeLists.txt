@@ -1,5 +1,4 @@
 find_package(Boost REQUIRED COMPONENTS filesystem)
-find_package(Metal REQUIRED)
 
 add_library(base INTERFACE)
 target_include_directories(base

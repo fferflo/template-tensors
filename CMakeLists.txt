@@ -39,6 +39,7 @@ set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME})
 
 
 
+add_subdirectory(extern)
 add_subdirectory(src)
 add_subdirectory(app)
 add_subdirectory(test)
@@ -59,8 +60,9 @@ endif(DOXYGEN_FOUND)
 
 # Install headers
 if(INSTALL_HEADERS_AS_SYMLINK)
-  install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})")
-  install(CODE "message(\"-- Installed symlink: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR} -> ${CMAKE_CURRENT_SOURCE_DIR}/include\")")
+  install(CODE "file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})")
+  install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/include/template_tensors ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/template_tensors)")
+  install(CODE "message(\"-- Installed symlink: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/template_tensors -> ${CMAKE_CURRENT_SOURCE_DIR}/include/template_tensors\")")
 else()
   install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endif()
