@@ -19,7 +19,15 @@
 #endif
 
 #include <boost/preprocessor/facilities/overload.hpp>
+
 #ifdef __CUDACC__
+#include <cuda.h>
+#define USE_THRUST_TRIVIAL_RELOCATION (CUDA_VERSION > 10000)
+#else
+#define USE_THRUST_TRIVIAL_RELOCATION false
+#endif
+
+#if USE_THRUST_TRIVIAL_RELOCATION
 #include <thrust/type_traits/is_trivially_relocatable.h>
 #endif
 
@@ -465,29 +473,28 @@ using default_for =
 } // end of ns alloc
 
 
-
+#if !USE_THRUST_TRIVIAL_RELOCATION
 namespace detail {
-
 template <typename TArg>
 struct proclaim_trivially_relocatable
 {
   static const bool value = false;
 };
-
 } // end of ns detail
+#endif
 
 template <typename TArg>
 struct is_trivially_relocatable_v
 {
   static const bool value =
-#ifdef __CUDACC__
+#if USE_THRUST_TRIVIAL_RELOCATION
     ::thrust::is_trivially_relocatable<typename std::decay<TArg>::type>::value;
 #else
     detail::proclaim_trivially_relocatable<typename std::decay<TArg>::type>::value;
 #endif
 };
 
-#ifdef __CUDACC__
+#if USE_THRUST_TRIVIAL_RELOCATION
 #define TT_PROCLAIM_TRIVIALLY_RELOCATABLE_2(TYPE, ...) \
   struct thrust::proclaim_trivially_relocatable<ESC TYPE> \
     : std::conditional<__VA_ARGS__, ::thrust::true_type, ::thrust::false_type>::type \
