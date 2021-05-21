@@ -44,7 +44,7 @@ set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME})
 
 
 
-add_subdirectory(extern)
+include(extern/dependencies.cmake)
 add_subdirectory(src)
 add_subdirectory(app)
 add_subdirectory(test)
