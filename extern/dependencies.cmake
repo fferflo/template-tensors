@@ -1,16 +1,19 @@
+option(UPDATE_GIT_SUBMODULE "Call 'git update' on required submodules" ON)
 function(git_submodule NAME)
-  find_package(Git QUIET)
-  if(NOT GIT_FOUND)
-    message(FATAL_ERROR "Cannot build external dependencies without git")
+  if(UPDATE_GIT_SUBMODULE)
+    find_package(Git QUIET)
+    if(NOT GIT_FOUND)
+      message(FATAL_ERROR "Cannot build external dependencies without git")
+    endif()
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
+      message(FATAL_ERROR "Project is not a git directory")
+    endif()
+    execute_process(
+      COMMAND ${GIT_EXECUTABLE} submodule update --init --remote extern/${NAME}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMAND_ERROR_IS_FATAL ANY
+    )
   endif()
-  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
-    message(FATAL_ERROR "Project is not a git directory")
-  endif()
-  execute_process(
-    COMMAND ${GIT_EXECUTABLE} submodule update --init --remote extern/${NAME}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND_ERROR_IS_FATAL ANY
-  )
 endfunction()
 
 # Metal
