@@ -15,7 +15,6 @@
 #include <template_tensors/util/Array.h>
 #include <template_tensors/tmp/Reflection.h>
 #include <template_tensors/util/Constexpr.h>
-#include <template_tensors/util/Tuple.h>
 #include <template_tensors/util/Assert.h>
 #include <template_tensors/util/Math.h>
 #include <template_tensors/util/Functor.h>
@@ -163,7 +162,6 @@
 #include <template_tensors/tensor/linear_algebra/Convolution.h>
 #include <template_tensors/tensor/linear_algebra/Quaternion.h>
 #include <template_tensors/tensor/util/ArgComp.h>
-#include <template_tensors/tensor/util/Tuple.h>
 #include <template_tensors/tensor/linear_algebra/Diag.h>
 #include <template_tensors/tensor/linear_algebra/homogeneous/Vector.h>
 #include <template_tensors/tensor/linear_algebra/homogeneous/Translation.h>
@@ -212,6 +210,7 @@
 #include <template_tensors/numeric/LogProb.h>
 #include <template_tensors/numeric/FixedFloatingPoint.h>
 
+#include <template_tensors/interface/jtuple/Tuple.h>
 #include <template_tensors/interface/cublas/Gemm.h>
 #include <template_tensors/interface/cudnn/ConvolutionForward.h>
 #include <template_tensors/interface/std/Vector.h>

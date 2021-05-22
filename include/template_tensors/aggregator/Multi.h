@@ -1,5 +1,8 @@
 #pragma once
 
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
+
 namespace aggregator {
 
 namespace detail {
@@ -8,9 +11,9 @@ template <typename... TAggregators>
 class multi : public aggregator::IsAggregator
 {
 private:
-  ::tuple::Tuple<TAggregators...> m_aggregators;
+  jtuple::tuple<TAggregators...> m_aggregators;
 
-  struct Getter
+  struct Getter // TODO: replace with bind
   {
     template <typename TIn>
     __host__ __device__
@@ -21,7 +24,7 @@ private:
 public:
   __host__ __device__
   multi(TAggregators&&... aggregators)
-    : m_aggregators(::tuple::Tuple<TAggregators...>(util::forward<TAggregators>(aggregators)...))
+    : m_aggregators(jtuple::tuple<TAggregators...>(util::forward<TAggregators>(aggregators)...))
   {
   }
 
@@ -34,12 +37,12 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    ::tuple::for_each(util::functor::apply_to_all(util::forward<TInput>(input)...), m_aggregators);
+    jtuple::tuple_for_each([&](auto&& aggregator){aggregator(input...);}, m_aggregators);
   }
 
   __host__ __device__
   auto get() const
-  RETURN_AUTO(::tuple::map(Getter(), m_aggregators))
+  RETURN_AUTO(jtuple::tuple_map(Getter(), m_aggregators))
 };
 
 } // end of ns detail

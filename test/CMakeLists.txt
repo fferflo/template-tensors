@@ -193,7 +193,6 @@ add_custom_target(middlebury_flow DEPENDS middlebury_flow_gt middlebury_flow_col
 
 ######################## TEST BASICS ########################
 
-addTest(test_tuple util/TestTuple)
 addTest(test_aggregator util/TestAggregator)
 addTest(test_numeric numeric/TestNumeric)
 addTest(test_field field/TestField)
@@ -267,6 +266,8 @@ endif()
 
 
 ######################## TEST INTERFACES ########################
+
+addTest(test_jtuple interface/TestJtuple)
 
 if(TARGET interface.cublas)
   addCudaTest(test_cublas interface/TestCublas)

@@ -4,6 +4,8 @@
 
 #include <thrust/device_vector.h>
 #include <thrust/for_each.h>
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
 
 namespace template_tensors {
 
@@ -20,7 +22,7 @@ struct DeviceRasterizerFunctor
   TPrimitiveIterator primitives_end;
   TShader shader;
   template_tensors::Vector2s viewport_size;
-  ::tuple::Tuple<TArgs...> args;
+  jtuple::tuple<TArgs...> args;
 
   __host__
   DeviceRasterizerFunctor(TPrimitiveIterator primitives_begin, TPrimitiveIterator primitives_end, TShader shader, template_tensors::Vector2s viewport_size, TArgs... args)
@@ -47,7 +49,7 @@ struct DeviceRasterizerFunctor
 
       Data data;
       bool visible;
-      ::tuple::for_all([&]__device__(TArgs... args2){
+      jtuple::tuple_apply([&]__device__(TArgs... args2){
         visible = primitive.precompute(data, viewport_size, args2...);
       }, args);
       if (!visible)
@@ -64,7 +66,7 @@ struct DeviceRasterizerFunctor
         return true;
       };
 
-      ::tuple::for_all([&]__device__(TArgs... args2){
+      jtuple::tuple_apply([&]__device__(TArgs... args2){
         bool success = primitive.intersect(pos, data, handler, args2...);
         ASSERT(success, "Intersection should never fail here");
       }, args);

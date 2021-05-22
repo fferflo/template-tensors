@@ -7,7 +7,7 @@ target_include_directories(base
     $<INSTALL_INTERFACE:include>
 )
 target_compile_features(base INTERFACE cxx_std_11)
-target_link_libraries(base INTERFACE Boost::filesystem Metal)
+target_link_libraries(base INTERFACE Boost::filesystem Metal jtuple)
 target_compile_definitions(base INTERFACE
   COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES=${COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES}
   BOOST_PP_VARIADICS=1 # Force this option for versions of boost that disable it for nvcc

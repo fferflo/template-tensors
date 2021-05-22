@@ -1,3 +1,9 @@
 [submodule "extern/metal"]
 	path = extern/metal
 	url = https://github.com/brunocodutra/metal
+[submodule "extern/tuple"]
+	path = extern/tuple
+	url = https://github.com/fferflo/tuple
+[submodule "extern/tuple_utility"]
+	path = extern/tuple_utility
+	url = https://github.com/fferflo/tuple_utility

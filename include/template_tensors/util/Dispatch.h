@@ -3,6 +3,9 @@
 #include <vector>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/make_unique.hpp>
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
+#include <template_tensors/util/Util.h>
 
 namespace dispatch {
 
@@ -11,6 +14,8 @@ namespace detail {
 struct ResultToError
 {
   std::string prefix = "";
+
+  DEFAULT_COPY_MOVE_DESTRUCTOR(ResultToError)
 
   template <typename TResult>
   std::string operator()(TResult&& result) const
@@ -40,7 +45,7 @@ struct First
 {
   struct Result
   {
-    ::tuple::Tuple<typename std::decay<TDispatchers>::type::Result...> results;
+    jtuple::tuple<typename std::decay<TDispatchers>::type::Result...> results;
     size_t success_index = sizeof...(TDispatchers);
 
     operator bool() const
@@ -50,14 +55,14 @@ struct First
 
     std::string error(std::string prefix = "") const
     {
-      std::vector<std::string> errors = ::tuple::for_all(ToVector(), ::tuple::map(ResultToError{prefix + "  "}, results));
+      std::vector<std::string> errors = jtuple::tuple_apply(ToVector(), jtuple::tuple_map(ResultToError{prefix + "  "}, results));
       return prefix + std::string("None matched from:\n") + boost::algorithm::join(errors, "\n");
     }
   };
 
-  ::tuple::Tuple<TDispatchers...> dispatchers;
+  jtuple::tuple<TDispatchers...> dispatchers;
 
-  template <typename... TArgs, ENABLE_IF(std::is_constructible<::tuple::Tuple<TDispatchers...>, TArgs&&...>::value)>
+  template <typename... TArgs, ENABLE_IF(std::is_constructible<jtuple::tuple<TDispatchers...>, TArgs&&...>::value)>
   First(TArgs&&... args)
     : dispatchers(util::forward<TArgs>(args)...)
   {
@@ -80,16 +85,16 @@ struct First
     template <size_t I = 0, typename TFirst>
     Result operator()(TFirst&& first)
     {
-      ::tuple::get<I>(result.results) = first(functor);
-      result.success_index = ::tuple::get<I>(result.results) ? I : I + 1;
+      jtuple::get<I>(result.results) = first(functor);
+      result.success_index = jtuple::get<I>(result.results) ? I : I + 1;
       return result;
     }
 
     template <size_t I = 0, typename TFirst, typename TSecond, typename... TRest>
     Result operator()(TFirst&& first, TSecond&& second, TRest&&... rest)
     {
-      ::tuple::get<I>(result.results) = first(functor);
-      if (::tuple::get<I>(result.results))
+      jtuple::get<I>(result.results) = first(functor);
+      if (jtuple::get<I>(result.results))
       {
         result.success_index = I;
         return result;
@@ -103,7 +108,7 @@ struct First
 
   template <typename TFunctor>
   auto operator()(TFunctor&& functor)
-  RETURN_AUTO(::tuple::for_all(Dispatch<util::store_member_t<TFunctor&&>>(util::forward<TFunctor>(functor)), dispatchers))
+  RETURN_AUTO(jtuple::tuple_apply(Dispatch<util::store_member_t<TFunctor&&>>(util::forward<TFunctor>(functor)), dispatchers))
 };
 
 } // end of ns detail
@@ -316,13 +321,13 @@ struct ForwardAll
   template <typename TDispatchedOutput>
   void operator()(TDispatchedOutput&& dispatched_output)
   {
-    ::tuple::get<I>(result.results) = ::tuple::get<0>(input)(makeForwardAll<I + 1>(
+    jtuple::get<I>(result.results) = jtuple::get<0>(input)(makeForwardAll<I + 1>(
       result,
       static_cast<TFunctor&&>(functor),
-      ::tuple::pop_front(static_cast<TInputTuple&&>(input)),
-      ::tuple::append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_tail(static_cast<TInputTuple&&>(input)),
+      jtuple::tuple_append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
     ));
-    if (!::tuple::get<I>(result.results))
+    if (!jtuple::get<I>(result.results))
     {
       result.failure_index = I;
     }
@@ -330,14 +335,14 @@ struct ForwardAll
 };
 
 template <size_t I, typename TResult, typename TFunctor, typename TInputTuple>
-struct ForwardAll<I, TResult, TFunctor, TInputTuple, ::tuple::Tuple<>>
+struct ForwardAll<I, TResult, TFunctor, TInputTuple, jtuple::tuple<>>
 {
   TResult& result;
   TFunctor functor;
   TInputTuple input;
 
   template <typename TFunctor2, typename TInputTuple2>
-  ForwardAll(TResult& result, TFunctor2&& functor, TInputTuple2&& input, ::tuple::Tuple<> output)
+  ForwardAll(TResult& result, TFunctor2&& functor, TInputTuple2&& input, jtuple::tuple<> output)
     : result(result)
     , functor(util::forward<TFunctor2>(functor))
     , input(util::forward<TInputTuple2>(input))
@@ -347,13 +352,13 @@ struct ForwardAll<I, TResult, TFunctor, TInputTuple, ::tuple::Tuple<>>
   template <typename TDispatchedOutput>
   void operator()(TDispatchedOutput&& dispatched_output)
   {
-    ::tuple::get<I>(result.results) = ::tuple::get<0>(input)(makeForwardAll<I + 1>(
+    jtuple::get<I>(result.results) = jtuple::get<0>(input)(makeForwardAll<I + 1>(
       result,
       static_cast<TFunctor&&>(functor),
-      ::tuple::pop_front(static_cast<TInputTuple&&>(input)),
-      ::tuple::append(::tuple::Tuple<>(), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_tail(static_cast<TInputTuple&&>(input)),
+      jtuple::tuple_append(jtuple::tuple<>(), util::forward<TDispatchedOutput>(dispatched_output))
     ));
-    if (!::tuple::get<I>(result.results))
+    if (!jtuple::get<I>(result.results))
     {
       result.failure_index = I;
     }
@@ -361,14 +366,14 @@ struct ForwardAll<I, TResult, TFunctor, TInputTuple, ::tuple::Tuple<>>
 };
 
 template <size_t I, typename TResult, typename TFunctor, typename TOutputTuple>
-struct ForwardAll<I, TResult, TFunctor, ::tuple::Tuple<>, TOutputTuple>
+struct ForwardAll<I, TResult, TFunctor, jtuple::tuple<>, TOutputTuple>
 {
   TResult& result;
   TFunctor functor;
   TOutputTuple output;
 
   template <typename TFunctor2, typename TOutputTuple2>
-  ForwardAll(TResult& result, TFunctor2&& functor, ::tuple::Tuple<> input, TOutputTuple2&& output)
+  ForwardAll(TResult& result, TFunctor2&& functor, jtuple::tuple<> input, TOutputTuple2&& output)
     : result(result)
     , functor(util::forward<TFunctor2>(functor))
     , output(util::forward<TOutputTuple2>(output))
@@ -378,22 +383,22 @@ struct ForwardAll<I, TResult, TFunctor, ::tuple::Tuple<>, TOutputTuple>
   template <typename TDispatchedOutput>
   void operator()(TDispatchedOutput&& dispatched_output)
   {
-    ::tuple::for_all(
+    jtuple::tuple_apply(
       static_cast<TFunctor&&>(functor),
-      ::tuple::append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
     );
     result.failure_index = I;
   }
 };
 
 template <size_t I, typename TResult, typename TFunctor>
-struct ForwardAll<I, TResult, TFunctor, ::tuple::Tuple<>, ::tuple::Tuple<>>
+struct ForwardAll<I, TResult, TFunctor, jtuple::tuple<>, jtuple::tuple<>>
 {
   TResult& result;
   TFunctor functor;
 
   template <typename TFunctor2>
-  ForwardAll(TResult& result, TFunctor2&& functor, ::tuple::Tuple<> input, ::tuple::Tuple<> output)
+  ForwardAll(TResult& result, TFunctor2&& functor, jtuple::tuple<> input, jtuple::tuple<> output)
     : result(result)
     , functor(util::forward<TFunctor2>(functor))
   {
@@ -413,7 +418,7 @@ struct All
   struct Result
   {
     size_t failure_index;
-    ::tuple::Tuple<typename std::decay<TDispatchers>::type::Result...> results;
+    jtuple::tuple<typename std::decay<TDispatchers>::type::Result...> results;
 
     operator bool() const
     {
@@ -422,12 +427,12 @@ struct All
 
     std::string error(std::string prefix = "") const
     {
-      std::vector<std::string> errors = ::tuple::for_all(ToVector(), ::tuple::map(ResultToError{prefix + "  "}, results));
+      std::vector<std::string> errors = jtuple::tuple_apply(ToVector(), jtuple::tuple_map(ResultToError{prefix + "  "}, results));
       return prefix + std::string("Argument ") + util::to_string(failure_index + 1) + " did not match:\n" + errors[failure_index];
     }
   };
 
-  ::tuple::Tuple<TDispatchers...> dispatchers;
+  jtuple::tuple<TDispatchers...> dispatchers;
 
   template <typename... TDispatchers2>
   All(TDispatchers2&&... dispatchers)
@@ -439,13 +444,13 @@ struct All
   Result operator()(TFunctor&& functor)
   {
     Result result;
-    ::tuple::get<0>(result.results) = ::tuple::get<0>(dispatchers)(makeForwardAll<1>(
+    jtuple::get<0>(result.results) = jtuple::get<0>(dispatchers)(makeForwardAll<1>(
       result,
       static_cast<TFunctor&&>(functor),
-      ::tuple::pop_front(dispatchers),
-      ::tuple::Tuple<>()
+      jtuple::tuple_tail(dispatchers),
+      jtuple::tuple<>()
     ));
-    if (!::tuple::get<0>(result.results))
+    if (!jtuple::get<0>(result.results))
     {
       result.failure_index = 0;
     }

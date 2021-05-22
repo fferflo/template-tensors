@@ -3,6 +3,7 @@
 #ifdef BOOST_PYTHON_INCLUDED
 
 #include <boost/python/list.hpp>
+#include <jtuple/tuple_utility.hpp>
 
 namespace template_tensors {
 
@@ -190,7 +191,7 @@ __host__
     ::boost::python::object cupy_module = ::boost::python::import("cupy");
 
     cupy_array = cupy_module.attr("empty")(
-      ::tuple::for_all(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
+      jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
       detail::cupy_elementtype_name<ElementType>::get(),
       "C"
     );

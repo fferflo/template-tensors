@@ -1,5 +1,8 @@
 #pragma once
 
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
+
 namespace aggregator {
 
 namespace detail {
@@ -25,23 +28,23 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    m_functor_and_value.first()(m_functor_and_value.second(), util::forward<TInput>(input)...);
+    jtuple::get<0>(m_functor_and_value)(jtuple::get<1>(m_functor_and_value), util::forward<TInput>(input)...);
   }
 
   __host__ __device__
   TResultType get() const
   {
-    return m_functor_and_value.second();
+    return jtuple::get<1>(m_functor_and_value);
   }
 
   __host__ __device__
   TResultType get() const volatile
   {
-    return m_functor_and_value.second();
+    return jtuple::get<1>(m_functor_and_value);
   }
 
 private:
-  ::tuple::CompressedPair<TFunctor, TResultType> m_functor_and_value;
+  jtuple::tuple<TFunctor, TResultType> m_functor_and_value;
 };
 
 } // end of ns detail

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
+
 namespace aggregator {
 
 namespace detail {
@@ -8,7 +11,7 @@ template <typename TPredicate, typename TAggregator>
 class filter : public aggregator::IsAggregator
 {
 private:
-  ::tuple::CompressedPair<TPredicate, TAggregator> m_predicate_and_aggregator;
+  jtuple::tuple<TPredicate, TAggregator> m_predicate_and_aggregator;
 
 public:
   template <typename TPredicate2, typename TAggregator2>
@@ -28,15 +31,15 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    if (m_predicate_and_aggregator.first()(util::forward<TInput>(input)...))
+    if (jtuple::get<0>(m_predicate_and_aggregator)(util::forward<TInput>(input)...))
     {
-      m_predicate_and_aggregator.second()(util::forward<TInput>(input)...);
+      jtuple::get<1>(m_predicate_and_aggregator)(util::forward<TInput>(input)...);
     }
   }
 
   __host__ __device__
   auto get() const
-  RETURN_AUTO(m_predicate_and_aggregator.second().get())
+  RETURN_AUTO(jtuple::get<1>(m_predicate_and_aggregator).get())
 };
 
 } // end of ns detail

@@ -5,68 +5,11 @@
 #include <type_traits>
 #include <boost/make_unique.hpp>
 
-#include <template_tensors/util/Tuple.h>
 #include <template_tensors/for_each/Sequential.h>
 
 namespace util {
 
 namespace functor {
-
-namespace detail {
-
-template <typename... TArgs>
-class apply_to_each
-{
-private:
-  ::tuple::Tuple<TArgs...> m_args;
-
-public:
-  __host__ __device__
-  apply_to_each(TArgs... args)
-    : m_args(args...)
-  {
-  }
-
-  template <typename TThisType, typename TFunctor>
-  __host__ __device__
-  static auto get(TThisType&& self, TFunctor&& functor)
-  RETURN_AUTO(::tuple::for_each(util::forward<TFunctor>(functor), self.m_args))
-
-  FORWARD_ALL_QUALIFIERS(operator(), get)
-};
-
-template <typename... TArgs>
-class apply_to_all
-{
-private:
-  ::tuple::Tuple<TArgs...> m_args;
-
-public:
-  __host__ __device__
-  apply_to_all(TArgs... args)
-    : m_args(args...)
-  {
-  }
-
-  template <typename TThisType, typename TFunctor>
-  __host__ __device__
-  static auto get(TThisType&& self, TFunctor&& functor)
-  RETURN_AUTO(::tuple::for_all(util::forward<TFunctor>(functor), self.m_args))
-
-  FORWARD_ALL_QUALIFIERS(operator(), get)
-};
-
-} // end of ns detail
-
-template <typename... TArgs>
-__host__ __device__
-auto apply_to_each(TArgs&&... args)
-RETURN_AUTO(detail::apply_to_each<util::store_member_t<TArgs&&>...>(util::forward<TArgs>(args)...))
-
-template <typename... TArgs>
-__host__ __device__
-auto apply_to_all(TArgs&&... args)
-RETURN_AUTO(detail::apply_to_all<util::store_member_t<TArgs&&>...>(util::forward<TArgs>(args)...))
 
 template <typename TResultType>
 struct construct

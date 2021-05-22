@@ -2,6 +2,7 @@
 
 #ifdef BOOST_NUMPY_INCLUDED
 
+#include <jtuple/tuple_utility.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/numpy.hpp>
 
@@ -84,7 +85,7 @@ public:
   static ::boost::python::numpy::ndarray make(template_tensors::VectorXT<size_t, TRank> dims)
   {
     template_tensors::boost::python::with_gil guard;
-    return ::boost::python::numpy::empty(::tuple::for_all(functor::make_tuple(), template_tensors::toTuple(dims)), ::boost::python::numpy::dtype::get_builtin<TElementType>());
+    return ::boost::python::numpy::empty(jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(dims)), ::boost::python::numpy::dtype::get_builtin<TElementType>());
   }
 
   __host__

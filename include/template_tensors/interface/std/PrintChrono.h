@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <iostream>
-#include <tuple>
 #include <metal.hpp>
 
 namespace std {

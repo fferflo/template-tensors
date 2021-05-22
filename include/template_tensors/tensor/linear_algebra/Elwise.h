@@ -1,3 +1,8 @@
+#pragma once
+
+#include <jtuple/tuple.hpp>
+#include <jtuple/tuple_utility.hpp>
+
 namespace template_tensors {
 
 namespace detail {
@@ -9,7 +14,7 @@ struct ElwiseOperationTensorElementAccess
   template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(toCoordVector<TCoordsRank>(util::forward<TCoordArgTypes>(coords)...), ::tuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
+  RETURN_AUTO(util::forward<TOperation>(op)(toCoordVector<TCoordsRank>(util::forward<TCoordArgTypes>(coords)...), jtuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
 };
 
 template <>
@@ -19,7 +24,7 @@ struct ElwiseOperationTensorElementAccess<DYN>
   template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(::tuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
+  RETURN_AUTO(util::forward<TOperation>(op)(jtuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
 };
 
 } // end of ns detail
@@ -71,26 +76,26 @@ public:
   __host__ __device__
   dim_t getDynDim() const
   {
-    return ::tuple::get<0>(m_tensors).template dim<TIndex>();
+    return jtuple::get<0>(m_tensors).template dim<TIndex>();
   }
 
   __host__ __device__
   dim_t getDynDim(size_t index) const
   {
-    return ::tuple::get<0>(m_tensors).dim(index);
+    return jtuple::get<0>(m_tensors).dim(index);
   }
 
 private:
   TOperation m_op;
-  ::tuple::Tuple<TTensorTypesIn...> m_tensors;
+  jtuple::tuple<TTensorTypesIn...> m_tensors;
 
   HD_WARNING_DISABLE
   template <typename TTransform, metal::int_... TIndices>
   __host__ __device__
   auto map(TTransform transform, metal::numbers<TIndices...>)
   RETURN_AUTO(ElwiseOperationTensor
-    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(::tuple::get<TIndices>(m_tensors)))>...>
-    (transform(m_op), transform(::tuple::get<TIndices>(m_tensors))...)
+    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(jtuple::get<TIndices>(m_tensors)))>...>
+    (transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
   )
 
   HD_WARNING_DISABLE
@@ -98,8 +103,8 @@ private:
   __host__ __device__
   auto map(TTransform transform, metal::numbers<TIndices...>) const
   RETURN_AUTO(ElwiseOperationTensor
-    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(::tuple::get<TIndices>(m_tensors)))>...>
-    (transform(m_op), transform(::tuple::get<TIndices>(m_tensors))...)
+    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(jtuple::get<TIndices>(m_tensors)))>...>
+    (transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
   )
 
 public:

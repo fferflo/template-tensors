@@ -47,12 +47,6 @@ HOST_DEVICE_TEST_CASE(tensor_streamop)
   CHECK(tt::eq(tt::to_string<char>("[[1 2 3][4 5 6][7 8 9][10 11 12]]"), str.str()));
 }
 
-HOST_DEVICE_TEST_CASE(tensor_tuple_conversion)
-{
-  tt::Vector3s v(1, 2, 3);
-  CHECK(tt::eq(v, tt::fromTuple(tt::toTuple(v))));
-}
-
 HOST_DEVICE_TEST_CASE(tensor_ordering)
 {
   tt::AllocVectorT<size_t, mem::alloc::heap> v(2);
