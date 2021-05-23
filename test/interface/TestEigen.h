@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(storage_interface)
     auto eigen_map = tt::toEigen(m);
     auto eigen_matrix = tt::toEigen(decltype(m)(m));
     auto m2_ref = tt::fromEigen(eigen_map);
-    auto m2_val = tt::fromEigen(std::move(eigen_matrix));
+    auto m2_val = tt::fromEigen(std::move(tt::toEigen(decltype(m)(m))));
 
     BOOST_CHECK(eigen_map.data() == &m());
     BOOST_CHECK(eigen_matrix.data() != &m());
@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE(storage_interface)
   {
     const tt::VectorXT<uint32_t, 3, tt::ColMajor> m(1, 2, 3);
 
-    auto eigen_matrix = tt::toEigen(std::move(m));
-    auto m2_val = tt::fromEigen(std::move(eigen_matrix));
+    auto eigen_matrix = tt::toEigen(std::move(decltype(m)(m)));
+    auto m2_val = tt::fromEigen(std::move(tt::toEigen(std::move(decltype(m)(m)))));
 
     BOOST_CHECK(eigen_matrix.data() != &m());
     BOOST_CHECK(&m2_val() != &m());
