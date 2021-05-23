@@ -112,7 +112,7 @@ inline std::map<uint32_t, Camera> readCameras(const boost::filesystem::path& pat
       throw boost::filesystem::filesystem_error("Camera model " + std::to_string(camera.model_id) + " not supported", boost::system::errc::make_error_code(boost::system::errc::io_error));
     }
 
-    cameras[camera.id] = util::move(camera);
+    cameras.emplace(camera.id, util::move(camera));
   }
 
   return cameras;
@@ -159,7 +159,7 @@ inline std::map<uint32_t, ImageMetaData> readImageMetaData(const boost::filesyst
       image.points_3d_ids[i] = point_3d_id;
     }
 
-    image_meta_data[image.id] = image;
+    image_meta_data.emplace(image.id, util::move(image));
   }
 
   return image_meta_data;
