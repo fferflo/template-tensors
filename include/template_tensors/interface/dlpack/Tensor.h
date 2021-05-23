@@ -113,7 +113,7 @@ struct dlpack_devicetype<mem::HOST>
 template <>
 struct dlpack_devicetype<mem::DEVICE>
 {
-  static const DLDeviceType value = kDLGPU;
+  static const DLDeviceType value = kDLCUDA;
 };
 
 #define ThisType FromDlPack<TElementType, TRank, TMemoryType>
@@ -203,9 +203,9 @@ FromDlPack<TElementType, TRank, TMemoryType> fromDlPack(SafeDLManagedTensor&& dl
       static_cast<DLDataTypeCode>(dl->dl_tensor.dtype.code), dl->dl_tensor.dtype.bits, dl->dl_tensor.dtype.lanes
     );
   }
-  if (dlpack_devicetype<TMemoryType>::value != dl->dl_tensor.ctx.device_type)
+  if (dlpack_devicetype<TMemoryType>::value != dl->dl_tensor.device.device_type)
   {
-    throw InvalidDlPackMemoryType(dl->dl_tensor.ctx.device_type, dlpack_devicetype<TMemoryType>::value);
+    throw InvalidDlPackMemoryType(dl->dl_tensor.device.device_type, dlpack_devicetype<TMemoryType>::value);
   }
 
   return FromDlPack<TElementType, TRank, TMemoryType>(util::move(dl));
@@ -255,8 +255,8 @@ SafeDLManagedTensor toDlPack(TTensorPtr&& tensor)
   manager_ctx->dl.deleter = &ManagerContext::deleter;
   manager_ctx->dl.manager_ctx = manager_ctx;
   manager_ctx->dl.dl_tensor.data = manager_ctx->ptr->data();
-  manager_ctx->dl.dl_tensor.ctx.device_type = dlpack_devicetype<MEMORY_TYPE>::value;
-  manager_ctx->dl.dl_tensor.ctx.device_id = 0; // TODO: get different device ids (compare https://github.com/tensorflow/tensorflow/blob/22e07fb204386768e5bcbea563641ea11f96ceb8/tensorflow/c/eager/dlpack.cc#L110)
+  manager_ctx->dl.dl_tensor.device.device_type = dlpack_devicetype<MEMORY_TYPE>::value;
+  manager_ctx->dl.dl_tensor.device.device_id = 0; // TODO: get different device ids (compare https://github.com/tensorflow/tensorflow/blob/22e07fb204386768e5bcbea563641ea11f96ceb8/tensorflow/c/eager/dlpack.cc#L110)
   manager_ctx->dl.dl_tensor.ndim = manager_ctx->shape.size();
   manager_ctx->dl.dl_tensor.dtype.code = dlpack_elementtype<ElementType>::getCode();
   manager_ctx->dl.dl_tensor.dtype.bits = dlpack_elementtype<ElementType>::getBits();

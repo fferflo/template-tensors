@@ -45,7 +45,7 @@ struct FromDlPack
     template <mem::MemoryType TMemoryType>
     bool operator()()
     {
-      return dl->dl_tensor.ctx.device_type == template_tensors::dlpack_devicetype<TMemoryType>::value;
+      return dl->dl_tensor.device.device_type == template_tensors::dlpack_devicetype<TMemoryType>::value;
     }
   };
 
