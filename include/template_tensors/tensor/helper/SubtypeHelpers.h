@@ -22,7 +22,7 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   __VA_ARGS__& operator=(TTensorType2&& other) \
   { \
     using Copier = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoCopier<>>::type; \
-    Copier::copy(static_cast<__VA_ARGS__&>(*this), util::forward<TTensorType2>(other)); \
+    Copier::copy(static_cast<__VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
     return static_cast<__VA_ARGS__&>(*this); \
   } \
   template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value)> \
@@ -30,20 +30,20 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   void operator=(TTensorType2&& other) volatile \
   { \
     using Copier = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoCopier<>>::type; \
-    Copier::copy(static_cast<volatile __VA_ARGS__&>(*this), util::forward<TTensorType2>(other)); \
+    Copier::copy(static_cast<volatile __VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
   } \
   template <typename TNonTensorType, bool TDummy = true, ENABLE_IF(!template_tensors::is_tensor_v<TNonTensorType>::value)> \
   __host__ __device__ \
   __VA_ARGS__& operator=(TNonTensorType&& other) \
   { \
-    template_tensors::fill(*this, util::forward<TNonTensorType>(other)); \
+    template_tensors::fill(*this, std::forward<TNonTensorType>(other)); \
     return static_cast<__VA_ARGS__&>(*this); \
   } \
   template <typename TNonTensorType, bool TDummy = true, ENABLE_IF(!template_tensors::is_tensor_v<TNonTensorType>::value)> \
   __host__ __device__ \
   void operator=(TNonTensorType&& other) volatile \
   { \
-    template_tensors::fill(*this, util::forward<TNonTensorType>(other)); \
+    template_tensors::fill(*this, std::forward<TNonTensorType>(other)); \
   }
 
 #ifdef OPENCV_INCLUDED
@@ -84,15 +84,15 @@ void fill(TTensorType&& tensor, TElementType&& fill);
 
 // TODO: include ASSERTION in TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS
 /*#define ASSERTION \
-  ASSERT_STREAM(coordsAreInRange(this->dims(), util::forward<TCoordArgTypes>(coords)...), \
-    "Coordinates " << toCoordVector(util::forward<TCoordArgTypes>(coords)...) << " are out of range of dimensions " << this->dims());
+  ASSERT_STREAM(coordsAreInRange(this->dims(), std::forward<TCoordArgTypes>(coords)...), \
+    "Coordinates " << toCoordVector(std::forward<TCoordArgTypes>(coords)...) << " are out of range of dimensions " << this->dims());
 */
 #define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(NAME) \
   HD_WARNING_DISABLE \
   template <typename TThisType__, typename... TCoordArgTypes__, ENABLE_IF(template_tensors::are_coord_args_v<TCoordArgTypes__...>::value)> \
   __host__ __device__ \
   static auto getElementForward__(TThisType__&& self, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), util::forward<TCoordArgTypes__>(coords)...)) \
+  RETURN_AUTO(NAME(std::forward<TThisType__>(self), std::forward<TCoordArgTypes__>(coords)...)) \
   FORWARD_ALL_QUALIFIERS(operator(), getElementForward__)
 
 #define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(NAME, N) \
@@ -100,8 +100,8 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeqN__(TThisType__&& self, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<N>>(), \
-    util::forward<TCoordArgTypes__>(coords)...)) \
+  RETURN_AUTO(NAME(std::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<N>>(), \
+    std::forward<TCoordArgTypes__>(coords)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeqN__)
 
 #define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(NAME) \
@@ -109,8 +109,8 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSeq__(TThisType__&& self, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<template_tensors::coordinate_num_v<TCoordArgTypes__...>::value>>(), \
-    util::forward<TCoordArgTypes__>(coords)...)) \
+  RETURN_AUTO(NAME(std::forward<TThisType__>(self), metal::iota<metal::number<0>, metal::number<template_tensors::coordinate_num_v<TCoordArgTypes__...>::value>>(), \
+    std::forward<TCoordArgTypes__>(coords)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElementForwardSeq__)
 
 #define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(NAME, N) \
@@ -118,7 +118,7 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, metal::int_... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSizeTN__(TThisType__&& self, metal::numbers<TIndices__...>, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
+  RETURN_AUTO(NAME(std::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(std::forward<TCoordArgTypes__>(coords)...)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElementForwardSizeTN__, N)
 
 #define TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T(NAME) \
@@ -126,7 +126,7 @@ void fill(TTensorType&& tensor, TElementType&& fill);
   template <typename TThisType__, metal::int_... TIndices__, typename... TCoordArgTypes__> \
   __host__ __device__ \
   static auto getElementForwardSizeT__(TThisType__&& self, metal::numbers<TIndices__...>, TCoordArgTypes__&&... coords) \
-  RETURN_AUTO(NAME(util::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(util::forward<TCoordArgTypes__>(coords)...)...)) \
+  RETURN_AUTO(NAME(std::forward<TThisType__>(self), template_tensors::getNthCoordinate<TIndices__>(std::forward<TCoordArgTypes__>(coords)...)...)) \
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElementForwardSizeT__)
 
 } // end of ns template_tensors

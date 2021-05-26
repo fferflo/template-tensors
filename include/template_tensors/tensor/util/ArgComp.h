@@ -12,7 +12,7 @@ VectorXs<TRank> argcomp(TTensorType&& tensor, TCompareFunctor compare)
       best_el = el;
       best_pos = pos;
     }
-  }, util::forward<TTensorType>(tensor));
+  }, std::forward<TTensorType>(tensor));
   return best_pos;
 }
 
@@ -20,7 +20,7 @@ template <metal::int_ TRank2, typename TTensorType, metal::int_ TRank = TRank2 !
 __host__ __device__
 VectorXs<TRank> argmax(TTensorType&& tensor)
 {
-  return argcomp<TRank>(util::forward<TTensorType>(tensor), math::functor::gt());
+  return argcomp<TRank>(std::forward<TTensorType>(tensor), math::functor::gt());
 }
 
 namespace functor {
@@ -30,7 +30,7 @@ namespace functor {
     template <typename TTensorType>
     __host__ __device__
     auto operator()(TTensorType&& t) const
-    RETURN_AUTO(template_tensors::argmax<TRank>(util::forward<TTensorType>(t)))
+    RETURN_AUTO(template_tensors::argmax<TRank>(std::forward<TTensorType>(t)))
   };
 }
 
@@ -38,7 +38,7 @@ template <metal::int_ TRank2, typename TTensorType, metal::int_ TRank = TRank2 !
 __host__ __device__
 VectorXs<TRank> argmin(TTensorType&& tensor)
 {
-  return argcomp<TRank>(util::forward<TTensorType>(tensor), math::functor::lt());
+  return argcomp<TRank>(std::forward<TTensorType>(tensor), math::functor::lt());
 }
 
 namespace functor {
@@ -48,7 +48,7 @@ namespace functor {
     template <typename TTensorType>
     __host__ __device__
     auto operator()(TTensorType&& t) const
-    RETURN_AUTO(template_tensors::argmin<TRank>(util::forward<TTensorType>(t)))
+    RETURN_AUTO(template_tensors::argmin<TRank>(std::forward<TTensorType>(t)))
   };
 }
 

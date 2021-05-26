@@ -14,14 +14,14 @@ FromDlPack<TElementType, TRank, TMemoryType> fromCppFlow(cppflow::tensor cppflow
   void* dl_ptr = tensorflow::TFE_HandleToDLPack(cppflow.tfe_handle.get(), cppflow::context::get_status());
   cppflow::status_check(cppflow::context::get_status());
   SafeDLManagedTensor dlpack = SafeDLManagedTensor(reinterpret_cast<DLManagedTensor*>(dl_ptr));
-  return fromDlPack<TElementType, TRank, TMemoryType>(util::move(dlpack));
+  return fromDlPack<TElementType, TRank, TMemoryType>(std::move(dlpack));
 }
 
 template <typename TTensorType>
 __host__
 cppflow::tensor toCppFlow(TTensorType&& tensor)
 {
-  SafeDLManagedTensor dlpack = template_tensors::toDlPack(util::forward<TTensorType>(tensor));
+  SafeDLManagedTensor dlpack = template_tensors::toDlPack(std::forward<TTensorType>(tensor));
   TFE_TensorHandle* tfe_handle = tensorflow::TFE_HandleFromDLPack(dlpack.use(), cppflow::context::get_status(), cppflow::context::get_context());
   cppflow::status_check(cppflow::context::get_status());
   return cppflow::tensor(tfe_handle);

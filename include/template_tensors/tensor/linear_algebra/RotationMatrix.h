@@ -189,7 +189,7 @@ struct EulerRotationHelper3<TElementType, TAxis, TAxisNext, TAxes...>
   template <typename... TArgs>
   __host__ __device__
   static auto make(TElementType angle, TElementType next_angle, TArgs&&... args)
-  RETURN_AUTO(matmul(eval(EulerRotationHelper3<TElementType, TAxisNext, TAxes...>::make(next_angle, util::forward<TArgs>(args)...)),
+  RETURN_AUTO(matmul(eval(EulerRotationHelper3<TElementType, TAxisNext, TAxes...>::make(next_angle, std::forward<TArgs>(args)...)),
                      BasicRotationMatrix3<TElementType, TAxis>(angle)))
 };
 
@@ -212,6 +212,6 @@ struct EulerRotationHelper3<TElementType, TAxis, TAxisNext, TAxes...>
 template <typename TElementType, metal::int_... TAxes, typename... TArgs>
 __host__ __device__
 auto euler_rotation_3d(TArgs&&... angles)
-RETURN_AUTO(eval(detail::EulerRotationHelper3<TElementType, TAxes...>::template make(util::forward<TArgs>(angles)...)))
+RETURN_AUTO(eval(detail::EulerRotationHelper3<TElementType, TAxes...>::template make(std::forward<TArgs>(angles)...)))
 
 } // end of ns template_tensors

@@ -106,7 +106,7 @@ template <typename TEigenDerived>
 __host__
 auto fromEigenDerived(TEigenDerived&& eigen_matrix)
 RETURN_AUTO(
-  FromEigenMatrix<util::store_member_t<TEigenDerived&&>>(util::forward<TEigenDerived>(eigen_matrix))
+  FromEigenMatrix<util::store_member_t<TEigenDerived&&>>(std::forward<TEigenDerived>(eigen_matrix))
 )
 
 } // end of ns detail
@@ -168,7 +168,7 @@ __host__
 TEigenMatrix toEigen(TMatrixType&& matrix)
 {
   TEigenMatrix eigen(matrix.rows(), matrix.cols());
-  fromEigen(eigen) = util::forward<TMatrixType>(matrix);
+  fromEigen(eigen) = std::forward<TMatrixType>(matrix);
   return eigen;
 }
 

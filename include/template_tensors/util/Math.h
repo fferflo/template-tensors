@@ -117,7 +117,7 @@ struct reinterpret_cast_to
     template <typename T1, typename T2> \
     __host__ __device__ \
     constexpr auto operator()(T1&& x1, T2&& x2) const volatile \
-    RETURN_AUTO(math:: NAME(util::forward<T1>(x1), util::forward<T2>(x2))) \
+    RETURN_AUTO(math:: NAME(std::forward<T1>(x1), std::forward<T2>(x2))) \
   }; \
   }
 
@@ -134,7 +134,7 @@ struct reinterpret_cast_to
     template <typename T1, typename T2, typename T3> \
     __host__ __device__ \
     constexpr auto operator()(T1&& x1, T2&& x2, T3&& x3) const volatile \
-    RETURN_AUTO(math:: NAME(util::forward<T1>(x1), util::forward<T2>(x2), util::forward<T3>(x3))) \
+    RETURN_AUTO(math:: NAME(std::forward<T1>(x1), std::forward<T2>(x2), std::forward<T3>(x3))) \
   }; \
   }
 
@@ -177,7 +177,7 @@ struct reinterpret_cast_to
   template <typename... TArgs> \
   __host__ __device__ \
   static constexpr auto NAME(TArgs TYPE_POSTFIX ... args) \
-  RETURN_AUTO(NAME##Helper<sizeof...(args)> :: calculate(util::forward<TArgs>(args)...)) \
+  RETURN_AUTO(NAME##Helper<sizeof...(args)> :: calculate(std::forward<TArgs>(args)...)) \
   HD_WARNING_DISABLE \
   __host__ __device__ \
   static constexpr auto calculate() \
@@ -198,7 +198,7 @@ struct reinterpret_cast_to
   template <typename... TTypes> \
   __host__ __device__ \
   constexpr auto NAME(TTypes&&... xs) \
-  RETURN_AUTO(detail:: NAME##Helper<sizeof...(TTypes)> :: NAME(util::forward<TTypes>(xs)...)) \
+  RETURN_AUTO(detail:: NAME##Helper<sizeof...(TTypes)> :: NAME(std::forward<TTypes>(xs)...)) \
   namespace functor { \
   struct NAME \
   { \
@@ -206,15 +206,15 @@ struct reinterpret_cast_to
     template <typename... TTypes> \
     __host__ __device__ \
     constexpr auto operator()(TTypes&&... xs) const volatile \
-    RETURN_AUTO(math:: NAME(util::forward<TTypes>(xs)...)) \
+    RETURN_AUTO(math:: NAME(std::forward<TTypes>(xs)...)) \
   }; \
   }
 
-#define X util::forward<T>(x)
-#define X1 util::forward<T1>(x1)
-#define X2 util::forward<T2>(x2)
-#define X3 util::forward<T3>(x3)
-#define REST util::forward<TRest>(rest)
+#define X std::forward<T>(x)
+#define X1 std::forward<T1>(x1)
+#define X2 std::forward<T2>(x2)
+#define X3 std::forward<T3>(x3)
+#define REST std::forward<TRest>(rest)
 
 OPERATION_V2(add, 0, x, add(X1 + X2, REST...))
 OPERATION_TT(subtract, X1 - X2)

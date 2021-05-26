@@ -34,7 +34,7 @@ struct Neighbors
   auto operator()(tt::VectorXi<TRank> center)
   RETURN_AUTO(
     iterable::filter(
-      tt::broadcast<2 * TRank>(tt::singleton(util::move(center))) + tt::repeat<tt::DimSeq<2>>(tt::UnitVectors<int32_t, TRank>()) * tt::broadcast<2 * TRank>(tt::Vector2i(1, -1)),
+      tt::broadcast<2 * TRank>(tt::singleton(std::move(center))) + tt::repeat<tt::DimSeq<2>>(tt::UnitVectors<int32_t, TRank>()) * tt::broadcast<2 * TRank>(tt::Vector2i(1, -1)),
       IsInDims<TRank>(dims)
     )
   )

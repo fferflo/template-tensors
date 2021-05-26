@@ -17,7 +17,7 @@ public:
   template <typename TPredicate2, typename TAggregator2>
   __host__ __device__
   filter(TPredicate2&& predicate, TAggregator2&& aggregator)
-    : m_predicate_and_aggregator(util::forward<TPredicate2>(predicate), util::forward<TAggregator2>(aggregator))
+    : m_predicate_and_aggregator(std::forward<TPredicate2>(predicate), std::forward<TAggregator2>(aggregator))
   {
   }
 
@@ -31,9 +31,9 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    if (jtuple::get<0>(m_predicate_and_aggregator)(util::forward<TInput>(input)...))
+    if (jtuple::get<0>(m_predicate_and_aggregator)(std::forward<TInput>(input)...))
     {
-      jtuple::get<1>(m_predicate_and_aggregator)(util::forward<TInput>(input)...);
+      jtuple::get<1>(m_predicate_and_aggregator)(std::forward<TInput>(input)...);
     }
   }
 
@@ -47,7 +47,7 @@ public:
 template <typename TPredicate, typename TAggregator>
 __host__ __device__
 auto filter(TPredicate&& predicate, TAggregator&& aggregator)
-RETURN_AUTO(detail::filter<util::store_member_t<TPredicate&&>, util::store_member_t<TAggregator&&>>(util::forward<TPredicate>(predicate), util::forward<TAggregator>(aggregator)))
+RETURN_AUTO(detail::filter<util::store_member_t<TPredicate&&>, util::store_member_t<TAggregator&&>>(std::forward<TPredicate>(predicate), std::forward<TAggregator>(aggregator)))
 
 
 } // end of ns aggregator

@@ -27,7 +27,7 @@ public:
 
   __host__ __device__
   FixedFloatingPoint(FixedFloatingPoint<TInteger, TShifts>&& other)
-    : m_int(util::move(other.m_int))
+    : m_int(std::move(other.m_int))
   {
   }
 
@@ -63,7 +63,7 @@ public:
   __host__ __device__
   FixedFloatingPoint<TInteger, TShifts>& operator=(FixedFloatingPoint<TInteger, TShifts>&& other)
   {
-    this->m_int = util::move(other.m_int);
+    this->m_int = std::move(other.m_int);
     return *this;
   }
 

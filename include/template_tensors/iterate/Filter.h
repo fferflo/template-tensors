@@ -14,9 +14,9 @@ public:
   template <typename TInputIterator2, typename TPredicate2>
   __host__ __device__
   Filter(TInputIterator2&& begin, TInputIterator2&& end, TPredicate2&& pred)
-    : m_current(util::forward<TInputIterator2>(begin))
-    , m_end(util::forward<TInputIterator2>(end))
-    , m_pred(util::forward<TPredicate2>(pred))
+    : m_current(std::forward<TInputIterator2>(begin))
+    , m_end(std::forward<TInputIterator2>(end))
+    , m_pred(std::forward<TPredicate2>(pred))
   {
     while (m_current != m_end && !pred(*m_current))
     {
@@ -71,7 +71,7 @@ __host__ __device__
 auto filter(TIterator&& begin, TIterator&& end, TPredicate&& pred)
 RETURN_AUTO(
   Filter<util::store_member_t<TIterator&&>, util::store_member_t<TPredicate&&>>
-    (util::forward<TIterator>(begin), util::forward<TIterator>(end), util::forward<TPredicate>(pred))
+    (std::forward<TIterator>(begin), std::forward<TIterator>(end), std::forward<TPredicate>(pred))
 )
 
 } // end of ns iterator
@@ -89,8 +89,8 @@ public:
   template <typename TIterable2, typename TPredicate2>
   __host__ __device__
   Filter(TIterable2&& iterable, TPredicate2&& pred)
-    : m_iterable(util::forward<TIterable2>(iterable))
-    , m_pred(util::forward<TPredicate2>(pred))
+    : m_iterable(std::forward<TIterable2>(iterable))
+    , m_pred(std::forward<TPredicate2>(pred))
   {
   }
 
@@ -108,7 +108,7 @@ __host__ __device__
 auto filter(TIterable&& in, TPredicate&& pred)
 RETURN_AUTO(
   Filter<util::store_member_t<TIterable&&>, util::store_member_t<TPredicate&&>>
-    (util::forward<TIterable>(in), util::forward<TPredicate>(pred))
+    (std::forward<TIterable>(in), std::forward<TPredicate>(pred))
 )
 
 } // end of ns iterable

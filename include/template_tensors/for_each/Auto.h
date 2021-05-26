@@ -72,13 +72,13 @@ struct ExecuteAutoForEach<metal::list<TForEach1, TForEach2, TForEachs...>>
   __host__ __device__
   static bool run(TIteratorBegin begin, TIteratorEnd end, TFunctor&& functor)
   {
-    if (TForEach1::template for_each<TNum, TMemoryType, false>(begin, end, util::forward<TFunctor>(functor)))
+    if (TForEach1::template for_each<TNum, TMemoryType, false>(begin, end, std::forward<TFunctor>(functor)))
     {
       return true;
     }
     else
     {
-      return ExecuteAutoForEach<metal::list<TForEach2, TForEachs...>>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor));
+      return ExecuteAutoForEach<metal::list<TForEach2, TForEachs...>>::template run<TNum, TMemoryType>(begin, end, std::forward<TFunctor>(functor));
     }
   }
 };
@@ -91,7 +91,7 @@ struct ExecuteAutoForEach<metal::list<TForEach>>
   __host__ __device__
   static bool run(TIteratorBegin begin, TIteratorEnd end, TFunctor&& functor)
   {
-    return TForEach::template for_each<TNum, TMemoryType, false>(begin, end, util::forward<TFunctor>(functor));
+    return TForEach::template for_each<TNum, TMemoryType, false>(begin, end, std::forward<TFunctor>(functor));
   }
 };
 
@@ -149,9 +149,9 @@ struct AutoForEach
     INSTANTIATE_DEVICE(ESC(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>), INSTANTIATE_ARG(TIteratorBegin), INSTANTIATE_ARG(TIteratorEnd), INSTANTIATE_ARG(TFunctor&&));
 
 #if TT_IS_ON_HOST
-    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<HostForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
+    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<HostForEachSeq>::template run<TNum, TMemoryType>(begin, end, std::forward<TFunctor>(functor)));
 #else
-    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>(begin, end, util::forward<TFunctor>(functor)));
+    return TT_FOR_EACH_CHECK_RESULT(detail::ExecuteAutoForEach<DeviceForEachSeq>::template run<TNum, TMemoryType>(begin, end, std::forward<TFunctor>(functor)));
 #endif
     return false;
   }

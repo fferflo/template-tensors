@@ -9,8 +9,8 @@ struct StrideToIndexHelper
   __host__ __device__
   static size_t toIndex(TStrideVector&& stride, TCoordArgTypes&&... coords)
   {
-    return stride(I) * getNthCoordinate<I>(util::forward<TCoordArgTypes>(coords)...)
-      + StrideToIndexHelper<I - 1>::toIndex(stride, util::forward<TCoordArgTypes>(coords)...);
+    return stride(I) * getNthCoordinate<I>(std::forward<TCoordArgTypes>(coords)...)
+      + StrideToIndexHelper<I - 1>::toIndex(stride, std::forward<TCoordArgTypes>(coords)...);
   }
 };
 
@@ -21,7 +21,7 @@ struct StrideToIndexHelper<0>
   __host__ __device__
   static size_t toIndex(TStrideVector&& stride, TCoordArgTypes&&... coords)
   {
-    return stride(0) * getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
+    return stride(0) * getNthCoordinate<0>(std::forward<TCoordArgTypes>(coords)...);
   }
 };
 
@@ -34,8 +34,8 @@ struct StrideGetSizeHelper
   __host__ __device__
   static size_t getSize(const VectorXs<TStrideRank>& stride, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<I>(util::forward<TDimArgTypes>(dims)...);
-    return stride(I) * (dim - 1) + StrideGetSizeHelper<I + 1, N>::getSize(stride, util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I>(std::forward<TDimArgTypes>(dims)...);
+    return stride(I) * (dim - 1) + StrideGetSizeHelper<I + 1, N>::getSize(stride, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -70,7 +70,7 @@ public:
   template <typename... TStrideArgs, ENABLE_IF(std::is_constructible<VectorXs<TRank>, TStrideArgs...>::value)>
   __host__ __device__
   Stride(TStrideArgs&&... strides)
-    : m_stride(util::forward<TStrideArgs>(strides)...)
+    : m_stride(std::forward<TStrideArgs>(strides)...)
   {
   }
 
@@ -78,16 +78,16 @@ public:
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const
   {
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    return detail::StrideToIndexHelper<TRank - 1>::toIndex(m_stride, util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    return detail::StrideToIndexHelper<TRank - 1>::toIndex(m_stride, std::forward<TCoordArgTypes>(coords)...);
   }
 
   template <typename TDimArgType, typename... TCoordArgTypes, ENABLE_IF(are_dim_args_v<TDimArgType&&>::value)>
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const volatile
   {
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    return detail::StrideToIndexHelper<TRank - 1>::toIndex(m_stride, util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    return detail::StrideToIndexHelper<TRank - 1>::toIndex(m_stride, std::forward<TCoordArgTypes>(coords)...);
   }
 
   TT_INDEXSTRATEGY_TO_INDEX_2
@@ -96,14 +96,14 @@ public:
   __host__ __device__
   size_t getSize(TDimArgTypes&&... dims) const // template_tensors::dot(m_stride, dims - 1) + 1
   {
-    return detail::StrideGetSizeHelper<0, TRank>::getSize(m_stride, util::forward<TDimArgTypes>(dims)...);
+    return detail::StrideGetSizeHelper<0, TRank>::getSize(m_stride, std::forward<TDimArgTypes>(dims)...);
   }
 
   template <typename... TDimArgTypes>
   __host__ __device__
   size_t getSize(TDimArgTypes&&... dims) const volatile // template_tensors::dot(m_stride, dims - 1) + 1
   {
-    return detail::StrideGetSizeHelper<0, TRank>::getSize(m_stride, util::forward<TDimArgTypes>(dims)...);
+    return detail::StrideGetSizeHelper<0, TRank>::getSize(m_stride, std::forward<TDimArgTypes>(dims)...);
   }
 
   template <metal::int_ TRank2>
@@ -204,7 +204,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const Stride<TRank>& index_strategy)
 {
   stream << "Stride(" << index_strategy.m_stride << ")";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

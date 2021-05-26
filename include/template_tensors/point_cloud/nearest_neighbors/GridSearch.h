@@ -19,7 +19,7 @@ public:
   template <typename... TArgs, ENABLE_IF(std::is_constructible<TGrid, TArgs&&...>::value)>
   __host__ __device__
   GridSearch(TArgs&&... args)
-    : m_grid(util::forward<TArgs>(args)...)
+    : m_grid(std::forward<TArgs>(args)...)
   {
   }
 
@@ -33,7 +33,7 @@ public:
   HD_WARNING_DISABLE
   __host__ __device__
   GridSearch(GridSearch<TGrid>&& other)
-    : m_grid(util::move(other.m_grid))
+    : m_grid(std::move(other.m_grid))
   {
   }
 
@@ -48,7 +48,7 @@ public:
   __host__ __device__
   void update(TGetFeatures&& get_features)
   {
-    m_grid.update(util::functor::compose(template_tensors::functor::static_cast_to<size_t>(), util::forward<TGetFeatures>(get_features)));
+    m_grid.update(util::functor::compose(template_tensors::functor::static_cast_to<size_t>(), std::forward<TGetFeatures>(get_features)));
   }
 
   HD_WARNING_DISABLE
@@ -60,7 +60,7 @@ public:
     template_tensors::VectorXs<TRank> min = template_tensors::max(template_tensors::static_cast_to<size_t>(center), range) - range;
     template_tensors::VectorXs<TRank> max = template_tensors::min(template_tensors::static_cast_to<size_t>(center + range) + 1, m_grid.template dims<TRank>());
     template_tensors::VectorXs<TRank> size = max - min;
-    template_tensors::for_each(util::functor::for_each(util::forward<TOp>(op)), template_tensors::head(template_tensors::offset(m_grid, min), size));
+    template_tensors::for_each(util::functor::for_each(std::forward<TOp>(op)), template_tensors::head(template_tensors::offset(m_grid, min), size));
   }
 
 #ifdef __CUDACC__

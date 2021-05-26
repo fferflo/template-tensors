@@ -14,7 +14,7 @@ struct ElwiseOperationTensorElementAccess
   template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(toCoordVector<TCoordsRank>(util::forward<TCoordArgTypes>(coords)...), jtuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
+  RETURN_AUTO(std::forward<TOperation>(op)(toCoordVector<TCoordsRank>(std::forward<TCoordArgTypes>(coords)...), jtuple::get<TTensorIndices>(std::forward<TTensorTuple>(tensors))(std::forward<TCoordArgTypes>(coords)...)...))
 };
 
 template <>
@@ -24,7 +24,7 @@ struct ElwiseOperationTensorElementAccess<DYN>
   template <typename TOperation, typename TTensorTuple, metal::int_... TTensorIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto get(TOperation&& op, TTensorTuple&& tensors, metal::numbers<TTensorIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(jtuple::get<TTensorIndices>(util::forward<TTensorTuple>(tensors))(util::forward<TCoordArgTypes>(coords)...)...))
+  RETURN_AUTO(std::forward<TOperation>(op)(jtuple::get<TTensorIndices>(std::forward<TTensorTuple>(tensors))(std::forward<TCoordArgTypes>(coords)...)...))
 };
 
 } // end of ns detail
@@ -67,7 +67,7 @@ public:
         self.m_op,
         self.m_tensors,
         metal::iota<metal::number<0>, metal::number<sizeof...(TTensorTypesIn)>>(),
-        util::forward<TCoordArgTypes>(coords)...
+        std::forward<TCoordArgTypes>(coords)...
       )
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
@@ -143,7 +143,7 @@ template <metal::int_ TCoordsRank = DYN, typename TOperation, typename... TTenso
 __host__ __device__
 auto elwise(TOperation&& op, TTensorTypesIn&&... tensors)
 RETURN_AUTO(
-  ElwiseOperationTensor<TCoordsRank, util::store_member_t<TOperation&&>, util::store_member_t<TTensorTypesIn&&>...>(util::forward<TOperation>(op), util::forward<TTensorTypesIn>(tensors)...)
+  ElwiseOperationTensor<TCoordsRank, util::store_member_t<TOperation&&>, util::store_member_t<TTensorTypesIn&&>...>(std::forward<TOperation>(op), std::forward<TTensorTypesIn>(tensors)...)
 );
 
 namespace functor {
@@ -164,7 +164,7 @@ struct elwise
   template <typename TThisType, typename... TTensorTypesIn>
   __host__ __device__
   static auto get(TThisType&& self, TTensorTypesIn&&... tensors)
-  RETURN_AUTO(template_tensors::elwise<TCoordsRank>(self.op, util::forward<TTensorTypesIn>(tensors)...))
+  RETURN_AUTO(template_tensors::elwise<TCoordsRank>(self.op, std::forward<TTensorTypesIn>(tensors)...))
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
 
@@ -173,7 +173,7 @@ struct elwise
 template <metal::int_ TCoordsRank = DYN, typename TOperation>
 __host__ __device__
 auto elwise(TOperation&& op)
-RETURN_AUTO(detail::elwise<TCoordsRank, util::store_member_t<TOperation&&>>(util::forward<TOperation>(op)))
+RETURN_AUTO(detail::elwise<TCoordsRank, util::store_member_t<TOperation&&>>(std::forward<TOperation>(op)))
 
 } // end of ns functor
 
@@ -181,14 +181,14 @@ template <typename TNewElementType, typename TTensorType, ENABLE_IF(is_tensor_v<
 __host__ __device__
 auto static_cast_to(TTensorType&& t)
 RETURN_AUTO(
-  template_tensors::elwise(math::functor::static_cast_to<TNewElementType>(), util::forward<TTensorType>(t))
+  template_tensors::elwise(math::functor::static_cast_to<TNewElementType>(), std::forward<TTensorType>(t))
 );
 
 template <typename TNewElementType, typename TNonTensorType, ENABLE_IF(!is_tensor_v<TNonTensorType>::value)>
 __host__ __device__
 auto static_cast_to(TNonTensorType&& t)
 RETURN_AUTO(
-  math::functor::static_cast_to<TNewElementType>()(util::forward<TNonTensorType>(t))
+  math::functor::static_cast_to<TNewElementType>()(std::forward<TNonTensorType>(t))
 );
 
 namespace functor {
@@ -198,7 +198,7 @@ struct static_cast_to
   template <typename TThisType, typename TTensorType>
   __host__ __device__
   static auto get(TThisType&& self, TTensorType&& tensor)
-  RETURN_AUTO(template_tensors::static_cast_to<TNewElementType>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::static_cast_to<TNewElementType>(std::forward<TTensorType>(tensor)))
 
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
@@ -208,7 +208,7 @@ template <typename TNewElementType, typename TTensorType>
 __host__ __device__
 auto dynamic_cast_to(TTensorType&& t)
 RETURN_AUTO(
-  elwise(math::functor::dynamic_cast_to<TNewElementType>(), util::forward<TTensorType>(t))
+  elwise(math::functor::dynamic_cast_to<TNewElementType>(), std::forward<TTensorType>(t))
 );
 
 namespace functor {
@@ -218,7 +218,7 @@ struct dynamic_cast_to
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& tensor)
-  RETURN_AUTO(template_tensors::dynamic_cast_to<TNewElementType>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::dynamic_cast_to<TNewElementType>(std::forward<TTensorType>(tensor)))
 };
 } // end of ns functor
 
@@ -226,7 +226,7 @@ template <typename TNewElementType, typename TTensorType>
 __host__ __device__
 auto reinterpret_cast_to(TTensorType&& t)
 RETURN_AUTO(
-  elwise(math::functor::reinterpret_cast_to<TNewElementType>(), util::forward<TTensorType>(t))
+  elwise(math::functor::reinterpret_cast_to<TNewElementType>(), std::forward<TTensorType>(t))
 );
 
 namespace functor {
@@ -236,7 +236,7 @@ struct reinterpret_cast_to
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& tensor)
-  RETURN_AUTO(template_tensors::reinterpret_cast_to<TNewElementType>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::reinterpret_cast_to<TNewElementType>(std::forward<TTensorType>(tensor)))
 };
 } // end of ns functor
 
@@ -245,7 +245,7 @@ struct reinterpret_cast_to
   __host__ __device__ \
   auto NAME(TTensorType&& t) \
   RETURN_AUTO(elwise(OPERATION(), \
-    util::forward<TTensorType>(t) \
+    std::forward<TTensorType>(t) \
   ));
 
 #define ELWISE_OP_TT(NAME, OPERATION) \
@@ -253,8 +253,8 @@ struct reinterpret_cast_to
   __host__ __device__ \
   auto NAME(TTensorType1&& t1, TTensorType2&& t2) \
   RETURN_AUTO(elwise(OPERATION(), \
-    util::forward<TTensorType1>(t1), \
-    util::forward<TTensorType2>(t2) \
+    std::forward<TTensorType1>(t1), \
+    std::forward<TTensorType2>(t2) \
   ));
 
 namespace detail {
@@ -277,7 +277,7 @@ struct can_apply_elwise
   __host__ __device__ \
   auto NAME(TTensorType&& t, const TElementType& s) \
   RETURN_AUTO(elwise(OPERATION(), \
-    util::forward<TTensorType>(t), \
+    std::forward<TTensorType>(t), \
     broadcast<dimseq_t<TTensorType>>(SingletonT<TElementType>(s), t.dims()) \
   ));
 
@@ -288,7 +288,7 @@ struct can_apply_elwise
   auto NAME(const TElementType& s, TTensorType&& t) \
   RETURN_AUTO(elwise(OPERATION(), \
     broadcast<dimseq_t<TTensorType>>(SingletonT<TElementType>(s), t.dims()), \
-    util::forward<TTensorType>(t) \
+    std::forward<TTensorType>(t) \
   ));
 
 #define ELWISE_OP_V(NAME) \
@@ -297,9 +297,9 @@ struct can_apply_elwise
   auto NAME(TFirstType&& first, TSecondType&& second, TThirdType&& third, TRestType&&... rest) \
   RETURN_AUTO( \
     NAME( \
-      NAME(util::forward<TFirstType>(first), util::forward<TSecondType>(second)), \
-      util::forward<TThirdType>(third), \
-      util::forward<TRestType>(rest)... \
+      NAME(std::forward<TFirstType>(first), std::forward<TSecondType>(second)), \
+      std::forward<TThirdType>(third), \
+      std::forward<TRestType>(rest)... \
   ));
 
 
@@ -912,7 +912,7 @@ private:
   template <typename TThisType, typename T>
   __host__ __device__
   static auto get(TThisType&& self, T&& in)
-  RETURN_AUTO(template_tensors::clamp(util::forward<T>(in), util::forward<TThisType>(self).low, util::forward<TThisType>(self).high))
+  RETURN_AUTO(template_tensors::clamp(std::forward<T>(in), std::forward<TThisType>(self).low, std::forward<TThisType>(self).high))
 
 public:
   __host__ __device__
@@ -931,7 +931,7 @@ template <typename TLow, typename THigh>
 __host__ __device__
 auto clamp(TLow&& low, THigh&& high)
 RETURN_AUTO(
-  detail::clamp<util::store_member_t<TLow&&>, util::store_member_t<THigh&&>>(util::forward<TLow>(low), util::forward<THigh>(high))
+  detail::clamp<util::store_member_t<TLow&&>, util::store_member_t<THigh&&>>(std::forward<TLow>(low), std::forward<THigh>(high))
 )
 
 } // end of ns functor

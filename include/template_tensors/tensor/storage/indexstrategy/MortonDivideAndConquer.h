@@ -124,8 +124,8 @@ struct MortonDivideAndConquerToIndexHelper
   __host__ __device__
   static size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords)
   {
-    return (mortonSeparate<N>(getNthCoordinate<I>(util::forward<TCoordArgTypes>(coords)...)) << I)
-      | MortonDivideAndConquerToIndexHelper<I + 1, N>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    return (mortonSeparate<N>(getNthCoordinate<I>(std::forward<TCoordArgTypes>(coords)...)) << I)
+      | MortonDivideAndConquerToIndexHelper<I + 1, N>::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 };
 
@@ -152,7 +152,7 @@ struct MortonDivideAndConquerFromIndexHelper
       result(I) = mortonCompact<N>(index >> I);
     }
 
-    MortonDivideAndConquerFromIndexHelper<I + 1, N>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    MortonDivideAndConquerFromIndexHelper<I + 1, N>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -186,9 +186,9 @@ struct MortonDivideAndConquer
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const volatile
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= TRank, "Dimensions out of morton range");
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    return detail::MortonDivideAndConquerToIndexHelper<0, TRank>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgType>(dims)) <= TRank, "Dimensions out of morton range");
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    return detail::MortonDivideAndConquerToIndexHelper<0, TRank>::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 
   TT_INDEXSTRATEGY_TO_INDEX_2
@@ -197,9 +197,9 @@ struct MortonDivideAndConquer
   __host__ __device__
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgTypes>(dims)...) <= TRank, "Dimensions out of morton range");
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgTypes>(dims)...) <= TRank, "Dimensions out of morton range");
     VectorXs<TDims> result;
-    detail::MortonForLoopFromIndexHelper<0, TRank>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    detail::MortonForLoopFromIndexHelper<0, TRank>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 
@@ -209,7 +209,7 @@ struct MortonDivideAndConquer
   __host__ __device__
   size_t getSize(TDimArgTypes&&... dim_args) const volatile
   {
-    return toIndex(toDimVector(util::forward<TDimArgTypes>(dim_args)...), toDimVector(util::forward<TDimArgTypes>(dim_args)...) - 1) + 1;
+    return toIndex(toDimVector(std::forward<TDimArgTypes>(dim_args)...), toDimVector(std::forward<TDimArgTypes>(dim_args)...) - 1) + 1;
   }
 };
 
@@ -226,7 +226,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const MortonDivideAndConquer<TRank>& index_strategy)
 {
   stream << "MortonDivideAndConquer<" << TRank << ">";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

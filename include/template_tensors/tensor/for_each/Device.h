@@ -33,8 +33,8 @@ struct DeviceForEachHelper
     TT_CUDA_SAFE_CALL((detail::kernel_for_each_element_with_coords<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK, TCoordsRank><<<grid, block>>>(
       mem::toKernel(func),
       size,
-      util::first(util::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
-      util::first(util::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>(),
+      util::first(std::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
+      util::first(std::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>(),
       mem::toKernel(tensors)...
     )));
     TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
@@ -65,9 +65,9 @@ struct DeviceForEachHelper<DYN>
     block = dim3(TBlockSize);
     grid = dim3(TGridSize);
     TT_CUDA_SAFE_CALL((detail::kernel_for_each_element<TKernelIndexStrategy, TBlockSize * TGridSize, KERNEL_COORDS_RANK><<<grid, block>>>(
-      mem::toKernel(util::forward<TFunctor>(func)),
+      mem::toKernel(std::forward<TFunctor>(func)),
       size,
-      util::first(util::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
+      util::first(std::forward<TTensorTypes>(tensors)...).template dims<KERNEL_COORDS_RANK>(),
       mem::toKernel(tensors)...
     )));
     TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
@@ -111,9 +111,9 @@ struct DeviceForEach
     static_assert(are_compatible_dimseqs_v<dimseq_t<TTensorTypes>...>::value, "Incompatible static dimensions");
 
     detail::DeviceForEachHelper<TCoordsRank>::template for_each<TKernelIndexStrategy, TBlockSize, TGridSize>(
-      util::forward<TFunctor>(func),
-      template_tensors::prod(util::first(util::forward<TTensorTypes>(tensors)...).dims()),
-      util::forward<TTensorTypes>(tensors)...
+      std::forward<TFunctor>(func),
+      template_tensors::prod(util::first(std::forward<TTensorTypes>(tensors)...).dims()),
+      std::forward<TTensorTypes>(tensors)...
     );
   }
 

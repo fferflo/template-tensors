@@ -92,7 +92,7 @@ public:
     detail::DeviceRasterizerFunctor<TPrimitiveIterator, TShader, typename std::decay<TArgs&&>::type...> pixel_functor
       (primitives_begin, primitives_end, shader, dest.template dims<2>(), static_cast<typename std::decay<TArgs&&>::type>(args)...);
 
-    template_tensors::for_each<2>(pixel_functor, util::forward<TDestMap>(dest));
+    template_tensors::for_each<2>(pixel_functor, std::forward<TDestMap>(dest));
   }
 };
 

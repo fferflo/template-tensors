@@ -64,8 +64,8 @@ public:
   Matrix(Matrix<TElementType, TBufferUsage>&& other)
     : SuperType(static_cast<SuperType&&>(other))
     , StoreDimensions<dyn_dimseq_t<2>>(static_cast<StoreDimensions<dyn_dimseq_t<2>>&&>(other))
-    , m_buffer_obj(util::move(other.m_buffer_obj))
-    , m_ptr(util::move(other.m_ptr))
+    , m_buffer_obj(std::move(other.m_buffer_obj))
+    , m_ptr(std::move(other.m_ptr))
   {
   }
 
@@ -77,7 +77,7 @@ public:
         template_tensors::Vector2s(buffer_obj->getWidth(), buffer_obj->getHeight())
       )
     , StoreDimensions<dyn_dimseq_t<2>>(template_tensors::Vector2s(buffer_obj->getWidth(), buffer_obj->getHeight()))
-    , m_buffer_obj(util::move(buffer_obj))
+    , m_buffer_obj(std::move(buffer_obj))
     , m_ptr(reinterpret_cast<TElementType*>(static_cast<NvOFBufferCudaDevicePtr*>(m_buffer_obj.get())->getCudaDevicePtr()))
   {
     ASSERT(m_buffer_obj->getElementSize() == sizeof(TElementType), "Invalid element type");
@@ -86,27 +86,27 @@ public:
   }
 
   Matrix(NvOFBufferObj&& buffer_obj)
-    : Matrix(util::move(buffer_obj), static_cast<NvOFBufferCudaDevicePtr*>(buffer_obj.get())->getStrideInfo())
+    : Matrix(std::move(buffer_obj), static_cast<NvOFBufferCudaDevicePtr*>(buffer_obj.get())->getStrideInfo())
   {
   }
 
   template <typename TPixel, NV_OF_PERF_LEVEL TPerfLevel = NV_OF_PERF_LEVEL_SLOW>
   Matrix(Op<TPixel, TPerfLevel>& context)
-    : Matrix(util::move(context.m_context->CreateBuffers(TBufferUsage, 1)[0]))
+    : Matrix(std::move(context.m_context->CreateBuffers(TBufferUsage, 1)[0]))
   {
   }
 
   template <typename TPixel, NV_OF_PERF_LEVEL TPerfLevel = NV_OF_PERF_LEVEL_SLOW>
   Matrix(Op<TPixel, TPerfLevel>& context, template_tensors::Vector2s resolution)
-    : Matrix(util::move(context.m_context->CreateBuffers(resolution(0), resolution(1), TBufferUsage, 1)[0]))
+    : Matrix(std::move(context.m_context->CreateBuffers(resolution(0), resolution(1), TBufferUsage, 1)[0]))
   {
   }
 
   Matrix<TElementType, TBufferUsage>& operator=(Matrix<TElementType, TBufferUsage>&& other)
   {
     static_cast<SuperType&>(*this) = static_cast<SuperType&&>(other);
-    m_buffer_obj = util::move(other.m_buffer_obj);
-    m_ptr = util::move(other.m_ptr);
+    m_buffer_obj = std::move(other.m_buffer_obj);
+    m_ptr = std::move(other.m_ptr);
 
     return *this;
   }

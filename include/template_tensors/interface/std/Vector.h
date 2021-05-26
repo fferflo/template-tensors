@@ -181,7 +181,7 @@ public:
 template <typename TStdVector>
 __host__
 auto fromStdVector(TStdVector&& vector)
-RETURN_AUTO(FromStdVector<util::store_member_t<TStdVector>>(util::forward<TStdVector>(vector)))
+RETURN_AUTO(FromStdVector<util::store_member_t<TStdVector>>(std::forward<TStdVector>(vector)))
 
 template <typename TAllocatorIn = util::EmptyDefaultType, typename TVectorType,
   typename TAllocator = TT_WITH_DEFAULT_TYPE(TAllocatorIn, std::allocator<decay_elementtype_t<TVectorType>>), ENABLE_IF(is_vector_v<TVectorType>::value)>

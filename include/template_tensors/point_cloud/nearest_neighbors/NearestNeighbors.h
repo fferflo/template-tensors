@@ -20,7 +20,7 @@ public:
   template <typename... TNearestNeighborsArgs, ENABLE_IF(std::is_constructible<TNearestNeighbors, TNearestNeighborsArgs&&...>::value)>
   __host__ __device__
   NearestNeighbors(TGetFeatures get_features, TDistanceMetric distance_metric, TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : m_nearest_neighbors(util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : m_nearest_neighbors(std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
     , m_get_features(get_features)
     , m_distance_metric(distance_metric)
   {
@@ -30,7 +30,7 @@ public:
   template <typename... TNearestNeighborsArgs, ENABLE_IF(std::is_constructible<TNearestNeighbors, TNearestNeighborsArgs&&...>::value)>
   __host__ __device__
   NearestNeighbors(TGetFeatures get_features, TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : NearestNeighbors(get_features, TDistanceMetric(), util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : NearestNeighbors(get_features, TDistanceMetric(), std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
   {
   }
 
@@ -38,7 +38,7 @@ public:
   template <typename... TNearestNeighborsArgs, ENABLE_IF(std::is_constructible<TNearestNeighbors, TNearestNeighborsArgs&&...>::value)>
   __host__ __device__
   NearestNeighbors(TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : NearestNeighbors(TGetFeatures(), util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : NearestNeighbors(TGetFeatures(), std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
   {
   }
 

@@ -77,9 +77,9 @@ bool isSymmetric(const TMatrixType& m)
     }; \
   }
 
-#define T (util::forward<TTensorType>(t))
-#define T1 (util::forward<TTensorType1>(t1))
-#define T2 (util::forward<TTensorType2>(t2))
+#define T (std::forward<TTensorType>(t))
+#define T1 (std::forward<TTensorType1>(t1))
+#define T2 (std::forward<TTensorType2>(t2))
 
 /*!
  * \brief Returns the dot product of the given tensors
@@ -173,7 +173,7 @@ struct toPolar
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& t) const
-  RETURN_AUTO(template_tensors::toPolar(util::forward<TTensorType>(t)))
+  RETURN_AUTO(template_tensors::toPolar(std::forward<TTensorType>(t)))
 };
 }
 
@@ -188,7 +188,7 @@ struct toCartesian
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& t) const
-  RETURN_AUTO(template_tensors::toCartesian(util::forward<TTensorType>(t)))
+  RETURN_AUTO(template_tensors::toCartesian(std::forward<TTensorType>(t)))
 };
 }
 

@@ -30,7 +30,7 @@ auto itoa(TIntegral i)
       result(index--) = '-';
     }
   }
-  return template_tensors::tail(util::move(result), TMaxLen - 1 - index);
+  return template_tensors::tail(std::move(result), TMaxLen - 1 - index);
 }
 
 template <metal::int_ TMaxLen = 64, typename TFloat>
@@ -114,7 +114,7 @@ auto ftoa(TFloat f, size_t max_significant_digits = 8)
       }
     }
   }
-  return template_tensors::head(util::move(result), index);
+  return template_tensors::head(std::move(result), index);
 }
 
 
@@ -132,7 +132,7 @@ RETURN_AUTO(itoa(t))
 template <typename TChar = char, typename T, ENABLE_IF(is_string_v<T, TChar>::value)>
 __host__ __device__
 auto to_string(T&& t)
-RETURN_AUTO(util::forward<T>(t))
+RETURN_AUTO(std::forward<T>(t))
 
 template <typename TChar>
 __host__ __device__

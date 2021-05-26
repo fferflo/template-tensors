@@ -15,8 +15,8 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   UnitVector(TDimArgTypes&&... dims)
-    : SuperType(util::forward<TDimArgTypes>(dims)...)
-    , StoreDimensions<template_tensors::DimSeq<TRows>>(util::forward<TDimArgTypes>(dims)...)
+    : SuperType(std::forward<TDimArgTypes>(dims)...)
+    , StoreDimensions<template_tensors::DimSeq<TRows>>(std::forward<TDimArgTypes>(dims)...)
   {
   }
 
@@ -62,8 +62,8 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   UnitVector(dim_t direction, TDimArgTypes&&... dims)
-    : SuperType(util::forward<TDimArgTypes>(dims)...)
-    , StoreDimensions<template_tensors::DimSeq<TRows>>(util::forward<TDimArgTypes>(dims)...)
+    : SuperType(std::forward<TDimArgTypes>(dims)...)
+    , StoreDimensions<template_tensors::DimSeq<TRows>>(std::forward<TDimArgTypes>(dims)...)
     , m_direction(direction)
   {
     ASSERT(direction < TRows, "Direction out of range");
@@ -114,8 +114,8 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   UnitVector(TDimArgTypes&&... dims)
-    : SuperType(util::forward<TDimArgTypes>(dims)...)
-    , StoreDimensions<template_tensors::DimSeq<DYN>>(util::forward<TDimArgTypes>(dims)...)
+    : SuperType(std::forward<TDimArgTypes>(dims)...)
+    , StoreDimensions<template_tensors::DimSeq<DYN>>(std::forward<TDimArgTypes>(dims)...)
   {
     ASSERT(TDirection < this->rows(), "Direction out of range");
   }
@@ -162,8 +162,8 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   UnitVector(dim_t direction, TDimArgTypes&&... dims)
-    : SuperType(util::forward<TDimArgTypes>(dims)...)
-    , StoreDimensions<template_tensors::DimSeq<DYN>>(util::forward<TDimArgTypes>(dims)...)
+    : SuperType(std::forward<TDimArgTypes>(dims)...)
+    , StoreDimensions<template_tensors::DimSeq<DYN>>(std::forward<TDimArgTypes>(dims)...)
     , m_direction(direction)
   {
     ASSERT(direction < this->rows(), "Direction out of range");
@@ -218,8 +218,8 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   UnitVectors(TDimArgTypes&&... dims)
-    : SuperType(util::forward<TDimArgTypes>(dims)...)
-    , StoreDimensions<template_tensors::DimSeq<TRows>>(util::forward<TDimArgTypes>(dims)...)
+    : SuperType(std::forward<TDimArgTypes>(dims)...)
+    , StoreDimensions<template_tensors::DimSeq<TRows>>(std::forward<TDimArgTypes>(dims)...)
   {
   }
 

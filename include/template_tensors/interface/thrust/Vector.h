@@ -202,7 +202,7 @@ public:
   __host__
   static auto toHost(TTensorType&& tensor)
   RETURN_AUTO(
-    SuperType::toHost(util::forward<TTensorType>(tensor))
+    SuperType::toHost(std::forward<TTensorType>(tensor))
   )
 
   template <typename TTensorType, LAZY_TYPE(TElementType, ThrustElementType),
@@ -217,7 +217,7 @@ public:
   __host__
   static auto toDevice(TTensorType&& tensor)
   RETURN_AUTO(
-    SuperType::toDevice(util::forward<TTensorType>(tensor))
+    SuperType::toDevice(std::forward<TTensorType>(tensor))
   )
 };
 #undef SuperType
@@ -230,7 +230,7 @@ public:
 template <typename TThrustVector>
 __host__
 auto fromThrust(TThrustVector&& vector)
-RETURN_AUTO(FromThrustVector<util::store_member_t<TThrustVector>>(util::forward<TThrustVector>(vector)))
+RETURN_AUTO(FromThrustVector<util::store_member_t<TThrustVector>>(std::forward<TThrustVector>(vector)))
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType, ENABLE_IF(mem::isOnHost<mem::memorytype_v<TTensorType>::value>()),
   typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>

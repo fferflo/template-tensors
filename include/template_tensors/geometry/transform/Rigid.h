@@ -92,27 +92,27 @@ public:
   template <typename TPoint>
   __host__ __device__
   auto transformPoint(TPoint&& point) const
-  RETURN_AUTO(matmul(m_rotation, util::forward<TPoint>(point)) + m_translation)
+  RETURN_AUTO(matmul(m_rotation, std::forward<TPoint>(point)) + m_translation)
 
   template <typename TPoint>
   __host__ __device__
   auto operator()(TPoint&& point) const
-  RETURN_AUTO(transformPoint(util::forward<TPoint>(point)))
+  RETURN_AUTO(transformPoint(std::forward<TPoint>(point)))
 
   template <typename TPoint>
   __host__ __device__
   auto transformPointInverted(TPoint&& point) const
-  RETURN_AUTO(matmul(template_tensors::transpose<2>(m_rotation), template_tensors::eval(util::forward<TPoint>(point) - m_translation)))
+  RETURN_AUTO(matmul(template_tensors::transpose<2>(m_rotation), template_tensors::eval(std::forward<TPoint>(point) - m_translation)))
 
   template <typename TDirection>
   __host__ __device__
   auto transformDirection(TDirection&& direction) const
-  RETURN_AUTO(matmul(m_rotation, util::forward<TDirection>(direction)))
+  RETURN_AUTO(matmul(m_rotation, std::forward<TDirection>(direction)))
 
   template <typename TDirection>
   __host__ __device__
   auto transformDirectionInverted(TDirection&& direction) const
-  RETURN_AUTO(matmul(template_tensors::transpose<2>(m_rotation), util::forward<TDirection>(direction)))
+  RETURN_AUTO(matmul(template_tensors::transpose<2>(m_rotation), std::forward<TDirection>(direction)))
 
   __host__ __device__
   Rigid<TScalar, TRank> inverse() const

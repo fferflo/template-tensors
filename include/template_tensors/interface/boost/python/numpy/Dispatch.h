@@ -99,7 +99,7 @@ struct FromNumpy
     if (class_name == "ndarray")
     {
       ::boost::python::numpy::ndarray& ndarray = static_cast<::boost::python::numpy::ndarray&>(object);
-      result.inner_result = inner_dispatcher(ndarray)(Forward<TFunctor&&>{ndarray, util::forward<TFunctor>(functor)});
+      result.inner_result = inner_dispatcher(ndarray)(Forward<TFunctor&&>{ndarray, std::forward<TFunctor>(functor)});
     }
     else
     {

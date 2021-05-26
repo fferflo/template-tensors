@@ -278,7 +278,7 @@ void read(const boost::filesystem::path& path, TElements&&... elements)
   ::tinyply::PlyFile ply_file;
   ply_file.parse_header(file_stream);
 
-  util::for_each(detail::ElementRequester(ply_file), util::forward<TElements>(elements)...);
+  util::for_each(detail::ElementRequester(ply_file), std::forward<TElements>(elements)...);
 
   ply_file.read(file_stream);
 }
@@ -368,7 +368,7 @@ void write(const boost::filesystem::path& path, bool binary, TElements&&... elem
 
   ::tinyply::PlyFile ply_file;
 
-  util::for_each(detail::ElementAdder(ply_file), util::forward<TElements>(elements)...);
+  util::for_each(detail::ElementAdder(ply_file), std::forward<TElements>(elements)...);
 
   ply_file.write(file_stream, binary);
 }

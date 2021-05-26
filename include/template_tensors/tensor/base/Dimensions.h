@@ -102,7 +102,7 @@ struct HasDimensions : public detail::UseStaticDimensionsIfPossible<TThisType, T
   __host__ __device__
   explicit HasDimensions(TDimArgTypes&&... dim_args)
   {
-    ASSERT(areCompatibleDimensions<TDimSeq>(util::forward<TDimArgTypes>(dim_args)...), "Dynamic dimensions do not match static dimensions");
+    ASSERT(areCompatibleDimensions<TDimSeq>(std::forward<TDimArgTypes>(dim_args)...), "Dynamic dimensions do not match static dimensions");
   }
 
   __host__ __device__
@@ -182,7 +182,7 @@ public:
   template <typename TTensorType>
   __host__
   static auto toKernel(TTensorType&& tensor)
-  RETURN_AUTO(VectorXs<TRank>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(VectorXs<TRank>(std::forward<TTensorType>(tensor)))
 
 private:
   TTensor m_tensor;

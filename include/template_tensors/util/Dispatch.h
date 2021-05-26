@@ -36,7 +36,7 @@ struct ToVector
   template <typename... TTypes>
   std::vector<std::string> operator()(TTypes&&... strings) const
   {
-    return std::vector<std::string>{util::forward<TTypes>(strings)...};
+    return std::vector<std::string>{std::forward<TTypes>(strings)...};
   }
 };
 
@@ -64,7 +64,7 @@ struct First
 
   template <typename... TArgs, ENABLE_IF(std::is_constructible<jtuple::tuple<TDispatchers...>, TArgs&&...>::value)>
   First(TArgs&&... args)
-    : dispatchers(util::forward<TArgs>(args)...)
+    : dispatchers(std::forward<TArgs>(args)...)
   {
   }
 
@@ -78,7 +78,7 @@ struct First
 
     template <typename TFunctor2>
     Dispatch(TFunctor2&& functor)
-      : functor(util::forward<TFunctor2>(functor))
+      : functor(std::forward<TFunctor2>(functor))
     {
     }
 
@@ -101,21 +101,21 @@ struct First
       }
       else
       {
-        return this->template operator()<I + 1>(util::forward<TSecond>(second), util::forward<TRest>(rest)...);
+        return this->template operator()<I + 1>(std::forward<TSecond>(second), std::forward<TRest>(rest)...);
       }
     }
   };
 
   template <typename TFunctor>
   auto operator()(TFunctor&& functor)
-  RETURN_AUTO(jtuple::tuple_apply(Dispatch<util::store_member_t<TFunctor&&>>(util::forward<TFunctor>(functor)), dispatchers))
+  RETURN_AUTO(jtuple::tuple_apply(Dispatch<util::store_member_t<TFunctor&&>>(std::forward<TFunctor>(functor)), dispatchers))
 };
 
 } // end of ns detail
 
 template <typename... TDispatchers>
 auto first(TDispatchers&&... dispatchers)
-RETURN_AUTO(detail::First<util::store_member_t<TDispatchers&&>...>(util::forward<TDispatchers>(dispatchers)...))
+RETURN_AUTO(detail::First<util::store_member_t<TDispatchers&&>...>(std::forward<TDispatchers>(dispatchers)...))
 
 
 
@@ -228,7 +228,7 @@ struct FirstTypeHelper<metal::list<TElementTypes...>>
 template <typename TElementTypeSeq, typename TTypePredicate>
 auto first_type(TTypePredicate&& pred, std::string name = "Type")
 RETURN_AUTO(
-  detail::FirstTypeHelper<TElementTypeSeq>::make(util::forward<TTypePredicate>(pred), name)
+  detail::FirstTypeHelper<TElementTypeSeq>::make(std::forward<TTypePredicate>(pred), name)
 )
 
 namespace detail {
@@ -251,7 +251,7 @@ struct FirstValueHelper<TType, metal::numbers<TNumbers...>>
 template <typename TType, typename TNumbers, typename TPredicate>
 auto first_value(TPredicate&& pred, std::string name = "Value")
 RETURN_AUTO(
-  detail::FirstValueHelper<TType, TNumbers>::make(util::forward<TPredicate>(pred), name)
+  detail::FirstValueHelper<TType, TNumbers>::make(std::forward<TPredicate>(pred), name)
 )
 
 
@@ -269,7 +269,7 @@ struct id
 
   template <typename T2, ENABLE_IF(std::is_constructible<T, T2&&>::value)>
   id(T2&& t2)
-    : t(util::forward<T2>(t2))
+    : t(std::forward<T2>(t2))
   {
   }
 
@@ -285,7 +285,7 @@ struct id
 
 template <typename T>
 auto id(T&& t)
-RETURN_AUTO(detail::id<util::store_member_t<T&&>>(util::forward<T>(t)))
+RETURN_AUTO(detail::id<util::store_member_t<T&&>>(std::forward<T>(t)))
 
 
 
@@ -299,7 +299,7 @@ struct ForwardAll;
 template <size_t I, typename TResult, typename TFunctor, typename TInputTuple, typename TOutputTuple>
 auto makeForwardAll(TResult& result, TFunctor&& functor, TInputTuple&& input, TOutputTuple&& output)
 RETURN_AUTO(ForwardAll<I, TResult, util::store_member_t<TFunctor&&>, util::store_member_t<TInputTuple&&>, util::store_member_t<TOutputTuple&&>>
-  (result, util::forward<TFunctor>(functor), util::forward<TInputTuple>(input), util::forward<TOutputTuple>(output)))
+  (result, std::forward<TFunctor>(functor), std::forward<TInputTuple>(input), std::forward<TOutputTuple>(output)))
 
 template <size_t I, typename TResult, typename TFunctor, typename TInputTuple, typename TOutputTuple>
 struct ForwardAll
@@ -312,9 +312,9 @@ struct ForwardAll
   template <typename TFunctor2, typename TInputTuple2, typename TOutputTuple2>
   ForwardAll(TResult& result, TFunctor2&& functor, TInputTuple2&& input, TOutputTuple2&& output)
     : result(result)
-    , functor(util::forward<TFunctor2>(functor))
-    , input(util::forward<TInputTuple2>(input))
-    , output(util::forward<TOutputTuple2>(output))
+    , functor(std::forward<TFunctor2>(functor))
+    , input(std::forward<TInputTuple2>(input))
+    , output(std::forward<TOutputTuple2>(output))
   {
   }
 
@@ -325,7 +325,7 @@ struct ForwardAll
       result,
       static_cast<TFunctor&&>(functor),
       jtuple::tuple_tail(static_cast<TInputTuple&&>(input)),
-      jtuple::tuple_append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_append(std::move(output), std::forward<TDispatchedOutput>(dispatched_output))
     ));
     if (!jtuple::get<I>(result.results))
     {
@@ -344,8 +344,8 @@ struct ForwardAll<I, TResult, TFunctor, TInputTuple, jtuple::tuple<>>
   template <typename TFunctor2, typename TInputTuple2>
   ForwardAll(TResult& result, TFunctor2&& functor, TInputTuple2&& input, jtuple::tuple<> output)
     : result(result)
-    , functor(util::forward<TFunctor2>(functor))
-    , input(util::forward<TInputTuple2>(input))
+    , functor(std::forward<TFunctor2>(functor))
+    , input(std::forward<TInputTuple2>(input))
   {
   }
 
@@ -356,7 +356,7 @@ struct ForwardAll<I, TResult, TFunctor, TInputTuple, jtuple::tuple<>>
       result,
       static_cast<TFunctor&&>(functor),
       jtuple::tuple_tail(static_cast<TInputTuple&&>(input)),
-      jtuple::tuple_append(jtuple::tuple<>(), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_append(jtuple::tuple<>(), std::forward<TDispatchedOutput>(dispatched_output))
     ));
     if (!jtuple::get<I>(result.results))
     {
@@ -375,8 +375,8 @@ struct ForwardAll<I, TResult, TFunctor, jtuple::tuple<>, TOutputTuple>
   template <typename TFunctor2, typename TOutputTuple2>
   ForwardAll(TResult& result, TFunctor2&& functor, jtuple::tuple<> input, TOutputTuple2&& output)
     : result(result)
-    , functor(util::forward<TFunctor2>(functor))
-    , output(util::forward<TOutputTuple2>(output))
+    , functor(std::forward<TFunctor2>(functor))
+    , output(std::forward<TOutputTuple2>(output))
   {
   }
 
@@ -385,7 +385,7 @@ struct ForwardAll<I, TResult, TFunctor, jtuple::tuple<>, TOutputTuple>
   {
     jtuple::tuple_apply(
       static_cast<TFunctor&&>(functor),
-      jtuple::tuple_append(util::move(output), util::forward<TDispatchedOutput>(dispatched_output))
+      jtuple::tuple_append(std::move(output), std::forward<TDispatchedOutput>(dispatched_output))
     );
     result.failure_index = I;
   }
@@ -400,14 +400,14 @@ struct ForwardAll<I, TResult, TFunctor, jtuple::tuple<>, jtuple::tuple<>>
   template <typename TFunctor2>
   ForwardAll(TResult& result, TFunctor2&& functor, jtuple::tuple<> input, jtuple::tuple<> output)
     : result(result)
-    , functor(util::forward<TFunctor2>(functor))
+    , functor(std::forward<TFunctor2>(functor))
   {
   }
 
   template <typename TDispatchedOutput>
   void operator()(TDispatchedOutput&& dispatched_output)
   {
-    static_cast<TFunctor&&>(functor)(util::forward<TDispatchedOutput>(dispatched_output));
+    static_cast<TFunctor&&>(functor)(std::forward<TDispatchedOutput>(dispatched_output));
     result.failure_index = I;
   }
 };
@@ -436,7 +436,7 @@ struct All
 
   template <typename... TDispatchers2>
   All(TDispatchers2&&... dispatchers)
-    : dispatchers(util::forward<TDispatchers2>(dispatchers)...)
+    : dispatchers(std::forward<TDispatchers2>(dispatchers)...)
   {
   }
 
@@ -463,7 +463,7 @@ struct All
 template <typename... TDispatchers>
 auto all(TDispatchers&&... dispatchers)
 RETURN_AUTO(
-  detail::All<util::store_member_t<TDispatchers&&>...>(util::forward<TDispatchers>(dispatchers)...)
+  detail::All<util::store_member_t<TDispatchers&&>...>(std::forward<TDispatchers>(dispatchers)...)
 )
 
 
@@ -514,7 +514,7 @@ public:
     : m_data(nullptr)
     , m_id(static_cast<size_t>(-1))
   {
-    *this = util::forward<TType>(other);
+    *this = std::forward<TType>(other);
   }
 
   struct Copy
@@ -528,7 +528,7 @@ public:
       using Type = typename detail::UnionExGet<0, TType, TTypes>::type;
       static_assert(ID < metal::size<TTypes>::value, "This should never happen");
 
-      self.m_data = new Type(util::forward<TType>(other));
+      self.m_data = new Type(std::forward<TType>(other));
       self.m_id = ID;
     }
   };
@@ -572,7 +572,7 @@ public:
     using Type = typename detail::UnionExGet<0, TType, TTypes>::type;
     static_assert(ID < metal::size<TTypes>::value, "Cannot assign object to union");
     m_id = ID;
-    m_data = new Type(util::forward<TType>(other));
+    m_data = new Type(std::forward<TType>(other));
 
     return *this;
   }
@@ -629,8 +629,8 @@ public:
   static auto dispatch(TThisType&& self, TFunctor&& functor)
   RETURN_AUTO(
     ::dispatch::first_value<size_t, metal::iota<metal::number<0>, metal::size<TTypes>>>
-      (IdMatches<TThisType&&>{util::forward<TThisType>(self)}, std::string(DISPATCH_NAME))
-      (Dispatch<TThisType&&, TFunctor&&>{util::forward<TThisType>(self), util::forward<TFunctor>(functor)})
+      (IdMatches<TThisType&&>{std::forward<TThisType>(self)}, std::string(DISPATCH_NAME))
+      (Dispatch<TThisType&&, TFunctor&&>{std::forward<TThisType>(self), std::forward<TFunctor>(functor)})
   )
   FORWARD_ALL_QUALIFIERS(operator(), dispatch)
 
@@ -661,7 +661,7 @@ struct ResultFunctor
   void operator()(TArgs&&... args)
   {
     return_value = boost::make_unique<TResultType>(
-      util::forward<TFunctor>(functor)(util::forward<TArgs>(args)...)
+      std::forward<TFunctor>(functor)(std::forward<TArgs>(args)...)
     );
   }
 };
@@ -687,13 +687,13 @@ template <typename TResultTypeIn = util::EmptyDefaultType, typename TFunctor, ty
   typename TResultType = typename detail::ResultTypeDeducer<TResultTypeIn, TFunctor, TDispatchers...>::type>
 TResultType get_result(TFunctor&& functor, TDispatchers&&... dispatchers)
 {
-  detail::ResultFunctor<TFunctor&&, TResultType> result_functor(util::forward<TFunctor>(functor));
-  auto result = dispatch::all(util::forward<TDispatchers>(dispatchers)...)(result_functor);
+  detail::ResultFunctor<TFunctor&&, TResultType> result_functor(std::forward<TFunctor>(functor));
+  auto result = dispatch::all(std::forward<TDispatchers>(dispatchers)...)(result_functor);
   if (!result)
   {
     throw std::invalid_argument(result.error());
   }
-  return util::move(*result_functor.return_value);
+  return std::move(*result_functor.return_value);
 }
 
 } // end of ns dispatch

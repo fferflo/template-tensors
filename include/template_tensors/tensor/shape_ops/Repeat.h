@@ -54,7 +54,7 @@ public:
 
   __host__ __device__
   StaticRepeatTensor(TTensorTypeIn tensor)
-    : SuperType(detail::StaticRepeatDims<dimseq_t<SuperType>, TRepetitionsSeq>::get(util::forward<TTensorTypeIn>(tensor)))
+    : SuperType(detail::StaticRepeatDims<dimseq_t<SuperType>, TRepetitionsSeq>::get(std::forward<TTensorTypeIn>(tensor)))
     , m_tensor(tensor)
   {
   }
@@ -67,7 +67,7 @@ public:
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor((coords / util::constant<metal::int_, nth_dimension_v<TIndices, TRepetitionsSeq>::value>())...)
-  ) // TODO: util::forward coords
+  ) // TODO: std::forward coords
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <metal::int_ TIndex>
@@ -138,7 +138,7 @@ public:
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
     self.m_tensor((coords / getNthDimension<TIndices>(self.m_repetitions))...)
-  ) // TODO: util::forward coords?
+  ) // TODO: std::forward coords?
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <metal::int_ TIndex>
@@ -185,7 +185,7 @@ template <typename TRepetitionsSeq, typename TOtherTensorType, ENABLE_IF(is_dims
 __host__ __device__
 auto repeat(TOtherTensorType&& tensor)
 RETURN_AUTO(StaticRepeatTensor<util::store_member_t<TOtherTensorType&&>, TRepetitionsSeq>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 )
 
 
@@ -193,12 +193,12 @@ template <typename TDummy = void, typename TRepetitionsVector, typename TOtherTe
 __host__ __device__
 auto repeat(TOtherTensorType&& tensor, TRepetitionsVector&& factor)
 RETURN_AUTO(DynamicRepeatTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TRepetitionsVector&&>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TRepetitionsVector>(factor))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TRepetitionsVector>(factor))
 )
 
 template <typename TDummy = void, typename TRepetitionsScalar, typename TOtherTensorType, bool TDummy2 = true, ENABLE_IF(!is_tensor_v<TRepetitionsScalar>::value && std::is_same<TDummy, void>::value)>
 __host__ __device__
 auto repeat(TOtherTensorType&& tensor, TRepetitionsScalar&& repetitions)
-RETURN_AUTO(repeat(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TRepetitionsScalar>(repetitions))))
+RETURN_AUTO(repeat(std::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(std::forward<TRepetitionsScalar>(repetitions))))
 
 } // end of ns template_tensors

@@ -11,7 +11,7 @@ template <typename TFunctor, typename... TArgs>
 __host__ __device__
 void call_without_warning(TFunctor&& functor, TArgs&&... args)
 {
-  functor(util::forward<TArgs>(args)...);
+  functor(std::forward<TArgs>(args)...);
 }
 
 template <metal::int_ TCoordsRank>
@@ -23,14 +23,14 @@ struct LocalArrayForEachHelper
   static void for_each(TFunctor&& func, size_t size, TTensorTypes&&... tensors)
   {
     using IndexStrategy = indexstrategy_t<metal::front<metal::list<TTensorTypes...>>>;
-    IndexStrategy index_strategy = util::first(util::forward<TTensorTypes>(tensors)...).getIndexStrategy();
-    VectorXs<TCoordsRank> dims = util::first(util::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>();
+    IndexStrategy index_strategy = util::first(std::forward<TTensorTypes>(tensors)...).getIndexStrategy();
+    VectorXs<TCoordsRank> dims = util::first(std::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>();
 
     TForEach::template for_each<multiply_dimensions_v<combine_dimseqs_t<TTensorTypes...>>::value, mem::combine<mem::memorytype_v<TTensorTypes>::value...>()>(
       ::iterator::counting_iterator<size_t>(0),
       ::iterator::counting_iterator<size_t>(size),
       [&](size_t index){
-        call_without_warning(util::forward<TFunctor>(func), index_strategy.fromIndex(index, dims), tensors.data()[index]...);
+        call_without_warning(std::forward<TFunctor>(func), index_strategy.fromIndex(index, dims), tensors.data()[index]...);
       });
   }
 };
@@ -47,7 +47,7 @@ struct LocalArrayForEachHelper<DYN>
       ::iterator::counting_iterator<size_t>(0),
       ::iterator::counting_iterator<size_t>(size),
       [&](size_t index){
-        call_without_warning(util::forward<TFunctor>(func), tensors.data()[index]...);
+        call_without_warning(std::forward<TFunctor>(func), tensors.data()[index]...);
       });
   }
 };
@@ -87,9 +87,9 @@ struct LocalArrayForEach
       "Storages must have the same indexing strategy");
 
     detail::LocalArrayForEachHelper<TCoordsRank>::template for_each<TForEach>(
-      util::forward<TFunctor>(func),
-      util::first(util::forward<TTensorTypes>(tensors)...).size(),
-      util::forward<TTensorTypes>(tensors)...
+      std::forward<TFunctor>(func),
+      util::first(std::forward<TTensorTypes>(tensors)...).size(),
+      std::forward<TTensorTypes>(tensors)...
     );
   }
 

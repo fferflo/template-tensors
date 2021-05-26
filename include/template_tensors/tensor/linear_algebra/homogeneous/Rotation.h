@@ -93,7 +93,7 @@ template <typename TMatrixType>
 __host__ __device__
 auto homogenizeRotation(TMatrixType&& rotation)
 RETURN_AUTO(
-  HomogenizedRotation<util::store_member_t<TMatrixType&&>>(util::forward<TMatrixType>(rotation))
+  HomogenizedRotation<util::store_member_t<TMatrixType&&>>(std::forward<TMatrixType>(rotation))
 )
 
 } // end of ns template_tensors

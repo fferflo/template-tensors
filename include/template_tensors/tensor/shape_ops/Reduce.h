@@ -20,7 +20,7 @@ struct ReductionCoordHelper<I, false>
   __host__ __device__
   static dim_t get(dim_t new_coord, TCoordArgTypes&&... old_coords)
   {
-    return getNthCoordinate<I>(util::forward<TCoordArgTypes>(old_coords)...);
+    return getNthCoordinate<I>(std::forward<TCoordArgTypes>(old_coords)...);
   }
 };
 
@@ -31,12 +31,12 @@ struct ReductionHelper
   __host__ __device__
   static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
-    ASSERT(getNthCoordinate<I - 1>(util::forward<TCoordArgTypes>(coords)...) == 0, "Reduced coordinate has to be zero");
+    ASSERT(getNthCoordinate<I - 1>(std::forward<TCoordArgTypes>(coords)...) == 0, "Reduced coordinate has to be zero");
     for (dim_t i = 0; i < tensor.template dim<I - 1>(); i++)
     {
       ReductionHelper<metal::contains<TReducedDimsAsSeq, metal::number<I - 2>>::value, I - 1>
-        ::template reduce<TReducedDimsAsSeq>(seq, aggregator, util::forward<TTensorTypeIn>(tensor),
-            ReductionCoordHelper<TIndices, TIndices == I - 1>::get(i, util::forward<TCoordArgTypes>(coords)...)...
+        ::template reduce<TReducedDimsAsSeq>(seq, aggregator, std::forward<TTensorTypeIn>(tensor),
+            ReductionCoordHelper<TIndices, TIndices == I - 1>::get(i, std::forward<TCoordArgTypes>(coords)...)...
           );
     }
   }
@@ -50,8 +50,8 @@ struct ReductionHelper<false, I>
   static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
     ReductionHelper<metal::contains<TReducedDimsAsSeq, metal::number<I - 2>>::value, I - 1>
-        ::template reduce<TReducedDimsAsSeq>(seq, aggregator, util::forward<TTensorTypeIn>(tensor),
-            util::forward<TCoordArgTypes>(coords)...
+        ::template reduce<TReducedDimsAsSeq>(seq, aggregator, std::forward<TTensorTypeIn>(tensor),
+            std::forward<TCoordArgTypes>(coords)...
           );
   }
 };
@@ -63,7 +63,7 @@ struct ReductionHelper<true, 0>
   __host__ __device__
   static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
-    aggregator(tensor(util::forward<TCoordArgTypes>(coords)...));
+    aggregator(tensor(std::forward<TCoordArgTypes>(coords)...));
   }
 };
 
@@ -74,7 +74,7 @@ struct ReductionHelper<false, 0>
   __host__ __device__
   static void reduce(metal::numbers<TIndices...> seq, TAggregator& aggregator, TTensorTypeIn&& tensor, TCoordArgTypes&&... coords)
   {
-    aggregator(tensor(util::forward<TCoordArgTypes>(coords)...));
+    aggregator(tensor(std::forward<TCoordArgTypes>(coords)...));
   }
 };
 
@@ -199,7 +199,7 @@ public:
             metal::iota<metal::number<0>, metal::number<ORIGINAL_NON_TRIVIAL_DIMENSIONS_NUM>>(),
             aggregator,
             self.m_tensor,
-            util::forward<TCoordArgTypes>(coords)...
+            std::forward<TCoordArgTypes>(coords)...
           );
     return aggregator.get();
   }
@@ -276,7 +276,7 @@ RETURN_AUTO(
               util::store_member_t<TAggregator&&>,
               util::store_member_t<TTensorType&&>,
               metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<dimseq_t<TTensorType>>::value>>
-            >(util::forward<TTensorType>(tensor), util::forward<TAggregator>(aggregator))
+            >(std::forward<TTensorType>(tensor), std::forward<TAggregator>(aggregator))
 );
 
 /*!
@@ -295,7 +295,7 @@ RETURN_AUTO(
               util::store_member_t<TAggregator&&>,
               util::store_member_t<TTensorType&&>,
               metal::numbers<TReducedDims...>
-            >(util::forward<TTensorType>(tensor), util::forward<TAggregator>(aggregator))
+            >(std::forward<TTensorType>(tensor), std::forward<TAggregator>(aggregator))
 );
 // TODO: eval the elementtype of a tensor that is reduced if that elementtype is a tensor
 /*!
@@ -309,7 +309,7 @@ template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType
 __host__ __device__
 auto sum(TTensorType&& tensor, TElementType initial_value = 0)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::sum(initial_value)
 )());
 FUNCTOR(sum, template_tensors::sum)
@@ -325,7 +325,7 @@ template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType
 __host__ __device__
 auto prod(TTensorType&& tensor, TElementType initial_value = 1)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::prod(initial_value)
 )());
 FUNCTOR(prod, template_tensors::prod)
@@ -342,7 +342,7 @@ template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType
 __host__ __device__
 auto min_el(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::min(tensor())
 )());
 FUNCTOR(min_el, template_tensors::min_el)
@@ -352,7 +352,7 @@ template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType
 __host__ __device__
 auto max_el(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::max(tensor())
 )());
 FUNCTOR(max_el, template_tensors::max_el)
@@ -361,7 +361,7 @@ template <typename TTensorType>
 __host__ __device__
 auto all(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::all()
 )());
 
@@ -369,7 +369,7 @@ template <typename TTensorType>
 __host__ __device__
 auto any(TTensorType&& tensor)
 RETURN_AUTO(reduceAll(
-  util::forward<TTensorType>(tensor),
+  std::forward<TTensorType>(tensor),
   aggregator::any()
 )());
 
@@ -390,7 +390,7 @@ template <typename TTensorType>
 __host__ __device__
 dim_t count(TTensorType&& t)
 {
-  return sum<dim_t>(elwise(detail::BoolTo01(), util::forward<TTensorType>(t)));
+  return sum<dim_t>(elwise(detail::BoolTo01(), std::forward<TTensorType>(t)));
 }
 
 /*!

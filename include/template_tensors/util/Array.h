@@ -877,7 +877,7 @@ public:
   HD_WARNING_DISABLE
   __host__ __device__
   ReferenceArray(TPointerType data, size_t size)
-    : m_data(util::move(data))
+    : m_data(std::move(data))
     , m_size(size)
   {
   }
@@ -1006,17 +1006,17 @@ private:
 template <typename TArray, ENABLE_IF(::array::is_array_type_v<TArray&&>::value)>
 __host__ __device__
 auto ref(TArray&& array)
-RETURN_AUTO(ReferenceArray<ptr::value_t<decltype(std::declval<TArray&&>().data())>, mem::memorytype_v<TArray&&>::value, size_v<TArray&&>::value>(util::forward<TArray>(array)))
+RETURN_AUTO(ReferenceArray<ptr::value_t<decltype(std::declval<TArray&&>().data())>, mem::memorytype_v<TArray&&>::value, size_v<TArray&&>::value>(std::forward<TArray>(array)))
 
 template <mem::MemoryType TMemoryType, metal::int_ TSize, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
 __host__ __device__
 auto ref(TPointerType&& ptr)
-RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(util::forward<TPointerType>(ptr)))
+RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(std::forward<TPointerType>(ptr)))
 
 template <mem::MemoryType TMemoryType, metal::int_ TSize = ::array::DYN, typename TPointerType, ENABLE_IF(!::array::is_array_type_v<TPointerType&&>::value)>
 __host__ __device__
 auto ref(TPointerType&& ptr, size_t size)
-RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(util::forward<TPointerType>(ptr), size))
+RETURN_AUTO(ReferenceArray<ptr::value_t<TPointerType&&>, TMemoryType, TSize, typename std::decay<TPointerType>::type>(std::forward<TPointerType>(ptr), size))
 
 
 

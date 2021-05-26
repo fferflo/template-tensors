@@ -15,7 +15,7 @@ struct Choose<true>
   template <typename TTrue, typename TFalse>
   __host__ __device__
   static auto get(TTrue&& on_true, TFalse&& on_false)
-  RETURN_AUTO(util::forward<TTrue>(on_true))
+  RETURN_AUTO(std::forward<TTrue>(on_true))
 };
 
 template <>
@@ -24,7 +24,7 @@ struct Choose<false>
   template <typename TTrue, typename TFalse>
   __host__ __device__
   static auto get(TTrue&& on_true, TFalse&& on_false)
-  RETURN_AUTO(util::forward<TFalse>(on_false))
+  RETURN_AUTO(std::forward<TFalse>(on_false))
 };
 
 } // end of ns detail
@@ -32,7 +32,7 @@ struct Choose<false>
 template <bool TCondition, typename TTrue, typename TFalse>
 __host__ __device__
 auto choose(TTrue&& on_true, TFalse&& on_false)
-RETURN_AUTO(detail::Choose<TCondition>::get(util::forward<TTrue>(on_true), util::forward<TFalse>(on_false)))
+RETURN_AUTO(detail::Choose<TCondition>::get(std::forward<TTrue>(on_true), std::forward<TFalse>(on_false)))
 
 
 
@@ -69,7 +69,7 @@ template <bool TCondition, typename TFunctor>
 __host__ __device__
 void constexpr_if(TFunctor&& functor)
 {
-  detail::ConstexprIf<TCondition>::call(util::forward<TFunctor>(functor));
+  detail::ConstexprIf<TCondition>::call(std::forward<TFunctor>(functor));
 }
 
 
@@ -109,7 +109,7 @@ template <bool TCondition, typename TFunctorTrue, typename TFunctorFalse>
 __host__ __device__
 void constexpr_if(TFunctorTrue&& functor_true, TFunctorFalse&& functor_false)
 {
-  detail::ConstexprIfElse<TCondition>::call(util::forward<TFunctorTrue>(functor_true), util::forward<TFunctorFalse>(functor_false));
+  detail::ConstexprIfElse<TCondition>::call(std::forward<TFunctorTrue>(functor_true), std::forward<TFunctorFalse>(functor_false));
 }
 
 } // end of ns util

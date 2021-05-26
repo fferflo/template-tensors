@@ -20,7 +20,7 @@ public:
   template <typename... TNearestNeighborsArgs, ENABLE_IF(std::is_constructible<TNearestNeighbors, TNearestNeighborsArgs&&...>::value)>
   __host__ __device__
   FeatureTransform(TFeatureTransform feature_transform, TFeatureDistanceTransform feature_distance_transform, TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : m_nearest_neighbors(util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : m_nearest_neighbors(std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
     , m_feature_transform(feature_transform)
     , m_feature_distance_transform(feature_distance_transform)
   {
@@ -31,7 +31,7 @@ public:
     && std::is_constructible<TFeatureDistanceTransform>::value && !std::is_same<TFeatureDistanceTransform, TFeatureTransform>::value)>
   __host__ __device__
   FeatureTransform(TFeatureTransform feature_transform, TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : FeatureTransform(feature_transform, TFeatureDistanceTransform(), util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : FeatureTransform(feature_transform, TFeatureDistanceTransform(), std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
   {
   }
 
@@ -40,7 +40,7 @@ public:
     && std::is_same<TFeatureDistanceTransform, TFeatureTransform>::value), bool TDummy = false>
   __host__ __device__
   FeatureTransform(TFeatureTransform feature_transform, TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : FeatureTransform(feature_transform, feature_transform, util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : FeatureTransform(feature_transform, feature_transform, std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
   {
   }
 
@@ -48,7 +48,7 @@ public:
   template <typename... TNearestNeighborsArgs, ENABLE_IF(std::is_constructible<TNearestNeighbors, TNearestNeighborsArgs&&...>::value)>
   __host__ __device__
   FeatureTransform(TNearestNeighborsArgs&&... nearest_neighbors_args)
-    : FeatureTransform(TFeatureTransform(), util::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
+    : FeatureTransform(TFeatureTransform(), std::forward<TNearestNeighborsArgs>(nearest_neighbors_args)...)
   {
   }
 
@@ -64,9 +64,9 @@ public:
   HD_WARNING_DISABLE
   __host__ __device__
   FeatureTransform(FeatureTransform<TNearestNeighbors, TFeatureTransform, TFeatureDistanceTransform>&& other)
-    : m_nearest_neighbors(util::move(other.m_nearest_neighbors))
-    , m_feature_transform(util::move(other.m_feature_transform))
-    , m_feature_distance_transform(util::move(other.m_feature_distance_transform))
+    : m_nearest_neighbors(std::move(other.m_nearest_neighbors))
+    , m_feature_transform(std::move(other.m_feature_transform))
+    , m_feature_distance_transform(std::move(other.m_feature_distance_transform))
   {
   }
 
@@ -81,7 +81,7 @@ public:
   __host__ __device__
   void for_each(TOp&& op, template_tensors::VectorXT<TScalar, TRank> center, template_tensors::VectorXT<TScalar, TRank> range)
   {
-    m_nearest_neighbors.for_each(util::forward<TOp>(op), m_feature_transform(center), m_feature_distance_transform(range));
+    m_nearest_neighbors.for_each(std::forward<TOp>(op), m_feature_transform(center), m_feature_distance_transform(range));
   }
 
   HD_WARNING_DISABLE
@@ -89,7 +89,7 @@ public:
   __host__ __device__
   void update(TGetFeatures&& get_features)
   {
-    m_nearest_neighbors.update(util::functor::compose(m_feature_transform, util::forward<TGetFeatures>(get_features)));
+    m_nearest_neighbors.update(util::functor::compose(m_feature_transform, std::forward<TGetFeatures>(get_features)));
   }
 
 #ifdef __CUDACC__

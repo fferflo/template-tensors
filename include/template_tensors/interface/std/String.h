@@ -94,7 +94,7 @@ private:
 template <typename TStdString>
 __host__
 auto fromStdString(TStdString&& string)
-RETURN_AUTO(FromStdString<util::store_member_t<TStdString>>(util::forward<TStdString>(string)))
+RETURN_AUTO(FromStdString<util::store_member_t<TStdString>>(std::forward<TStdString>(string)))
 
 template <typename TAllocatorIn = util::EmptyDefaultType, typename TVectorType,
   typename TAllocator = TT_WITH_DEFAULT_TYPE(TAllocatorIn, std::allocator<decay_elementtype_t<TVectorType>>), ENABLE_IF(is_vector_v<TVectorType>::value)>

@@ -16,7 +16,7 @@ private:
   __host__ __device__
   static auto get(TThisType&& self, TCoordVector&& coords)
   RETURN_AUTO(
-    util::forward<TThisType>(self).m_mapper(util::forward<TThisType>(self).m_field(util::forward<TCoordVector>(coords)))
+    std::forward<TThisType>(self).m_mapper(std::forward<TThisType>(self).m_field(std::forward<TCoordVector>(coords)))
   )
 
 public:
@@ -33,6 +33,6 @@ public:
 template <typename TField, typename TMapper>
 __host__ __device__
 auto map(TField&& field, TMapper&& mapper)
-RETURN_AUTO(MapField<util::store_member_t<TField&&>, util::store_member_t<TMapper&&>>(util::forward<TField>(field), util::forward<TMapper>(mapper)))
+RETURN_AUTO(MapField<util::store_member_t<TField&&>, util::store_member_t<TMapper&&>>(std::forward<TField>(field), std::forward<TMapper>(mapper)))
 
 } // end of ns field

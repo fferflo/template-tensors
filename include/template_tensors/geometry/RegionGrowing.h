@@ -17,11 +17,11 @@ struct RegionGrowing
   template <typename TOutput2, typename TValues2, typename TGetNeighbors2, typename TAreSimilar2, typename TAtomicOps2>
   __host__ __device__
   RegionGrowing(TOutput2&& output, TValues2&& values, TGetNeighbors2&& get_neighbors, TAreSimilar2&& are_similar, TAtomicOps2&& atomic_ops)
-    : output(util::forward<TOutput2>(output))
-    , values(util::forward<TValues2>(values))
-    , get_neighbors(util::forward<TGetNeighbors2>(get_neighbors))
-    , are_similar(util::forward<TAreSimilar2>(are_similar))
-    , atomic_ops(util::forward<TAtomicOps2>(atomic_ops))
+    : output(std::forward<TOutput2>(output))
+    , values(std::forward<TValues2>(values))
+    , get_neighbors(std::forward<TGetNeighbors2>(get_neighbors))
+    , are_similar(std::forward<TAreSimilar2>(are_similar))
+    , atomic_ops(std::forward<TAtomicOps2>(atomic_ops))
   {
   }
 
@@ -174,9 +174,9 @@ void regionGrow(TOutput&& output, TValues&& values, TGetNeighbors&& get_neighbor
   using RegionGrower = decltype(region_grower);
 
   static const bool HOST = mem::isOnHost<MEMORY_TYPE>();
-  TForEach::template for_each<Rank>(member::hd::reset<HOST, RegionGrower>(region_grower), util::forward<TOutput>(output));
-  TForEach::template for_each<Rank>(member::hd::merge<HOST, RegionGrower>(region_grower), util::forward<TValues>(values));
-  TForEach::template for_each<Rank>(member::hd::postprocess<HOST, RegionGrower>(region_grower), util::forward<TOutput>(output));
+  TForEach::template for_each<Rank>(member::hd::reset<HOST, RegionGrower>(region_grower), std::forward<TOutput>(output));
+  TForEach::template for_each<Rank>(member::hd::merge<HOST, RegionGrower>(region_grower), std::forward<TValues>(values));
+  TForEach::template for_each<Rank>(member::hd::postprocess<HOST, RegionGrower>(region_grower), std::forward<TOutput>(output));
 }
 
 
@@ -193,8 +193,8 @@ TResultTensor regionGrow(TValues&& values, TGetNeighbors&& get_neighbors, TAreSi
   INSTANTIATE_DEVICE(ESC(regionGrow<TRank, TForEach, TIndexStrategy, false, TValues, TGetNeighbors, TAreSimilar, TAtomicOps>),
     INSTANTIATE_ARG(TValues&&), INSTANTIATE_ARG(TGetNeighbors&&), INSTANTIATE_ARG(TAreSimilar&&), INSTANTIATE_ARG(TAtomicOps&&));
 
-  TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TValues>(values).dims());
-  regionGrow<TForEach>(result, util::forward<TValues>(values), util::forward<TGetNeighbors>(get_neighbors), util::forward<TAreSimilar>(are_similar), util::forward<TAtomicOps>(atomic_ops));
+  TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), std::forward<TValues>(values).dims());
+  regionGrow<TForEach>(result, std::forward<TValues>(values), std::forward<TGetNeighbors>(get_neighbors), std::forward<TAreSimilar>(are_similar), std::forward<TAtomicOps>(atomic_ops));
   return result;
 }
 
@@ -213,7 +213,7 @@ struct RegionGrowAtomicOps<true>
   static auto get(TDims&& dims)
   RETURN_AUTO(
     template_tensors::AllocTensorTEx<TAtomicOps, TAllocator, TIndexStrategy, TDimSeq>
-      (TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), util::forward<TDims>(dims))
+      (TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TIndexStrategy(), std::forward<TDims>(dims))
   )
 };
 
@@ -247,6 +247,6 @@ TResultTensor regionGrow(TValues&& values, TGetNeighbors&& get_neighbors, TAreSi
       mem::alloc::default_for<mem::memorytype_v<TValues>::value, TIsOnHost>,
       TIndexStrategy,
       template_tensors::dimseq_t<TValues&&>
-    >(util::forward<TValues>(values).dims());
-  return regionGrow<TRank, TForEach, TIndexStrategy>(util::forward<TValues>(values), util::forward<TGetNeighbors>(get_neighbors), util::forward<TAreSimilar>(are_similar), atomic_ops);
+    >(std::forward<TValues>(values).dims());
+  return regionGrow<TRank, TForEach, TIndexStrategy>(std::forward<TValues>(values), std::forward<TGetNeighbors>(get_neighbors), std::forward<TAreSimilar>(are_similar), atomic_ops);
 }

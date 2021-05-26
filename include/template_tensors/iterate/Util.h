@@ -15,9 +15,9 @@ namespace iterable {
 
 template <typename TForEach = for_each::AutoForEach<>, typename TInputIterable, typename TOutputIterable>
 __host__ __device__
-auto copy(TOutputIterable&& out, TInputIterable&& in) -> decltype(util::forward<TInputIterable>(in).begin())
+auto copy(TOutputIterable&& out, TInputIterable&& in) -> decltype(std::forward<TInputIterable>(in).begin())
 {
-  using Output = decltype(*util::forward<TOutputIterable>(out).begin());
+  using Output = decltype(*std::forward<TOutputIterable>(out).begin());
   auto in_it = in.begin();
   TForEach::for_each(out.begin(), out.end(), [&](Output& output){
     output = *in_it;
@@ -59,7 +59,7 @@ struct distance
   template <typename TIterable>
   __host__ __device__
   auto operator()(TIterable&& iterable) const
-  RETURN_AUTO(iterable::distance<TForEach>(util::forward<TIterable>(iterable)))
+  RETURN_AUTO(iterable::distance<TForEach>(std::forward<TIterable>(iterable)))
 };
 
 } // end of ns functor

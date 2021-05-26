@@ -14,7 +14,7 @@ public:
   template <typename... TDimArgs>
   __host__ __device__
   elwise_helper(TElwiseAggregator aggregator, TIndexStrategy index_strategy, TDimArgs&&... dim_args)
-    : m_aggregators(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
+    : m_aggregators(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, std::forward<TDimArgs>(dim_args)...)
   {
     template_tensors::fill(m_aggregators, aggregator);
   }
@@ -31,7 +31,7 @@ public:
     __host__ __device__
     void operator()(TAggregator&& aggregator, TInput&&... input) const
     {
-      aggregator(util::forward<TInput>(input)...);
+      aggregator(std::forward<TInput>(input)...);
     }
   };
 
@@ -39,7 +39,7 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    template_tensors::op::LocalForEach::for_each(AggregateElwise(), m_aggregators, util::forward<TInput>(input)...);
+    template_tensors::op::LocalForEach::for_each(AggregateElwise(), m_aggregators, std::forward<TInput>(input)...);
   }
 
   __host__ __device__
@@ -56,7 +56,7 @@ auto elwise(TElwiseAggregator aggregator, TIndexStrategy index_strategy, TDimArg
 RETURN_AUTO(detail::elwise_helper<typename std::decay<TElwiseAggregator>::type, TAllocator, TIndexStrategy, template_tensors::dyn_dimseq_t<template_tensors::dimension_num_v<TDimArgs...>::value>>(
   aggregator,
   index_strategy,
-  util::forward<TDimArgs>(dim_args)...
+  std::forward<TDimArgs>(dim_args)...
 ))
 
 template <typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,
@@ -66,7 +66,7 @@ auto elwise(TElwiseAggregator aggregator, TDimArgs&&... dim_args)
 RETURN_AUTO(aggregator::elwise(
   aggregator,
   TIndexStrategy(),
-  util::forward<TDimArgs>(dim_args)...
+  std::forward<TDimArgs>(dim_args)...
 ))
 
 template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TElwiseAggregator,

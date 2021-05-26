@@ -73,12 +73,12 @@ template <typename TMatrixType>
 __host__ __device__
 auto diag(TMatrixType&& matrix)
 RETURN_AUTO(DiagTensor<util::store_member_t<TMatrixType&&>>
-  (util::forward<TMatrixType>(matrix))
+  (std::forward<TMatrixType>(matrix))
 )
 
 template <typename TMatrixType>
 __host__ __device__
 auto trace(TMatrixType&& matrix)
-RETURN_AUTO(template_tensors::sum(template_tensors::diag(util::forward<TMatrixType>(matrix))))
+RETURN_AUTO(template_tensors::sum(template_tensors::diag(std::forward<TMatrixType>(matrix))))
 
 } // end of ns template_tensors

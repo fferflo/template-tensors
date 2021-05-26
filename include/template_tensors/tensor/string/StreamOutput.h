@@ -11,16 +11,16 @@ struct StreamOutputHelper
   static void output(TStreamType&& stream, const TTensorType& tensor, TCoords... coords)
   {
     dim_t max = tensor.template dim<I - 1>();
-    util::forward<TStreamType>(stream) << "[";
+    std::forward<TStreamType>(stream) << "[";
     for (dim_t i = 0; i < max; i++)
     {
-      StreamOutputHelper<TZeroSized, I - 1>::output(util::forward<TStreamType>(stream), tensor, i, coords...);
+      StreamOutputHelper<TZeroSized, I - 1>::output(std::forward<TStreamType>(stream), tensor, i, coords...);
       if (I == 1 && i < max - 1)
       {
-        util::forward<TStreamType>(stream) << " ";
+        std::forward<TStreamType>(stream) << " ";
       }
     }
-    util::forward<TStreamType>(stream) << "]";
+    std::forward<TStreamType>(stream) << "]";
   }
 };
 
@@ -32,7 +32,7 @@ struct StreamOutputHelper<false, 0>
   __host__ __device__
   static void output(TStreamType&& stream, const TTensorType& tensor, TCoords... coords)
   {
-    util::forward<TStreamType>(stream) << tensor(coords...);
+    std::forward<TStreamType>(stream) << tensor(coords...);
   }
 };
 
@@ -44,7 +44,7 @@ struct StreamOutputHelper<true, I>
   __host__ __device__
   static void output(TStreamType&& stream, const TTensorType& tensor, TCoords... coords)
   {
-    util::forward<TStreamType>(stream) << "[]";
+    std::forward<TStreamType>(stream) << "[]";
   }
 };
 
@@ -55,8 +55,8 @@ template <typename TStreamType, typename TTensorType, ENABLE_IF(is_tensor_v<TTen
 __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const TTensorType& tensor)
 {
-  detail::StreamOutputHelper<rows_v<TTensorType>::value == 0, math::max(static_cast<metal::int_>(1), non_trivial_dimensions_num_v<TTensorType>::value)>::output(util::forward<TStreamType>(stream), tensor);
-  return util::forward<TStreamType>(stream);
+  detail::StreamOutputHelper<rows_v<TTensorType>::value == 0, math::max(static_cast<metal::int_>(1), non_trivial_dimensions_num_v<TTensorType>::value)>::output(std::forward<TStreamType>(stream), tensor);
+  return std::forward<TStreamType>(stream);
 }
 
 } // end of ns template_tensors

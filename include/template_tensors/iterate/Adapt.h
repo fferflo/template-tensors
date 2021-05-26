@@ -13,8 +13,8 @@ public:
   template <typename TIterable2, typename TAdaptor2>
   __host__ __device__
   Adapt(TIterable2&& iterable, TAdaptor2&& adaptor)
-    : m_iterable(util::forward<TIterable2>(iterable))
-    , m_adaptor(util::forward<TAdaptor2>(adaptor))
+    : m_iterable(std::forward<TIterable2>(iterable))
+    , m_adaptor(std::forward<TAdaptor2>(adaptor))
   {
   }
 
@@ -32,7 +32,7 @@ __host__ __device__
 auto adapt(TIterable&& in, TAdaptor&& adaptor)
 RETURN_AUTO(
   Adapt<util::store_member_t<TIterable&&>, util::store_member_t<TAdaptor&&>>
-    (util::forward<TIterable>(in), util::forward<TAdaptor>(adaptor))
+    (std::forward<TIterable>(in), std::forward<TAdaptor>(adaptor))
 )
 
 } // end of ns iterable

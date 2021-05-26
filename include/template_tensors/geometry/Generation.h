@@ -235,7 +235,7 @@ __host__ __device__
 auto line(TVectorType1&& start, TVectorType2&& end)
 RETURN_AUTO(
   Line<decay_elementtype_t<TVectorType1&&>, rows_v<TVectorType1>::value, TInteger>(
-    util::forward<TVectorType1>(start), util::forward<TVectorType2>(end)
+    std::forward<TVectorType1>(start), std::forward<TVectorType2>(end)
   )
 )
 
@@ -251,14 +251,14 @@ struct add
   template <typename TVector2, ENABLE_IF(std::is_constructible<TVector, TVector2&&>::value)>
   __host__ __device__
   add(TVector2&& v)
-    : vector(util::forward<TVector2>(v))
+    : vector(std::forward<TVector2>(v))
   {
   }
 
   template <typename TThisType, typename TVector2>
   __host__ __device__
   static auto get(TThisType&& self, TVector2&& vector)
-  RETURN_AUTO(template_tensors::eval(self.vector + util::forward<TVector2>(vector))) // thrust::transform_iterator makes weird reference conversions, so have to call template_tensors::eval here
+  RETURN_AUTO(template_tensors::eval(self.vector + std::forward<TVector2>(vector))) // thrust::transform_iterator makes weird reference conversions, so have to call template_tensors::eval here
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
 
@@ -268,7 +268,7 @@ template <typename TIterable, typename TVectorType>
 __host__ __device__
 auto offset(TIterable&& object, TVectorType&& offset)
 RETURN_AUTO(
-  iterable::transform(util::forward<TIterable>(object), detail::add<util::store_member_t<TVectorType&&>>(util::forward<TVectorType>(offset)))
+  iterable::transform(std::forward<TIterable>(object), detail::add<util::store_member_t<TVectorType&&>>(std::forward<TVectorType>(offset)))
 )
 
 
@@ -284,8 +284,8 @@ public:
   template <typename TVectorType, typename TIndexStrategy2>
   __host__ __device__
   OriginBox(TVectorType&& size, TIndexStrategy2&& index_strategy)
-    : m_size(util::forward<TVectorType>(size))
-    , m_index_strategy(util::forward<TIndexStrategy2>(index_strategy))
+    : m_size(std::forward<TVectorType>(size))
+    , m_index_strategy(std::forward<TIndexStrategy2>(index_strategy))
   {
   }
 
@@ -319,7 +319,7 @@ __host__ __device__
 auto origin_box(TVectorType&& size, TIndexStrategy&& index_strategy = TIndexStrategy())
 RETURN_AUTO(
   OriginBox<rows_v<TVectorType>::value, util::store_member_t<TIndexStrategy&&>>(
-    util::forward<TVectorType>(size), util::forward<TIndexStrategy>(index_strategy)
+    std::forward<TVectorType>(size), std::forward<TIndexStrategy>(index_strategy)
   )
 )
 
@@ -330,9 +330,9 @@ RETURN_AUTO(
   discrete::offset(
     discrete::origin_box(
       template_tensors::static_cast_to<TInteger>(
-        template_tensors::ceil(util::forward<TVectorType2&&>(end)) - template_tensors::floor(static_cast<util::store_member_t<TVectorType1&&>>(start))
+        template_tensors::ceil(std::forward<TVectorType2&&>(end)) - template_tensors::floor(static_cast<util::store_member_t<TVectorType1&&>>(start))
       ),
-      util::forward<TIndexStrategy>(index_strategy)
+      std::forward<TIndexStrategy>(index_strategy)
     ),
     template_tensors::static_cast_to<TInteger>(
       template_tensors::floor(static_cast<util::store_member_t<TVectorType1&&>>(start))
@@ -355,8 +355,8 @@ struct sphere_helper
   __host__ __device__
   sphere_helper(TScalar radius, TVectorType2&& center, TDistanceFunctor2&& distance)
     : radius(radius)
-    , center(util::forward<TVectorType2>(center))
-    , distance(util::forward<TDistanceFunctor2>(distance))
+    , center(std::forward<TVectorType2>(center))
+    , distance(std::forward<TDistanceFunctor2>(distance))
   {
   }
 
@@ -364,7 +364,7 @@ struct sphere_helper
   __host__ __device__
   static bool get(TThisType&& self, TVector&& vector)
   {
-    return self.distance(util::forward<TVector>(vector), self.center) <= self.radius;
+    return self.distance(std::forward<TVector>(vector), self.center) <= self.radius;
   }
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
@@ -377,11 +377,11 @@ auto sphere(TVectorType&& center, TScalar radius, TDistanceFunctor&& distance = 
 RETURN_AUTO(
   filter(
     box(
-      util::forward_copyrvalue<TVectorType>(center) - radius,
-      util::forward_copyrvalue<TVectorType>(center) + radius,
-      util::forward<TIndexStrategy>(index_strategy)
+      TVectorType(center) - radius,
+      TVectorType(center) + radius,
+      std::forward<TIndexStrategy>(index_strategy)
     ),
-    detail::sphere_helper<TScalar, decltype(template_tensors::eval(center - static_cast<TScalar>(0.5))), util::store_member_t<TDistanceFunctor&&>>(radius, template_tensors::eval(center - static_cast<TScalar>(0.5)), util::forward<TDistanceFunctor>(distance))
+    detail::sphere_helper<TScalar, decltype(template_tensors::eval(center - static_cast<TScalar>(0.5))), util::store_member_t<TDistanceFunctor&&>>(radius, template_tensors::eval(center - static_cast<TScalar>(0.5)), std::forward<TDistanceFunctor>(distance))
   )
 )
 

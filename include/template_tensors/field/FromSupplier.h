@@ -15,7 +15,7 @@ private:
   __host__ __device__
   static auto get(TThisType&& self, TCoordVector&& coords)
   RETURN_AUTO(
-    util::forward<TThisType>(self).m_supplier(util::forward<TCoordVector>(coords))
+    std::forward<TThisType>(self).m_supplier(std::forward<TCoordVector>(coords))
   )
 
 public:
@@ -31,6 +31,6 @@ public:
 template <metal::int_ TRank, typename TSupplier>
 __host__ __device__
 auto fromSupplier(TSupplier&& supplier)
-RETURN_AUTO(FromSupplierField<TRank, util::store_member_t<TSupplier&&>>(util::forward<TSupplier>(supplier)))
+RETURN_AUTO(FromSupplierField<TRank, util::store_member_t<TSupplier&&>>(std::forward<TSupplier>(supplier)))
 
 } // end of ns field

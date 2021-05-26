@@ -95,7 +95,7 @@ struct NthValue<true, TRank, TDefault>
   __host__ __device__
   static constexpr dim_t get(TSizetArgs&&... values)
   {
-    return util::nth<TRank>(util::forward<TSizetArgs>(values)...);
+    return util::nth<TRank>(std::forward<TSizetArgs>(values)...);
   }
 
   template <typename TVectorType, ENABLE_IF(is_dim_or_coord_vector_v<TVectorType>::value)>
@@ -132,7 +132,7 @@ constexpr dim_t getNthValue(TDimOrCoordArgTypes&&... dim_or_coord_args)
   return detail::NthValue<math::lt(TRank, TAreDims ?
         dimension_num_v<TDimOrCoordArgTypes&&...>::value
       : coordinate_num_v<TDimOrCoordArgTypes&&...>::value),
-    TRank, TDefault>::get(util::forward<TDimOrCoordArgTypes>(dim_or_coord_args)...);
+    TRank, TDefault>::get(std::forward<TDimOrCoordArgTypes>(dim_or_coord_args)...);
 }
 
 } // end of ns detail
@@ -141,14 +141,14 @@ template <metal::int_ TRank, typename... TDimArgTypes>
 __host__ __device__
 constexpr dim_t getNthDimension(TDimArgTypes&&... dim_args)
 {
-  return detail::getNthValue<true, TRank, 1>(util::forward<TDimArgTypes>(dim_args)...);
+  return detail::getNthValue<true, TRank, 1>(std::forward<TDimArgTypes>(dim_args)...);
 }
 
 template <metal::int_ TRank, typename... TCoordArgTypes>
 __host__ __device__
 constexpr dim_t getNthCoordinate(TCoordArgTypes&&... coord_args)
 {
-  return detail::getNthValue<false, TRank, 0>(util::forward<TCoordArgTypes>(coord_args)...);
+  return detail::getNthValue<false, TRank, 0>(std::forward<TCoordArgTypes>(coord_args)...);
 }
 
 
@@ -160,7 +160,7 @@ __host__ __device__
 constexpr dim_t multiplyDimensionsHelper(metal::numbers<TIndices...>, TDimArgTypes&&... dims)
 {
   static_assert(sizeof...(TIndices) >= dimension_num_v<TDimArgTypes&&...>::value, "Invalid number of dimensions");
-  return math::multiply(template_tensors::getNthDimension<TIndices>(util::forward<TDimArgTypes>(dims)...)...);
+  return math::multiply(template_tensors::getNthDimension<TIndices>(std::forward<TDimArgTypes>(dims)...)...);
 }
 
 } // end of ns detail
@@ -170,7 +170,7 @@ __host__ __device__
 constexpr dim_t multiplyDimensions(TDimArgTypes&&... dim_args)
 {
   return detail::multiplyDimensionsHelper(metal::iota<metal::number<0>, metal::number<dimension_num_v<TDimArgTypes&&...>::value>>(),
-    util::forward<TDimArgTypes>(dim_args)...);
+    std::forward<TDimArgTypes>(dim_args)...);
 }
 
 
@@ -196,14 +196,14 @@ template <metal::int_... TIndices, typename... TDimArgTypes>
 __host__ __device__
 VectorXs<sizeof...(TIndices)> toDimVectorHelper(metal::numbers<TIndices...>, TDimArgTypes&&... dims)
 {
-  return VectorXs<sizeof...(TIndices)>(template_tensors::getNthDimension<TIndices>(util::forward<TDimArgTypes>(dims)...)...);
+  return VectorXs<sizeof...(TIndices)>(template_tensors::getNthDimension<TIndices>(std::forward<TDimArgTypes>(dims)...)...);
 }
 // TODO: assert rest is 0 or 1 if more dims/ coords are given than TIndices
 template <metal::int_... TIndices, typename... TCoordArgTypes>
 __host__ __device__
 VectorXs<sizeof...(TIndices)> toCoordVectorHelper(metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
 {
-  return VectorXs<sizeof...(TIndices)>(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...)...);
+  return VectorXs<sizeof...(TIndices)>(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...)...);
 }
 
 } // end of ns detail
@@ -213,7 +213,7 @@ __host__ __device__
 auto toDimVector(TDimArgTypes&&... dims)
 RETURN_AUTO(
   detail::toDimVectorHelper(metal::iota<metal::number<0>, metal::number<TDims == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDims>>(),
-    util::forward<TDimArgTypes>(dims)...)
+    std::forward<TDimArgTypes>(dims)...)
 )
 
 template <metal::int_ TDims = DYN, typename... TCoordArgTypes>
@@ -221,21 +221,21 @@ __host__ __device__
 auto toCoordVector(TCoordArgTypes&&... coords)
 RETURN_AUTO(
   detail::toCoordVectorHelper(metal::iota<metal::number<0>, metal::number<TDims == DYN ? coordinate_num_v<TCoordArgTypes&&...>::value : TDims>>(),
-    util::forward<TCoordArgTypes>(coords)...)
+    std::forward<TCoordArgTypes>(coords)...)
 )
 
 template <typename... TDimArgTypes>
 __host__ __device__
 constexpr dim_t getNthDimension(size_t n, TDimArgTypes&&... dims)
 {
-  return n < dimension_num_v<TDimArgTypes&&...>::value ? toDimVector(util::forward<TDimArgTypes>(dims)...)(n) : 1;
+  return n < dimension_num_v<TDimArgTypes&&...>::value ? toDimVector(std::forward<TDimArgTypes>(dims)...)(n) : 1;
 }
 
 template <typename... TCoordArgTypes>
 __host__ __device__
 constexpr dim_t getNthCoordinate(size_t n, TCoordArgTypes&&... coords)
 {
-  return n < coordinate_num_v<TCoordArgTypes&&...>::value ? toDimVector(util::forward<TCoordArgTypes>(coords)...)(n) : 0;
+  return n < coordinate_num_v<TCoordArgTypes&&...>::value ? toDimVector(std::forward<TCoordArgTypes>(coords)...)(n) : 0;
 }
 
 
@@ -250,8 +250,8 @@ struct GetNonTrivialDimensionsNumHelper
   __host__ __device__
   static constexpr size_t getNonTrivialDimensionsNum(TDimArgTypes&&... dims)
   {
-    return getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...) == 0 ? I
-      : GetNonTrivialDimensionsNumHelper<I - 1>::getNonTrivialDimensionsNum(util::forward<TDimArgTypes>(dims)...);
+    return getNthDimension<I - 1>(std::forward<TDimArgTypes>(dims)...) == 0 ? I
+      : GetNonTrivialDimensionsNumHelper<I - 1>::getNonTrivialDimensionsNum(std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -272,7 +272,7 @@ template <typename... TDimArgTypes>
 __host__ __device__
 constexpr size_t getNonTrivialDimensionsNum(TDimArgTypes&&... dims)
 {
-  return detail::GetNonTrivialDimensionsNumHelper<dimension_num_v<TDimArgTypes&&...>::value>::getNonTrivialDimensionsNum(util::forward<TDimArgTypes>(dims)...);
+  return detail::GetNonTrivialDimensionsNumHelper<dimension_num_v<TDimArgTypes&&...>::value>::getNonTrivialDimensionsNum(std::forward<TDimArgTypes>(dims)...);
 }
 
 } // end of ns template_tensors

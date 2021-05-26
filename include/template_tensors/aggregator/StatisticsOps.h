@@ -5,14 +5,14 @@ namespace aggregator {
 template <typename TResultType, typename TCounter = size_t>
 __host__ __device__
 auto mean_offline(TResultType initial_value = 0, TCounter initial_count = 0)
-RETURN_AUTO(sum(util::forward<TResultType>(initial_value)) / count(util::forward<TCounter>(initial_count)))
+RETURN_AUTO(sum(std::forward<TResultType>(initial_value)) / count(std::forward<TCounter>(initial_count)))
 
 namespace weighted {
 template <typename TResultType, typename TCounter = TResultType>
 __host__ __device__
 auto mean_offline(TResultType initial_value = 0, TCounter initial_count = 0)
-RETURN_AUTO(aggregator::weighted::sum<TResultType>(util::forward<TResultType>(initial_value))
-  / aggregator::weighted::count<TCounter>(util::forward<TCounter>(initial_count)))
+RETURN_AUTO(aggregator::weighted::sum<TResultType>(std::forward<TResultType>(initial_value))
+  / aggregator::weighted::count<TCounter>(std::forward<TCounter>(initial_count)))
 } // end of ns weighted
 
 namespace detail {

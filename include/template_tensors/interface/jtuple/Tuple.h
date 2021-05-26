@@ -15,7 +15,7 @@ struct ToTupleHelper
   __host__ __device__
   static auto toTuple(TVectorType&& vector, TValues&&... values)
   RETURN_AUTO(
-    ToTupleHelper<TElementType, TRows, N + 1>::toTuple(util::forward<TVectorType>(vector), util::forward<TValues>(values)..., vector(N))
+    ToTupleHelper<TElementType, TRows, N + 1>::toTuple(std::forward<TVectorType>(vector), std::forward<TValues>(values)..., vector(N))
   )
 };
 
@@ -26,7 +26,7 @@ struct ToTupleHelper<TElementType, TRows, TRows>
   __host__ __device__
   static auto toTuple(TVectorType&& vector, TValues&&... values)
   RETURN_AUTO(
-    metal::apply<metal::lambda<jtuple::tuple>, metal::repeat<TElementType, metal::number<TRows>>>(util::forward<TValues>(values)...)
+    metal::apply<metal::lambda<jtuple::tuple>, metal::repeat<TElementType, metal::number<TRows>>>(std::forward<TValues>(values)...)
   )
 };
 
@@ -37,7 +37,7 @@ template <typename TVectorType, metal::int_ TRows = rows_v<TVectorType>::value,
 __host__ __device__
 auto toTuple(TVectorType&& vector)
 RETURN_AUTO(
-  detail::ToTupleHelper<TElementType, TRows, 0>::toTuple(util::forward<TVectorType>(vector))
+  detail::ToTupleHelper<TElementType, TRows, 0>::toTuple(std::forward<TVectorType>(vector))
 )
 
 template <typename TElementType2 = util::EmptyDefaultType, typename TTuple,
@@ -46,7 +46,7 @@ __host__ __device__
 auto fromTuple(TTuple&& tuple)
 RETURN_AUTO(jtuple::tuple_apply(
   util::functor::construct<template_tensors::VectorXT<TElementType, std::tuple_size<TTuple>::value>>(),
-  util::forward<TTuple>(tuple)
+  std::forward<TTuple>(tuple)
 ))
 
 } // end of ns template_tensors

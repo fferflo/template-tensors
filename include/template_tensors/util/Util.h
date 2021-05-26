@@ -35,7 +35,7 @@ namespace util {struct EmptyDefaultType {};}
     template <typename... TArgs> \
     __host__ __device__ \
     auto operator()(TArgs&&... args) const volatile \
-    RETURN_AUTO(NAME2(util::forward<TArgs>(args)...)) \
+    RETURN_AUTO(NAME2(std::forward<TArgs>(args)...)) \
   }; \
   }
 #define MAX_COMPILE_RECURSION_DEPTH 64
@@ -71,14 +71,14 @@ struct TT_CONCAT(instantiator_helper_, __LINE__) \
   template <typename... TArgsForwardQualifier> \
   __host__ __device__ \
   auto NAME1(TArgsForwardQualifier&&... args) QUALIFIER \
-  RETURN_AUTO(NAME2(*this, util::forward<TArgsForwardQualifier>(args)...))
+  RETURN_AUTO(NAME2(*this, std::forward<TArgsForwardQualifier>(args)...))
 
 #define FORWARD_QUALIFIER_MOVE(NAME1, NAME2, QUALIFIER) \
   HD_WARNING_DISABLE \
   template <typename... TArgsForwardQualifier> \
   __host__ __device__ \
   auto NAME1(TArgsForwardQualifier&&... args) QUALIFIER \
-  RETURN_AUTO(NAME2(util::move(*this), util::forward<TArgsForwardQualifier>(args)...))
+  RETURN_AUTO(NAME2(std::move(*this), std::forward<TArgsForwardQualifier>(args)...))
 
 #define FORWARD_ALL_QUALIFIERS(NAME1, NAME2) \
   FORWARD_QUALIFIER(NAME1, NAME2, &) \
@@ -110,7 +110,7 @@ struct TT_CONCAT(instantiator_helper_, __LINE__) \
     template <typename... TArgs> \
     __host__ __device__ \
     auto operator()(TArgs&&... args) \
-    RETURN_AUTO(object.NAME(util::forward<TArgs>(args)...)) \
+    RETURN_AUTO(object.NAME(std::forward<TArgs>(args)...)) \
   }; \
   namespace hd { \
   template <bool THost, typename TObject> \
@@ -127,7 +127,7 @@ struct TT_CONCAT(instantiator_helper_, __LINE__) \
     template <typename... TArgs> \
     __host__ \
     auto operator()(TArgs&&... args) \
-    RETURN_AUTO(object.NAME(util::forward<TArgs>(args)...)) \
+    RETURN_AUTO(object.NAME(std::forward<TArgs>(args)...)) \
   }; \
   template <typename TObject> \
   struct NAME <false, TObject> \
@@ -141,7 +141,7 @@ struct TT_CONCAT(instantiator_helper_, __LINE__) \
     template <typename... TArgs> \
     __device__ \
     auto operator()(TArgs&&... args) \
-    RETURN_AUTO(object.NAME(util::forward<TArgs>(args)...)) \
+    RETURN_AUTO(object.NAME(std::forward<TArgs>(args)...)) \
   }; \
   } \
   }
@@ -180,34 +180,12 @@ T constant()
   return TConstant;
 }
 
-template <typename T>
-__host__ __device__
-constexpr typename std::remove_reference<T>::type&& move(T&& t)
-{
-  return static_cast<typename std::remove_reference<T>::type&&>(t);
-}
-
-template <typename T>
-__host__ __device__
-constexpr T&& forward(typename std::remove_reference<T>::type& t) noexcept
-{
-  return static_cast<T&&>(t);
-}
-
-template <typename T>
-__host__ __device__
-constexpr T&& forward(typename std::remove_reference<T>::type&& t) noexcept
-{
-  static_assert(!std::is_lvalue_reference<T>::value, "Cannot forward an rvalue as an lvalue.");
-  return static_cast<T&&>(t);
-}
-
 HD_WARNING_DISABLE
 template <typename T>
 __host__ __device__
 typename std::decay<T&&>::type decay(T&& t)
 {
-  return typename std::decay<T&&>::type(util::forward<T>(t));
+  return typename std::decay<T&&>::type(std::forward<T>(t));
 }
 
 HD_WARNING_DISABLE
@@ -221,18 +199,6 @@ RETURN_AUTO(
     T&&
   >::type(t)
 )
-// TODO: rename all of these to something else
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto forward_copyrvalue(typename std::remove_reference<T>::type& t)
-RETURN_AUTO(copy_rvalue(static_cast<T&&>(t)))
-
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto forward_copyrvalue(typename std::remove_reference<T>::type&& t)
-RETURN_AUTO(copy_rvalue(static_cast<T&&>(t)))
 
 HD_WARNING_DISABLE
 template <typename T>
@@ -243,28 +209,16 @@ RETURN_AUTO(
     std::is_rvalue_reference<T&&>::value,
     typename std::decay<T>::type,
     T&&
-  >::type(util::forward<T>(t))
+  >::type(std::forward<T>(t))
 )
-
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto forward_lvalue(typename std::remove_reference<T>::type& t)
-RETURN_AUTO(decay_rvalue(static_cast<T&&>(t)))
-// TODO: rename this to something else
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto forward_lvalue(typename std::remove_reference<T>::type&& t)
-RETURN_AUTO(decay_rvalue(static_cast<T&&>(t)))
 
 template <typename T>
 __host__ __device__
 void swap(T& first, T& second)
 {
-  T temp = util::move(first);
-  first = util::move(second);
-  second = util::move(temp);
+  T temp = std::move(first);
+  first = std::move(second);
+  second = std::move(temp);
 }
 
 namespace detail {
@@ -279,7 +233,7 @@ struct decay_if<true>
   __host__ __device__
   static typename std::decay<T&&>::type get(T&& t)
   {
-    return typename std::decay<T&&>::type(util::forward<T>(t));
+    return typename std::decay<T&&>::type(std::forward<T>(t));
   }
 };
 
@@ -289,7 +243,7 @@ struct decay_if<false>
   template <typename T>
   __host__ __device__
   static auto get(T&& t)
-  RETURN_AUTO(util::forward_lvalue<T>(t))
+  RETURN_AUTO(T(std::forward<T>(t)))
 };
 
 } // end of ns detail
@@ -297,7 +251,7 @@ struct decay_if<false>
 template <bool TCondition, typename T>
 __host__ __device__
 auto decay_if(T&& t)
-RETURN_AUTO(detail::decay_if<TCondition>::get(util::forward<T>(t)))
+RETURN_AUTO(detail::decay_if<TCondition>::get(std::forward<T>(t)))
 
 
 
@@ -314,7 +268,7 @@ struct move_if<true>
   template <typename T>
   __host__ __device__
   static auto get(T&& t)
-  RETURN_AUTO(util::move(t))
+  RETURN_AUTO(std::move(t))
 };
 
 template <>
@@ -323,7 +277,7 @@ struct move_if<false>
   template <typename T>
   __host__ __device__
   static auto get(T&& t)
-  RETURN_AUTO(util::forward_lvalue<T>(t))
+  RETURN_AUTO(T(std::forward<T>(t)))
 };
 
 } // end of ns detail
@@ -331,7 +285,7 @@ struct move_if<false>
 template <bool TCondition, typename T>
 __host__ __device__
 auto move_if(T&& t)
-RETURN_AUTO(detail::move_if<TCondition>::get(util::forward<T>(t)))
+RETURN_AUTO(detail::move_if<TCondition>::get(std::forward<T>(t)))
 
 
 
@@ -527,7 +481,7 @@ struct wrapper // TODO: reference forwarding c++20
 template <typename T>
 __host__ __device__
 auto wrap(T&& object)
-RETURN_AUTO(wrapper<util::store_member_t<T&&>>(util::forward<T>(object)))
+RETURN_AUTO(wrapper<util::store_member_t<T&&>>(std::forward<T>(object)))
 
 template <typename T>
 struct functor_wrapper // TODO: reference forwarding c++20
@@ -537,21 +491,21 @@ struct functor_wrapper // TODO: reference forwarding c++20
   template <typename T2, ENABLE_IF(std::is_constructible<T, T2&&>::value)>
   __host__ __device__
   functor_wrapper(T2&& f)
-    : functor(util::forward<T2>(f))
+    : functor(std::forward<T2>(f))
   {
   }
 
   template <typename TThisType, typename... TArgs>
   __host__ __device__
   static auto get(TThisType&& self, TArgs&&... args)
-  RETURN_AUTO(self.functor(util::forward<TArgs>(args)...))
+  RETURN_AUTO(self.functor(std::forward<TArgs>(args)...))
   FORWARD_ALL_QUALIFIERS(operator(), get)
 };
 
 template <typename T>
 __host__ __device__
 auto wrap_functor(T&& functor)
-RETURN_AUTO(functor_wrapper<util::store_member_t<T&&>>(util::forward<T>(functor)))
+RETURN_AUTO(functor_wrapper<util::store_member_t<T&&>>(std::forward<T>(functor)))
 
 
 
@@ -567,7 +521,7 @@ template <typename TFunc, typename TArg0>
 __host__ __device__
 void for_each(TFunc func, TArg0&& arg0)
 {
-  func(util::forward<TArg0>(arg0));
+  func(std::forward<TArg0>(arg0));
 }
 
 HD_WARNING_DISABLE
@@ -575,8 +529,8 @@ template <typename TFunc, typename TArg0, typename... TArgs>
 __host__ __device__
 void for_each(TFunc func, TArg0&& arg0, TArgs&&... args)
 {
-  func(util::forward<TArg0>(arg0));
-  for_each(func, util::forward<TArgs>(args)...);
+  func(std::forward<TArg0>(arg0));
+  for_each(func, std::forward<TArgs>(args)...);
 }
 
 
@@ -589,7 +543,7 @@ struct nth_element
   template <typename TFirst, typename... TRest>
   __host__ __device__
   static constexpr auto get(TFirst&& first, TRest&&... rest)
-  RETURN_AUTO(nth_element<I - 1>::get(util::forward<TRest>(rest)...))
+  RETURN_AUTO(nth_element<I - 1>::get(std::forward<TRest>(rest)...))
 };
 
 template <>
@@ -598,7 +552,7 @@ struct nth_element<0>
   template <typename TFirst, typename... TRest>
   __host__ __device__
   static constexpr auto get(TFirst&& first, TRest&&... rest)
-  RETURN_AUTO(util::forward<TFirst>(first))
+  RETURN_AUTO(std::forward<TFirst>(first))
 };
 
 } // end of ns detail
@@ -606,13 +560,13 @@ struct nth_element<0>
 template <size_t N, typename... T>
 __host__ __device__
 constexpr auto nth(T&&... elements)
-RETURN_AUTO(detail::nth_element<N>::get(util::forward<T>(elements)...))
+RETURN_AUTO(detail::nth_element<N>::get(std::forward<T>(elements)...))
 
 template <typename TFirst, typename... TRest>
 __host__ __device__
 constexpr TFirst&& first(TFirst&& first, TRest&&...)
 {
-  return util::forward<TFirst>(first);
+  return std::forward<TFirst>(first);
 }
 
 

@@ -67,7 +67,7 @@ public:
   __host__ __device__
   FromOpenCv(TCvMat2&& mat)
     : SuperType(mat.rows, mat.cols)
-    , m_mat(util::forward<TCvMat2>(mat))
+    , m_mat(std::forward<TCvMat2>(mat))
   {
     ASSERT(m_mat.elemSize() == sizeof(TElementType), "Invalid element size");
     ASSERT(m_mat.step == m_mat.cols * sizeof(TElementType), "Invalid step");
@@ -148,7 +148,7 @@ template <typename TElementType, typename TCvMat>
 __host__
 auto fromCv(TCvMat&& mat)
 RETURN_AUTO(
-  FromOpenCv<util::store_member_t<TCvMat>, TElementType>(util::forward<TCvMat>(mat))
+  FromOpenCv<util::store_member_t<TCvMat>, TElementType>(std::forward<TCvMat>(mat))
 )
 
 
@@ -182,7 +182,7 @@ cv::Mat toCv(TTensorType&& tensor)
 {
   static_assert(math::lte(non_trivial_dimensions_num_v<TTensorType>::value, 2), "Must be matrix");
   static_assert(TT_IS_ON_DEVICE || mem::isOnHost<mem::memorytype_v<TTensorType>::value>(), "Must be host tensor");
-  return detail::ToCvHelper<typename std::decay<TTensorType>::type>::toCv(util::forward<TTensorType>(tensor));
+  return detail::ToCvHelper<typename std::decay<TTensorType>::type>::toCv(std::forward<TTensorType>(tensor));
 }
 
 template <typename TTensorType, ENABLE_IF(!(has_indexstrategy_v<TTensorType, RowMajor>::value

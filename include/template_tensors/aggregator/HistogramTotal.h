@@ -14,7 +14,7 @@ public:
   template <typename... TDimArgs>
   __host__ __device__
   total_histogram(TBucketAggregator bucket_aggregator, TIndexStrategy index_strategy, TDimArgs&&... dim_args)
-    : m_buckets(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, util::forward<TDimArgs>(dim_args)...)
+    : m_buckets(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, std::forward<TDimArgs>(dim_args)...)
   {
     template_tensors::fill(m_buckets, bucket_aggregator);
   }
@@ -29,7 +29,7 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    m_buckets(template_tensors::static_cast_to<size_t>(template_tensors::concat<0>(util::forward<TInput>(input)...)))();
+    m_buckets(template_tensors::static_cast_to<size_t>(template_tensors::concat<0>(std::forward<TInput>(input)...)))();
   }
 
   struct Getter
@@ -54,7 +54,7 @@ auto total_histogram(TBucketAggregator aggregator, TIndexStrategy index_strategy
 RETURN_AUTO(detail::total_histogram<typename std::decay<TBucketAggregator>::type, TAllocator, TIndexStrategy, template_tensors::dyn_dimseq_t<template_tensors::dimension_num_v<TDimArgs...>::value>>(
   aggregator,
   index_strategy,
-  util::forward<TDimArgs>(dim_args)...
+  std::forward<TDimArgs>(dim_args)...
 ))
 
 template <typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,
@@ -64,7 +64,7 @@ auto total_histogram(TBucketAggregator aggregator, TDimArgs&&... dim_args)
 RETURN_AUTO(aggregator::total_histogram(
   aggregator,
   TIndexStrategy(),
-  util::forward<TDimArgs>(dim_args)...
+  std::forward<TDimArgs>(dim_args)...
 ))
 
 template <metal::int_... TDims, typename TAllocator = mem::alloc::heap, typename TIndexStrategy = template_tensors::ColMajor, typename TBucketAggregator,

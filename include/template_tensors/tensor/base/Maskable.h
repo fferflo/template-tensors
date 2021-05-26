@@ -7,7 +7,7 @@ private:
   template <typename TThisType2, typename TMask>
   __host__ __device__
   static auto mask_with(TThisType2&& self, TMask&& mask)
-  RETURN_AUTO(template_tensors::mask(static_cast<util::copy_qualifiers_t<TThisType, TThisType2&&>>(self), util::forward<TMask>(mask)))
+  RETURN_AUTO(template_tensors::mask(static_cast<util::copy_qualifiers_t<TThisType, TThisType2&&>>(self), std::forward<TMask>(mask)))
 
 public:
   FORWARD_ALL_QUALIFIERS(operator[], mask_with)

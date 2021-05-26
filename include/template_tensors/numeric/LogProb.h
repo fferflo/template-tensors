@@ -59,7 +59,7 @@ public:
 
   __host__ __device__
   LogProb(LogProb<TType, TLogFunctor, TExpFunctor>&& other)
-    : m_logprob(util::move(other.m_logprob))
+    : m_logprob(std::move(other.m_logprob))
   {
   }
 
@@ -80,7 +80,7 @@ public:
   __host__ __device__
   LogProb<TType, TLogFunctor, TExpFunctor>& operator=(LogProb<TType, TLogFunctor, TExpFunctor>&& other)
   {
-    this->m_logprob = util::move(other.m_logprob);
+    this->m_logprob = std::move(other.m_logprob);
     return *this;
   }
 

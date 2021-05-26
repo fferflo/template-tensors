@@ -160,27 +160,27 @@ public:
 template <typename TMatrixType>
 __host__ __device__
 auto matmul(TMatrixType&& matrix)
-RETURN_AUTO(util::forward_lvalue<TMatrixType>(matrix))
+RETURN_AUTO(TMatrixType(std::forward<TMatrixType>(matrix)))
 
 template <typename TMatrixType1, typename TMatrixType2, typename... TMatrixTypeRest>
 __host__ __device__
 auto matmul(TMatrixType1&& m1, TMatrixType2&& m2, TMatrixTypeRest&&... rest)
 RETURN_AUTO(template_tensors::matmul(
-  MatrixProduct<util::store_member_t<TMatrixType1&&>, util::store_member_t<TMatrixType2&&>>(util::forward<TMatrixType1>(m1), util::forward<TMatrixType2>(m2)),
-  util::forward<TMatrixTypeRest>(rest)...
+  MatrixProduct<util::store_member_t<TMatrixType1&&>, util::store_member_t<TMatrixType2&&>>(std::forward<TMatrixType1>(m1), std::forward<TMatrixType2>(m2)),
+  std::forward<TMatrixTypeRest>(rest)...
 ))
 
 template <typename TMatrixType>
 __host__ __device__
 auto matmul_eval(TMatrixType&& matrix)
-RETURN_AUTO(util::forward_lvalue<TMatrixType>(matrix))
+RETURN_AUTO(TMatrixType(std::forward<TMatrixType>(matrix)))
 
 template <typename TMatrixType1, typename TMatrixType2, typename... TMatrixTypeRest>
 __host__ __device__
 auto matmul_eval(TMatrixType1&& m1, TMatrixType2&& m2, TMatrixTypeRest&&... rest)
 RETURN_AUTO(matmul_eval(
-  template_tensors::eval(template_tensors::matmul(util::forward<TMatrixType1>(m1), util::forward<TMatrixType2>(m2))),
-  util::forward<TMatrixTypeRest>(rest)...
+  template_tensors::eval(template_tensors::matmul(std::forward<TMatrixType1>(m1), std::forward<TMatrixType2>(m2))),
+  std::forward<TMatrixTypeRest>(rest)...
 ))
 
 } // end of ns template_tensors

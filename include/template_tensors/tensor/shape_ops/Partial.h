@@ -86,7 +86,7 @@ struct PartialCoordinateHelper<N, TDropDim, TKeepDim, TDropSeq, true>
   __host__ __device__
   static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
-    return PartialCoordinateHelper<N - 1, TDropDim + 1, TKeepDim, TDropSeq>::coord(util::forward<TKeepCoordVector>(keep_coords), util::forward<TCoordArgTypes>(drop_coords)...);
+    return PartialCoordinateHelper<N - 1, TDropDim + 1, TKeepDim, TDropSeq>::coord(std::forward<TKeepCoordVector>(keep_coords), std::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
@@ -97,7 +97,7 @@ struct PartialCoordinateHelper<N, TDropDim, TKeepDim, TDropSeq, false>
   __host__ __device__
   static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
-    return PartialCoordinateHelper<N - 1, TDropDim, TKeepDim + 1, TDropSeq>::coord(util::forward<TKeepCoordVector>(keep_coords), util::forward<TCoordArgTypes>(drop_coords)...);
+    return PartialCoordinateHelper<N - 1, TDropDim, TKeepDim + 1, TDropSeq>::coord(std::forward<TKeepCoordVector>(keep_coords), std::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
@@ -108,7 +108,7 @@ struct PartialCoordinateHelper<0, TDropDim, TKeepDim, TDropSeq, true>
   __host__ __device__
   static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
-    return getNthCoordinate<TDropDim>(util::forward<TCoordArgTypes>(drop_coords)...);
+    return getNthCoordinate<TDropDim>(std::forward<TCoordArgTypes>(drop_coords)...);
   }
 };
 
@@ -119,7 +119,7 @@ struct PartialCoordinateHelper<0, TDropDim, TKeepDim, TDropSeq, false>
   __host__ __device__
   static dim_t coord(TKeepCoordVector&& keep_coords, TCoordArgTypes&&... drop_coords)
   {
-    return getNthCoordinate<TKeepDim>(util::forward<TKeepCoordVector>(keep_coords));
+    return getNthCoordinate<TKeepDim>(std::forward<TKeepCoordVector>(keep_coords));
   }
 };
 
@@ -161,7 +161,7 @@ public:
   PartialTensorElement(TTensorTypeIn tensor, TCoordArgTypes&&... keep_coords)
     : SuperType(detail::PickDims<TDropSeq>::pick(tensor))
     , m_tensor(tensor)
-    , m_keep_coords(toCoordVector<metal::size<KeepSeq>::value>(util::forward<TCoordArgTypes>(keep_coords)...))
+    , m_keep_coords(toCoordVector<metal::size<KeepSeq>::value>(std::forward<TCoordArgTypes>(keep_coords)...))
   {
   }
 
@@ -177,7 +177,7 @@ public:
   PartialTensorElement(PartialTensorElement<TTensorTypeIn, TDropSeq, TRValue>&& other)
     : SuperType(static_cast<SuperType&&>(other))
     , m_tensor(other.m_tensor)
-    , m_keep_coords(util::move(other.m_keep_coords))
+    , m_keep_coords(std::move(other.m_keep_coords))
   {
   }
 
@@ -206,7 +206,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    util::move_if<TRValue>(self.m_tensor)(detail::PartialCoordinateHelper<TIndices, 0, 0, TDropSeq>::coord(self.m_keep_coords, util::forward<TCoordArgTypes>(coords)...)...)
+    util::move_if<TRValue>(self.m_tensor)(detail::PartialCoordinateHelper<TIndices, 0, 0, TDropSeq>::coord(self.m_keep_coords, std::forward<TCoordArgTypes>(coords)...)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<TTensorTypeIn>::value)
 
@@ -262,7 +262,7 @@ public:
       TTensorTypeIn&,
       detail::invert_seq_t<non_trivial_dimensions_num_v<TTensorTypeIn>::value, TKeepSeq>,
       std::is_rvalue_reference<TThisType&&>::value && !std::is_reference<TTensorTypeIn>::value
-    >(self.m_tensor, util::forward<TCoordArgTypes>(coords)...)
+    >(self.m_tensor, std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
   // TODO: self is not properly forwarded as rvalue
@@ -311,24 +311,24 @@ TDropSeq>>
 __host__ __device__
 auto partial(TOtherTensorType&& tensor)
 RETURN_AUTO(PartialTensor<util::store_member_t<TOtherTensorType&&>, TKeepSeq>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 template <metal::int_... TDropDims, typename TOtherTensorType>
 __host__ __device__
 auto partial(TOtherTensorType&& tensor)
 RETURN_AUTO(partial<metal::numbers<TDropDims...>>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 template <typename TMatrixType>
 __host__ __device__
 auto rows(TMatrixType&& matrix)
-RETURN_AUTO(partial<1>(util::forward<TMatrixType>(matrix)))
+RETURN_AUTO(partial<1>(std::forward<TMatrixType>(matrix)))
 
 template <typename TMatrixType>
 __host__ __device__
 auto cols(TMatrixType&& matrix)
-RETURN_AUTO(partial<0>(util::forward<TMatrixType>(matrix)))
+RETURN_AUTO(partial<0>(std::forward<TMatrixType>(matrix)))
 
 } // end of ns template_tensors

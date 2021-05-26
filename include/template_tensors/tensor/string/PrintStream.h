@@ -29,7 +29,7 @@ template <typename TDummy, typename T>
 __host__ __device__
 PrintStream<TDummy>& operator<<(PrintStream<TDummy>& stream, T&& object)
 {
-  stream.m_stream << util::forward<T>(object);
+  stream.m_stream << std::forward<T>(object);
   return stream;
 }
 
@@ -37,8 +37,8 @@ template <typename TDummy, typename T>
 __host__ __device__
 PrintStream<TDummy>&& operator<<(PrintStream<TDummy>&& stream, T&& object)
 {
-  stream.m_stream << util::forward<T>(object);
-  return util::move(stream);
+  stream.m_stream << std::forward<T>(object);
+  return std::move(stream);
 }
 
 } // end of ns template_tensors

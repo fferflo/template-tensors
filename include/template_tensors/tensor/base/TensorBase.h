@@ -15,35 +15,35 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   explicit TensorBase(TDimArgTypes&&... dim_args)
-    : HasDimensions<TThisType, TDimSeq>(util::forward<TDimArgTypes>(dim_args)...)
+    : HasDimensions<TThisType, TDimSeq>(std::forward<TDimArgTypes>(dim_args)...)
   {
   }
 
   template <typename TTensorType, ENABLE_IF(mem::memorytype_v<TTensorType>::value == mem::DEVICE)>
   __host__
   static auto toHost(TTensorType&& tensor)
-  RETURN_AUTO(util::forward<TTensorType>(tensor).map(mem::functor::toHost()))
+  RETURN_AUTO(std::forward<TTensorType>(tensor).map(mem::functor::toHost()))
 
   template <typename TTensorType, ENABLE_IF(mem::memorytype_v<TTensorType>::value != mem::DEVICE)>
   __host__
   static auto toHost(TTensorType&& tensor)
-  RETURN_AUTO(mem::HasMemoryType<TThisType, TMemoryType>::toHost(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(mem::HasMemoryType<TThisType, TMemoryType>::toHost(std::forward<TTensorType>(tensor)))
 
 #ifdef __CUDACC__
   template <typename TTensorType, ENABLE_IF(mem::memorytype_v<TTensorType>::value != mem::DEVICE)>
   __host__
   static auto toDevice(TTensorType&& tensor)
-  RETURN_AUTO(util::forward<TTensorType>(tensor).map(mem::functor::toDevice()))
+  RETURN_AUTO(std::forward<TTensorType>(tensor).map(mem::functor::toDevice()))
 
   template <typename TTensorType, ENABLE_IF(mem::memorytype_v<TTensorType>::value == mem::DEVICE)>
   __host__
   static auto toDevice(TTensorType&& tensor)
-  RETURN_AUTO(mem::HasMemoryType<TThisType, TMemoryType>::toHost(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(mem::HasMemoryType<TThisType, TMemoryType>::toHost(std::forward<TTensorType>(tensor)))
 
   template <typename TTensorType>
   __host__
   static auto toKernel(TTensorType&& tensor)
-  RETURN_AUTO(util::forward<TTensorType>(tensor).map(mem::functor::toKernel()))
+  RETURN_AUTO(std::forward<TTensorType>(tensor).map(mem::functor::toKernel()))
 #endif
 };
 

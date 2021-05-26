@@ -5,13 +5,13 @@ namespace template_tensors {
   __host__ __device__ \
   size_t toIndex(TCoordArgTypes&&... coords) const \
   { \
-    return toIndex(DimSeq<TDims...>(), util::forward<TCoordArgTypes>(coords)...); \
+    return toIndex(DimSeq<TDims...>(), std::forward<TCoordArgTypes>(coords)...); \
   } \
   template <metal::int_... TDims, typename... TCoordArgTypes, ENABLE_IF(are_coord_args_v<TCoordArgTypes&&...>::value && sizeof...(TDims) != 0)> \
   __host__ __device__ \
   size_t toIndex(TCoordArgTypes&&... coords) const volatile \
   { \
-    return toIndex(DimSeq<TDims...>(), util::forward<TCoordArgTypes>(coords)...); \
+    return toIndex(DimSeq<TDims...>(), std::forward<TCoordArgTypes>(coords)...); \
   }
 
 #define TT_INDEXSTRATEGY_FROM_INDEX_2 \

@@ -16,7 +16,7 @@ struct AutoInverseHelper<2>
   {
     TT_MATRIX_INVERSE_CHECK_DIMS
 
-    return template_tensors::op::ClosedFormInverse<2>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
+    return template_tensors::op::ClosedFormInverse<2>()(std::forward<TMatrixTypeDest>(dest), std::forward<TMatrixTypeSrc>(src));
   }
 };
 // TODO: add this to Dispatch.h
@@ -29,7 +29,7 @@ struct AutoInverseHelper<3>
   {
     TT_MATRIX_INVERSE_CHECK_DIMS
 
-    return template_tensors::op::ClosedFormInverse<3>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
+    return template_tensors::op::ClosedFormInverse<3>()(std::forward<TMatrixTypeDest>(dest), std::forward<TMatrixTypeSrc>(src));
   }
 };
 
@@ -44,7 +44,7 @@ public:
   {
     TT_MATRIX_INVERSE_CHECK_DIMS
 
-    return detail::AutoInverseHelper<RANK>()(util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src));
+    return detail::AutoInverseHelper<RANK>()(std::forward<TMatrixTypeDest>(dest), std::forward<TMatrixTypeSrc>(src));
   }
 };
 
@@ -57,7 +57,7 @@ __host__ __device__
 TResultType inverse(TMatrixType&& matrix, TIndexStrategy index_strategy = TIndexStrategy())
 {
   TResultType result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, matrix.dims());
-  op::AutoInverse()(result, util::forward<TMatrixType>(matrix));
+  op::AutoInverse()(result, std::forward<TMatrixType>(matrix));
   return result;
 }
 

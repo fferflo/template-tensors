@@ -43,8 +43,8 @@ struct StaticPaddedElementAccess<TRank, TPadFrontSeq, TPadBackSeq, metal::number
   static bool isInOriginal(TTensorType&& tensor, TCoordArgTypes&&... coords)
   {
     return math::landsc((
-         (util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>() == 0 || math::gte(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), (size_t) util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>()))
-      && (util::constant<metal::int_, nth_coordinate_v<TIndices, TPadBackSeq>::value>() == 0 || math::lt(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), tensor.template dim<TIndices>() + (size_t) util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>()))
+         (util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>() == 0 || math::gte(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...), (size_t) util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>()))
+      && (util::constant<metal::int_, nth_coordinate_v<TIndices, TPadBackSeq>::value>() == 0 || math::lt(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...), tensor.template dim<TIndices>() + (size_t) util::constant<metal::int_, nth_coordinate_v<TIndices, TPadFrontSeq>::value>()))
     )...);
   }
 
@@ -72,7 +72,7 @@ public:
 
   __host__ __device__
   StaticPaddedTensor(TTensorTypeOverlay overlay, TBackgroundFunctor background)
-    : SuperType(detail::StaticPaddedDims<dimseq_t<SuperType>, TPadFrontSeq, TPadBackSeq>::get(util::forward<TTensorTypeOverlay>(overlay)))
+    : SuperType(detail::StaticPaddedDims<dimseq_t<SuperType>, TPadFrontSeq, TPadBackSeq>::get(std::forward<TTensorTypeOverlay>(overlay)))
     , m_overlay(overlay)
     , m_background(background)
   {
@@ -86,13 +86,13 @@ public:
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
     -> typename detail::CombineTensorMemberElementTypesHelper<decltype(self.m_overlay), decltype(self.m_background)>::type
   {
-    if (detail::StaticPaddedElementAccess<NON_TRIVIAL_DIMENSIONS_NUM, TPadFrontSeq, TPadBackSeq>::isInOriginal(self.m_overlay, util::forward<TCoordArgTypes>(coords)...))
+    if (detail::StaticPaddedElementAccess<NON_TRIVIAL_DIMENSIONS_NUM, TPadFrontSeq, TPadBackSeq>::isInOriginal(self.m_overlay, std::forward<TCoordArgTypes>(coords)...))
     {
-      return detail::StaticPaddedElementAccess<NON_TRIVIAL_DIMENSIONS_NUM, TPadFrontSeq, TPadBackSeq>::template get<TIndices...>(self.m_overlay, util::forward<TCoordArgTypes>(coords)...);
+      return detail::StaticPaddedElementAccess<NON_TRIVIAL_DIMENSIONS_NUM, TPadFrontSeq, TPadBackSeq>::template get<TIndices...>(self.m_overlay, std::forward<TCoordArgTypes>(coords)...);
     }
     else
     {
-      return self.m_background(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_background(std::forward<TCoordArgTypes>(coords)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
@@ -149,14 +149,14 @@ struct DynamicPadFrontElementAccess<TRank, metal::numbers<TIndices...>>
   static bool isInOriginal(TPaddingVector&& padding, TCoordArgTypes&&... coords)
   {
     return math::landsc((
-      math::gte(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), getNthCoordinate<TIndices>(padding))
+      math::gte(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...), getNthCoordinate<TIndices>(padding))
     )...);
   }
 
   template <metal::int_... TCoordinateIndices, typename TTensorType, typename TPaddingVector, typename... TCoordArgTypes>
   __host__ __device__
   static auto get(TTensorType&& tensor, TPaddingVector&& padding, TCoordArgTypes&&... coords)
-  RETURN_AUTO(tensor((coords - getNthCoordinate<TCoordinateIndices>(util::forward<TPaddingVector>(padding)))...))
+  RETURN_AUTO(tensor((coords - getNthCoordinate<TCoordinateIndices>(std::forward<TPaddingVector>(padding)))...))
 };
 
 } // end of ns detail
@@ -191,13 +191,13 @@ public:
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
     -> typename detail::CombineTensorMemberElementTypesHelper<decltype(self.m_overlay), decltype(self.m_background)>::type
   {
-    if (detail::DynamicPadFrontElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::isInOriginal(self.m_padding, util::forward<TCoordArgTypes>(coords)...))
+    if (detail::DynamicPadFrontElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::isInOriginal(self.m_padding, std::forward<TCoordArgTypes>(coords)...))
     {
-      return detail::DynamicPadFrontElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::template get<TIndices...>(self.m_overlay, self.m_padding, util::forward<TCoordArgTypes>(coords)...);
+      return detail::DynamicPadFrontElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::template get<TIndices...>(self.m_overlay, self.m_padding, std::forward<TCoordArgTypes>(coords)...);
     }
     else
     {
-      return self.m_background(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_background(std::forward<TCoordArgTypes>(coords)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
@@ -256,7 +256,7 @@ struct DynamicPadBackElementAccess<TRank, metal::numbers<TIndices...>>
   static bool isInOriginal(TTensorType&& overlay, TCoordArgTypes&&... coords)
   {
     return math::landsc((
-      math::lt(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), overlay.template dim<TIndices>())
+      math::lt(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...), overlay.template dim<TIndices>())
     )...);
   }
 };
@@ -294,13 +294,13 @@ public:
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
     -> typename detail::CombineTensorMemberElementTypesHelper<decltype(self.m_overlay), decltype(self.m_background)>::type
   {
-    if (detail::DynamicPadBackElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::isInOriginal(self.m_overlay, util::forward<TCoordArgTypes>(coords)...))
+    if (detail::DynamicPadBackElementAccess<NON_TRIVIAL_DIMENSIONS_NUM>::isInOriginal(self.m_overlay, std::forward<TCoordArgTypes>(coords)...))
     {
-      return self.m_overlay(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_overlay(std::forward<TCoordArgTypes>(coords)...);
     }
     else
     {
-      return self.m_background(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_background(std::forward<TCoordArgTypes>(coords)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
@@ -350,23 +350,23 @@ template <typename TPadFrontSeq, typename TPadBackSeq, bool TDummy = true, typen
 __host__ __device__
 auto pad(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(StaticPaddedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, TPadFrontSeq, TPadBackSeq>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
 template <typename TPadBothSeq, bool TDummy = true, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_coordseq_v<TPadBothSeq>::value)>
 __host__ __device__
 auto pad(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(pad<TPadBothSeq, TPadBothSeq>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(pad<TPadBothSeq, TPadBothSeq>(std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background)))
 
 template <typename TPadFrontSeq, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_coordseq_v<TPadFrontSeq>::value)>
 __host__ __device__
 auto pad_front(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(pad<TPadFrontSeq, CoordSeq<>>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(pad<TPadFrontSeq, CoordSeq<>>(std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background)))
 
 template <typename TPadBackSeq, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_coordseq_v<TPadBackSeq>::value)>
 __host__ __device__
 auto pad_back(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(pad<CoordSeq<>, TPadBackSeq>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(pad<CoordSeq<>, TPadBackSeq>(std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background)))
 
 
 template <metal::int_ TPadding, bool TDummy = true, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
@@ -375,21 +375,21 @@ auto pad(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroun
 RETURN_AUTO(pad<
   repeat_dimseq_t<TPadding, non_trivial_dimensions_num_v<TOtherTensorType>::value>,
   repeat_dimseq_t<TPadding, non_trivial_dimensions_num_v<TOtherTensorType>::value>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
 template <metal::int_ TPadding, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
 __host__ __device__
 auto pad_front(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(pad_front<repeat_dimseq_t<TPadding, non_trivial_dimensions_num_v<TOtherTensorType>::value>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
 template <metal::int_ TPadding, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
 __host__ __device__
 auto pad_back(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(pad_back<repeat_dimseq_t<TPadding, non_trivial_dimensions_num_v<TOtherTensorType>::value>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
 
@@ -397,42 +397,42 @@ template <typename TDummy = void, typename TPaddingVector, typename TOtherTensor
 __host__ __device__
 auto pad_front(TOtherTensorType&& tensor, TPaddingVector&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(DynamicPadFrontTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TPaddingVector&&>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background), util::forward<TPaddingVector>(padding))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TPaddingVector>(padding))
 )
 
 template <typename TDummy = void, typename TPaddingVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(std::is_same<TDummy, void>::value && is_tensor_v<TPaddingVector>::value)>
 __host__ __device__
 auto pad_back(TOtherTensorType&& tensor, TPaddingVector&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(DynamicPadBackTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TPaddingVector&&>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background), util::forward<TPaddingVector>(padding))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TPaddingVector>(padding))
 )
 
 template <typename TDummy = void, typename TPaddingVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(std::is_same<TDummy, void>::value && is_tensor_v<TPaddingVector>::value)>
 __host__ __device__
 auto pad(TOtherTensorType&& tensor, TPaddingVector&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(pad_front(
-  pad_back(util::forward<TOtherTensorType>(tensor), util::forward<TPaddingVector>(padding), util::forward<TBackgroundFunctor>(background)),
-  util::forward<TPaddingVector>(padding), util::forward<TBackgroundFunctor>(background)
+  pad_back(std::forward<TOtherTensorType>(tensor), std::forward<TPaddingVector>(padding), std::forward<TBackgroundFunctor>(background)),
+  std::forward<TPaddingVector>(padding), std::forward<TBackgroundFunctor>(background)
 ))
 
 
 template <typename TDummy = void, typename TPaddingScalar, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, bool TDummy2 = true, ENABLE_IF(std::is_same<TDummy, void>::value && !is_tensor_v<TPaddingScalar>::value)>
 __host__ __device__
 auto pad_front(TOtherTensorType&& tensor, TPaddingScalar&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(pad_front(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TPaddingScalar>(padding)), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(pad_front(std::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(std::forward<TPaddingScalar>(padding)), std::forward<TBackgroundFunctor>(background)))
 
 
 template <typename TDummy = void, typename TPaddingScalar, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, bool TDummy2 = true, ENABLE_IF(std::is_same<TDummy, void>::value && !is_tensor_v<TPaddingScalar>::value)>
 __host__ __device__
 auto pad_back(TOtherTensorType&& tensor, TPaddingScalar&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(pad_back(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TPaddingScalar>(padding)), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(pad_back(std::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(std::forward<TPaddingScalar>(padding)), std::forward<TBackgroundFunctor>(background)))
 
 template <typename TDummy = void, typename TPaddingScalar, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, bool TDummy2 = true, ENABLE_IF(std::is_same<TDummy, void>::value && !is_tensor_v<TPaddingScalar>::value)>
 __host__ __device__
 auto pad(TOtherTensorType&& tensor, TPaddingScalar&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(pad_front(
-  pad_back(util::forward<TOtherTensorType>(tensor), util::forward<TPaddingScalar>(padding), util::forward<TBackgroundFunctor>(background)),
-  util::forward<TPaddingScalar>(padding), util::forward<TBackgroundFunctor>(background)
+  pad_back(std::forward<TOtherTensorType>(tensor), std::forward<TPaddingScalar>(padding), std::forward<TBackgroundFunctor>(background)),
+  std::forward<TPaddingScalar>(padding), std::forward<TBackgroundFunctor>(background)
 ))
 
 } // end of ns template_tensors

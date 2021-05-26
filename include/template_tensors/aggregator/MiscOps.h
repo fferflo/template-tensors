@@ -31,7 +31,7 @@ struct weighted_inc
   __host__ __device__
   void operator()(TCounter& counter, TArg&&, TWeight&& weight)
   {
-    counter += util::forward<TWeight>(weight);
+    counter += std::forward<TWeight>(weight);
   }
 };
 
@@ -150,25 +150,25 @@ RETURN_AUTO(assign<bool>(util::functor::assign_self_mapped<math::functor::lorsc>
   template <typename TAggregator, ENABLE_IF(is_aggregator_v<TAggregator>::value)> \
   __host__ __device__ \
   auto NAME (TAggregator&& aggregator) \
-  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, util::forward<TAggregator>(aggregator)))
+  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, std::forward<TAggregator>(aggregator)))
 
 #define OPERATION_TT(NAME, ...) \
   template <typename TAggregatorLeft, typename TAggregatorRight, ENABLE_IF(is_aggregator_v<TAggregatorLeft>::value && is_aggregator_v<TAggregatorRight>::value)> \
   __host__ __device__ \
   auto NAME (TAggregatorLeft&& left, TAggregatorRight&& right) \
-  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, util::forward<TAggregatorLeft>(left), util::forward<TAggregatorRight>(right)))
+  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, std::forward<TAggregatorLeft>(left), std::forward<TAggregatorRight>(right)))
 
 #define OPERATION_TS(NAME, ...) \
   template <typename TAggregatorLeft, typename TNonAggregatorRight, ENABLE_IF(is_aggregator_v<TAggregatorLeft>::value && !is_aggregator_v<TNonAggregatorRight>::value)> \
   __host__ __device__ \
   auto NAME (TAggregatorLeft&& left, TNonAggregatorRight&& right) \
-  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, util::forward<TAggregatorLeft>(left), constant<util::store_member_t<TNonAggregatorRight&&>>(util::forward<TNonAggregatorRight>(right))))
+  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, std::forward<TAggregatorLeft>(left), constant<util::store_member_t<TNonAggregatorRight&&>>(std::forward<TNonAggregatorRight>(right))))
 
 #define OPERATION_ST(NAME, ...) \
   template <typename TNonAggregatorLeft, typename TAggregatorRight, ENABLE_IF(!is_aggregator_v<TNonAggregatorLeft>::value && is_aggregator_v<TAggregatorRight>::value)> \
   __host__ __device__ \
   auto NAME (TNonAggregatorLeft&& left, TAggregatorRight&& right) \
-  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, util::store_member_t<TNonAggregatorLeft&&>(util::forward<TNonAggregatorLeft>(left)), util::forward<TAggregatorRight>(right)))
+  RETURN_AUTO(aggregator::map_output(__VA_ARGS__, util::store_member_t<TNonAggregatorLeft&&>(std::forward<TNonAggregatorLeft>(left)), std::forward<TAggregatorRight>(right)))
 
 OPERATION_TT(operator+, math::functor::add());
 OPERATION_TS(operator+, math::functor::add());

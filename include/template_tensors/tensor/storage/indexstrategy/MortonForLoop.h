@@ -11,9 +11,9 @@ struct MortonForLoopToIndexHelper
   __host__ __device__
   static void toIndex(size_t& index, TDimArgType&& dims, TCoordArgTypes&&... coords)
   {
-    const size_t field = getNthCoordinate<I>(util::forward<TCoordArgTypes>(coords)...);
+    const size_t field = getNthCoordinate<I>(std::forward<TCoordArgTypes>(coords)...);
     ASSERT(N == 1 || ((((size_t) -1) << (N == 1 ? 0 : FIELD_BITS)) & field) == 0, "Coordinate out of morton range");
-    ASSERT(N == 1 || getNthDimension<I>(util::forward<TDimArgType>(dims)) < (1UL << (N == 1 ? 0 : FIELD_BITS)), "Dimension out of morton range");
+    ASSERT(N == 1 || getNthDimension<I>(std::forward<TDimArgType>(dims)) < (1UL << (N == 1 ? 0 : FIELD_BITS)), "Dimension out of morton range");
 
     for (auto field_bit = 0; field_bit < FIELD_BITS; field_bit++)
     {
@@ -21,7 +21,7 @@ struct MortonForLoopToIndexHelper
       index |= (field & (1UL << field_bit)) << (index_bit - field_bit);
     }
 
-    MortonForLoopToIndexHelper<I + 1, N>::toIndex(index, util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    MortonForLoopToIndexHelper<I + 1, N>::toIndex(index, std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 };
 
@@ -44,7 +44,7 @@ struct MortonForLoopFromIndexHelper
   __host__ __device__
   static void fromIndex(VectorXs<TDims>& result, size_t index, TDimArgTypes&&... dims)
   {
-    ASSERT(N == 1 || template_tensors::getNthDimension<I>(util::forward<TDimArgTypes>(dims)...) < (1UL << (N == 1 ? 0 : FIELD_BITS)), "Dimension out of morton range");
+    ASSERT(N == 1 || template_tensors::getNthDimension<I>(std::forward<TDimArgTypes>(dims)...) < (1UL << (N == 1 ? 0 : FIELD_BITS)), "Dimension out of morton range");
 
     if (I < TDims)
     {
@@ -57,7 +57,7 @@ struct MortonForLoopFromIndexHelper
       result(I) = field;
     }
 
-    MortonForLoopFromIndexHelper<I + 1, N>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    MortonForLoopFromIndexHelper<I + 1, N>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -91,10 +91,10 @@ struct MortonForLoop
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const volatile
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= TRank, "Dimensions out of morton range");
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgType>(dims)) <= TRank, "Dimensions out of morton range");
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
     size_t index = 0;
-    detail::MortonForLoopToIndexHelper<0, TRank>::toIndex(index, util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    detail::MortonForLoopToIndexHelper<0, TRank>::toIndex(index, std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
     return index;
   }
 
@@ -104,9 +104,9 @@ struct MortonForLoop
   __host__ __device__
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgTypes>(dims)...) <= TRank, "Dimensions out of morton range");
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgTypes>(dims)...) <= TRank, "Dimensions out of morton range");
     VectorXs<TDims> result;
-    detail::MortonForLoopFromIndexHelper<0, TRank>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    detail::MortonForLoopFromIndexHelper<0, TRank>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 
@@ -116,7 +116,7 @@ struct MortonForLoop
   __host__ __device__
   size_t getSize(TDimArgTypes&&... dim_args) const volatile
   {
-    return toIndex(toDimVector(util::forward<TDimArgTypes>(dim_args)...), toDimVector(util::forward<TDimArgTypes>(dim_args)...) - 1) + 1;
+    return toIndex(toDimVector(std::forward<TDimArgTypes>(dim_args)...), toDimVector(std::forward<TDimArgTypes>(dim_args)...) - 1) + 1;
   }
 };
 
@@ -133,7 +133,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const MortonForLoop<TRank>& index_strategy)
 {
   stream << "MortonForLoop<" << TRank << ">";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

@@ -46,8 +46,8 @@ namespace template_tensors {
   { \
     TT_SOLVER_CHECK_X_A_B_DIMS \
  \
-    return (*this)(util::forward<TMatrixTypeX>(x), \
-      template_tensors::concat<1>(util::forward<TMatrixTypeA>(A), util::forward<TMatrixTypeB>(b))); \
+    return (*this)(std::forward<TMatrixTypeX>(x), \
+      template_tensors::concat<1>(std::forward<TMatrixTypeA>(A), std::forward<TMatrixTypeB>(b))); \
   }
 
 #define TT_SOLVER_FORWARD_X_AB(...) \
@@ -58,9 +58,9 @@ namespace template_tensors {
     TT_SOLVER_CHECK_X_AB_DIMS \
  \
     return (*this)( \
-      util::forward<TMatrixTypeX>(x), \
-      template_tensors::head(util::forward<TMatrixTypeAb>(Ab), Ab.rows(), Ab.rows()), \
-      template_tensors::tail(util::forward<TMatrixTypeAb>(Ab), Ab.rows(), x.cols()) \
+      std::forward<TMatrixTypeX>(x), \
+      template_tensors::head(std::forward<TMatrixTypeAb>(Ab), Ab.rows(), Ab.rows()), \
+      template_tensors::tail(std::forward<TMatrixTypeAb>(Ab), Ab.rows(), x.cols()) \
     ); \
   }
 // TODO: template_tensors::head and template_tensors::tail don't consider static dims

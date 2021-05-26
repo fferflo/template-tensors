@@ -92,7 +92,7 @@ template <typename TVectorTypeLeft, typename TVectorTypeRight>
 __host__ __device__
 auto cross(TVectorTypeLeft&& left, TVectorTypeRight&& right)
 RETURN_AUTO(CrossProduct<util::store_member_t<TVectorTypeLeft&&>, util::store_member_t<TVectorTypeRight&&>>
-  (util::forward<TVectorTypeLeft>(left), util::forward<TVectorTypeRight>(right))
+  (std::forward<TVectorTypeLeft>(left), std::forward<TVectorTypeRight>(right))
 );
 
 
@@ -187,7 +187,7 @@ template <typename TVectorType>
 __host__ __device__
 auto cross_matrix(TVectorType&& vector)
 RETURN_AUTO(CrossProductMatrix<util::store_member_t<TVectorType&&>>
-  (util::forward<TVectorType>(vector))
+  (std::forward<TVectorType>(vector))
 );
 
 } // end of ns template_tensors

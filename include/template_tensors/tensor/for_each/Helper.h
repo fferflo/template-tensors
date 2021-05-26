@@ -7,14 +7,14 @@ template <typename TOperation, typename TTensorDest, typename... TTensorSrcs> \
 __VA_ARGS__ \
 static void map(TOperation&& op, TTensorDest&& dest, TTensorSrcs&&... srcs) \
 { \
-  for_each(util::functor::assign_mapped<util::store_member_t<TOperation&&>>(util::forward<TOperation>(op)), util::forward<TTensorDest>(dest), util::forward<TTensorSrcs>(srcs)...); \
+  for_each(util::functor::assign_mapped<util::store_member_t<TOperation&&>>(std::forward<TOperation>(op)), std::forward<TTensorDest>(dest), std::forward<TTensorSrcs>(srcs)...); \
 } \
  \
 template <typename TTensorDest, typename TTensorSrc> \
 __VA_ARGS__ \
 static void copy(TTensorDest&& dest, TTensorSrc&& src) \
 { \
-  map(math::functor::id(), util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src)); \
+  map(math::functor::id(), std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src)); \
 }
 
 namespace detail {

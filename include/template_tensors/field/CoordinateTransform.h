@@ -12,7 +12,7 @@ private:
   template <typename TThisType, typename TCoordVector>
   __host__ __device__
   static auto get(TThisType&& self, TCoordVector&& coords)
-  RETURN_AUTO(util::forward<TThisType>(self).m_field(util::forward<TThisType>(self).m_coord_functor(util::forward<TCoordVector>(coords))))
+  RETURN_AUTO(std::forward<TThisType>(self).m_field(std::forward<TThisType>(self).m_coord_functor(std::forward<TCoordVector>(coords))))
 
 public:
   static const metal::int_ RANK = std::decay<TField>::type::RANK;
@@ -30,6 +30,6 @@ public:
 template <typename TField, typename TCoordFunctor>
 __host__ __device__
 auto transform(TField&& field, TCoordFunctor&& coord_functor)
-RETURN_AUTO(CoordinateTransformedField<util::store_member_t<TField&&>, util::store_member_t<TCoordFunctor&&>>(util::forward<TField>(field), util::forward<TCoordFunctor>(coord_functor)))
+RETURN_AUTO(CoordinateTransformedField<util::store_member_t<TField&&>, util::store_member_t<TCoordFunctor&&>>(std::forward<TField>(field), std::forward<TCoordFunctor>(coord_functor)))
 
 } // end of ns field

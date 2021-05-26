@@ -170,31 +170,31 @@ public:
     && (TMemoryType == mem::HOST || TMemoryType == mem::LOCAL))>
   __host__
   static auto toHost(TType&& t)
-  RETURN_AUTO(util::forward_lvalue<TType>(t))
+  RETURN_AUTO(TType(std::forward<TType>(t)))
 
   template <typename TType, ENABLE_IF(!std::is_same<TType, void>::value
     && (TMemoryType == mem::DEVICE))>
   __host__
   static auto toDevice(TType&& t)
-  RETURN_AUTO(util::forward_lvalue<TType>(t))
+  RETURN_AUTO(TType(std::forward<TType>(t)))
 
   template <typename TType, ENABLE_IF(!std::is_same<TType, void>::value
     && (TMemoryType == mem::DEVICE || TMemoryType == mem::LOCAL))>
   __host__
   static typename std::decay<TType&&>::type toDevice(TType&& t)
   {
-    return typename std::decay<TType&&>::type(util::forward<TType>(t));
+    return typename std::decay<TType&&>::type(std::forward<TType>(t));
   }
 };
 
 template <typename TType, ENABLE_IF(has_memorytype_v<TType>::value)>
 __host__
 auto toHost(TType&& t)
-RETURN_AUTO(t.toHost(util::forward<TType>(t)))
+RETURN_AUTO(t.toHost(std::forward<TType>(t)))
 template <typename TType, ENABLE_IF(!has_memorytype_v<TType>::value)>
 __host__
 auto toHost(TType&& t)
-RETURN_AUTO(typename std::decay<TType&&>::type(util::forward<TType>(t)))
+RETURN_AUTO(typename std::decay<TType&&>::type(std::forward<TType>(t)))
 FUNCTOR(toHost, mem::toHost)
 // TODO: replace decay constructors with util::decay_rvalue
 #ifdef __CUDACC__
@@ -202,21 +202,21 @@ FUNCTOR(toHost, mem::toHost)
 template <typename TType, ENABLE_IF(has_memorytype_v<TType>::value)>
 __host__
 auto toDevice(TType&& t)
-RETURN_AUTO(t.toDevice(util::forward<TType>(t)))
+RETURN_AUTO(t.toDevice(std::forward<TType>(t)))
 template <typename TType, ENABLE_IF(!has_memorytype_v<TType>::value)>
 __host__
 auto toDevice(TType&& t)
-RETURN_AUTO(typename std::decay<TType&&>::type(util::forward<TType>(t)))
+RETURN_AUTO(typename std::decay<TType&&>::type(std::forward<TType>(t)))
 FUNCTOR(toDevice, mem::toDevice)
 
 template <typename TType, ENABLE_IF(has_memorytype_v<TType>::value)>
 __host__
 auto toKernel(TType&& t)
-RETURN_AUTO(t.toKernel(util::forward<TType>(t)))
+RETURN_AUTO(t.toKernel(std::forward<TType>(t)))
 template <typename TType, ENABLE_IF(!has_memorytype_v<TType>::value)>
 __host__
 auto toKernel(TType&& t)
-RETURN_AUTO(typename std::decay<TType&&>::type(util::forward<TType>(t)))
+RETURN_AUTO(typename std::decay<TType&&>::type(std::forward<TType>(t)))
 FUNCTOR(toKernel, mem::toKernel)
 
 #endif
@@ -233,7 +233,7 @@ struct toFunctor<TSame, TSame>
   template <typename T>
   __host__  __device__
   static auto get(T&& t)
-  RETURN_AUTO(util::forward_lvalue<T>(t))
+  RETURN_AUTO(T(std::forward<T>(t)))
 };
 
 #ifdef __CUDACC__
@@ -244,7 +244,7 @@ struct toFunctor<false, true>
   template <typename T>
   __host__  __device__
   static auto get(T&& t)
-  RETURN_AUTO(mem::toKernel(util::forward<T>(t)))
+  RETURN_AUTO(mem::toKernel(std::forward<T>(t)))
 };
 
 template <>
@@ -253,10 +253,10 @@ struct toFunctor<true, false>
   HD_WARNING_DISABLE
   template <typename T>
   __host__  __device__
-  static auto get(T&& t) -> decltype(util::forward_lvalue<T>(t))
+  static auto get(T&& t) -> decltype(T(std::forward<T>(t)))
   {
     ASSERT_(false, "Cannot pass host memory to functor on device");
-    return util::forward_lvalue<T>(t);
+    return T(std::forward<T>(t));
   }
 };
 #endif
@@ -266,7 +266,7 @@ struct toFunctor<true, false>
 template <mem::MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST, typename TType>
 __host__  __device__
 auto toFunctor(TType&& t)
-RETURN_AUTO(detail::toFunctor<mem::isOnHost<TMemoryType, TIsOnHost>(), TIsOnHost>::get(util::forward<TType>(t)))
+RETURN_AUTO(detail::toFunctor<mem::isOnHost<TMemoryType, TIsOnHost>(), TIsOnHost>::get(std::forward<TType>(t)))
 // TODO: naming toFunctor: toLambda?
 namespace functor {
 template <mem::MemoryType TMemoryType, bool TIsOnHost = TT_IS_ON_HOST>
@@ -275,7 +275,7 @@ struct toFunctor
   template <typename TType>
   __host__  __device__
   auto operator()(TType&& t)
-  RETURN_AUTO(mem::toFunctor<TMemoryType, TIsOnHost>(util::forward<TType>(t)))
+  RETURN_AUTO(mem::toFunctor<TMemoryType, TIsOnHost>(std::forward<TType>(t)))
 };
 } // end of ns functor
 

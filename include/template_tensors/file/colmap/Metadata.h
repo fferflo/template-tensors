@@ -112,7 +112,7 @@ inline std::map<uint32_t, Camera> readCamerasBin(const boost::filesystem::path& 
       throw boost::filesystem::filesystem_error("Camera model " + std::to_string(camera.model_id) + " not supported", boost::system::errc::make_error_code(boost::system::errc::io_error));
     }
 
-    cameras.emplace(camera.id, util::move(camera));
+    cameras.emplace(camera.id, std::move(camera));
   }
 
   return cameras;
@@ -179,7 +179,7 @@ inline std::map<uint32_t, Camera> readCamerasTxt(const boost::filesystem::path& 
         throw boost::filesystem::filesystem_error("Camera model " + std::to_string(camera.model_id) + " not supported", boost::system::errc::make_error_code(boost::system::errc::io_error));
       }
 
-      cameras.emplace(camera.id, util::move(camera));
+      cameras.emplace(camera.id, std::move(camera));
     }
   }
 
@@ -258,7 +258,7 @@ inline std::map<uint32_t, ImageMetaData> readImageMetaDataBin(const boost::files
       image.points_3d_ids[i] = point_3d_id;
     }
 
-    image_meta_data.emplace(image.id, util::move(image));
+    image_meta_data.emplace(image.id, std::move(image));
   }
 
   return image_meta_data;
@@ -321,7 +321,7 @@ inline std::map<uint32_t, ImageMetaData> readImageMetaDataTxt(const boost::files
         image.points_3d_ids.push_back(point_3d_id);
       }
 
-      image_meta_data.emplace(image.id, util::move(image));
+      image_meta_data.emplace(image.id, std::move(image));
     }
   }
 

@@ -50,8 +50,8 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   IterableEx(TElementType default_element, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
-    , StoreDimensions<TDimSeq>(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
+    , StoreDimensions<TDimSeq>(std::forward<TDimArgTypes>(dim_args)...)
     , m_iterable()
     , m_default(default_element)
   {
@@ -61,7 +61,7 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   IterableEx(const TIterable<CoordinateElement<TElementType, TRank>>& iterable, TElementType default_element, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
     , m_iterable(iterable)
     , m_default(default_element)
   {
@@ -76,7 +76,7 @@ public:
   {
     for (CoordinateElement<TElementType, TRank>& el : self.m_iterable)
     {
-      if (areSameCoordinates2(el.getCoordinates(), util::forward<TCoordArgTypes>(coords)...))
+      if (areSameCoordinates2(el.getCoordinates(), std::forward<TCoordArgTypes>(coords)...))
       {
         return el.getElement();
       }
@@ -102,7 +102,7 @@ public:
   __host__ __device__
   void push_back(TElementType element, TCoordArgTypes&&... coords)
   {
-    m_iterable.push_back(CoordinateElement<TElementType, TRank>(element, toCoordVector<TRank>(util::forward<TCoordArgTypes>(coords)...)));
+    m_iterable.push_back(CoordinateElement<TElementType, TRank>(element, toCoordVector<TRank>(std::forward<TCoordArgTypes>(coords)...)));
   }
 
 private:

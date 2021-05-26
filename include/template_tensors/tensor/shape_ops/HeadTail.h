@@ -65,11 +65,11 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   HeadTensor(TTensorTypeIn tensor, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
-    , StoreDimensions<TNewDimSeq>(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
+    , StoreDimensions<TNewDimSeq>(std::forward<TDimArgTypes>(dim_args)...)
     , m_tensor(tensor)
   {
-    ASSERT(areCompatibleDimensions<TNewDimSeq>(util::forward<TDimArgTypes>(dim_args)...), "Incompatible run-time and compile-time dimensions");
+    ASSERT(areCompatibleDimensions<TNewDimSeq>(std::forward<TDimArgTypes>(dim_args)...), "Incompatible run-time and compile-time dimensions");
   }
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
@@ -79,7 +79,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_tensor(util::forward<TCoordArgTypes>(coords)...)
+    self.m_tensor(std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
@@ -170,7 +170,7 @@ public:
     : SuperType(tensor.template dims<MAX_RANK>() - toCoordVector<MAX_RANK>(TOffsetCoordSeq()))
     , m_tensor(tensor)
   {
-    ASSERT(areCompatibleCoordinates<TOffsetCoordSeq>(util::forward<TOffsetArgTypes>(offset_args)...), "Incompatible run-time and compile-time offset");
+    ASSERT(areCompatibleCoordinates<TOffsetCoordSeq>(std::forward<TOffsetArgTypes>(offset_args)...), "Incompatible run-time and compile-time offset");
   }
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
@@ -197,7 +197,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    util::forward<TThisType>(self).m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + nth_coordinate_v<TIndices, TOffsetCoordSeq>::value)...)
+    std::forward<TThisType>(self).m_tensor((getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...) + nth_coordinate_v<TIndices, TOffsetCoordSeq>::value)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
@@ -240,9 +240,9 @@ public:
   template <typename... TOffsetArgTypes>
   __host__ __device__
   DynamicOffsetTensor(TTensorTypeIn tensor, TOffsetArgTypes&&... offset_args)
-    : SuperType(tensor.template dims<MAX_RANK>() - toCoordVector<MAX_RANK>(util::forward<TOffsetArgTypes>(offset_args)...))
+    : SuperType(tensor.template dims<MAX_RANK>() - toCoordVector<MAX_RANK>(std::forward<TOffsetArgTypes>(offset_args)...))
     , m_tensor(tensor)
-    , m_offset(util::forward<TOffsetArgTypes>(offset_args)...)
+    , m_offset(std::forward<TOffsetArgTypes>(offset_args)...)
   {
   }
 
@@ -273,7 +273,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, metal::numbers< TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_tensor((getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...) + getNthCoordinate<TIndices>(self.m_offset))...)
+    self.m_tensor((getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...) + getNthCoordinate<TIndices>(self.m_offset))...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
@@ -331,7 +331,7 @@ template <metal::int_... THeadDimSeq, typename TOtherTensorType>
 __host__ __device__
 auto head(TOtherTensorType&& tensor)
 RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<THeadDimSeq...>>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 /*!
@@ -345,14 +345,14 @@ template <typename TOtherTensorType, typename... TDimArgTypes, ENABLE_IF(sizeof.
 __host__ __device__
 auto head(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
 RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TDimArgTypes>(dim_args)...)
+  (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
 template <typename THeadDimSeq, typename TOtherTensorType, typename... TDimArgTypes>
 __host__ __device__
 auto headEx(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
 RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, THeadDimSeq>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TDimArgTypes>(dim_args)...)
+  (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
 /*!
@@ -366,7 +366,7 @@ template <metal::int_... TOffsetCoordSeq, ENABLE_IF(is_static_v<CoordSeq<TOffset
 __host__ __device__
 auto offset(TOtherTensorType&& tensor)
 RETURN_AUTO(StaticOffsetTensor<util::store_member_t<TOtherTensorType&&>, CoordSeq<TOffsetCoordSeq...>>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 /*!
@@ -380,14 +380,14 @@ template <typename TOtherTensorType, typename... TOffsetArgTypes, ENABLE_IF(size
 __host__ __device__
 auto offset(TOtherTensorType&& tensor, TOffsetArgTypes&&... offset_args)
 RETURN_AUTO(DynamicOffsetTensor<util::store_member_t<TOtherTensorType&&>, coordinate_num_v<TOffsetArgTypes...>::value>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TOffsetArgTypes>(offset_args)...)
+  (std::forward<TOtherTensorType>(tensor), std::forward<TOffsetArgTypes>(offset_args)...)
 );
 
 template <typename TOffsetCoordSeq, typename TOtherTensorType, typename... TOffsetArgTypes>
 __host__ __device__
 auto offsetEx(TOtherTensorType&& tensor, TOffsetArgTypes&&... offset_args)
 RETURN_AUTO(OffsetTensor<util::store_member_t<TOtherTensorType&&>, TOffsetCoordSeq>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TOffsetArgTypes>(offset_args)...)
+  (std::forward<TOtherTensorType>(tensor), std::forward<TOffsetArgTypes>(offset_args)...)
 );
 
 
@@ -412,7 +412,7 @@ __host__ __device__
 auto tail(TOtherTensorType&& tensor)
 RETURN_AUTO(
   TResultTensor(
-    util::forward<TOtherTensorType>(tensor),
+    std::forward<TOtherTensorType>(tensor),
     tensor.template dims<TMaxRank>() - toDimVector<TMaxRank>(DimSeq<TTailDimSeq...>())
   )
 )
@@ -429,8 +429,8 @@ template <typename TOtherTensorType, typename... TTailArgTypes,
 __host__ __device__
 auto tail(TOtherTensorType&& tensor, TTailArgTypes&&... tail_args)
 RETURN_AUTO(
-  DynamicOffsetTensor<TOtherTensorType, TMaxRank>(util::forward<TOtherTensorType>(tensor),
-    tensor.template dims<TMaxRank>() - toDimVector<TMaxRank>(util::forward<TTailArgTypes>(tail_args)...))
+  DynamicOffsetTensor<TOtherTensorType, TMaxRank>(std::forward<TOtherTensorType>(tensor),
+    tensor.template dims<TMaxRank>() - toDimVector<TMaxRank>(std::forward<TTailArgTypes>(tail_args)...))
 );
 
 
@@ -438,22 +438,22 @@ RETURN_AUTO(
 template <typename TMatrixType>
 __host__ __device__
 auto row(TMatrixType&& matrix, dim_t row)
-RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset(util::forward<TMatrixType>(matrix), row)));
+RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset(std::forward<TMatrixType>(matrix), row)));
 
 template <typename TMatrixType>
 __host__ __device__
 auto col(TMatrixType&& matrix, dim_t col)
-RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset(util::forward<TMatrixType>(matrix), 0, col)));
+RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset(std::forward<TMatrixType>(matrix), 0, col)));
 
 template <metal::int_ TRow, typename TMatrixType>
 __host__ __device__
 auto row(TMatrixType&& matrix)
-RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset<TRow>(util::forward<TMatrixType>(matrix))));
+RETURN_AUTO(template_tensors::head<1, cols_v<TMatrixType>::value>(template_tensors::offset<TRow>(std::forward<TMatrixType>(matrix))));
 
 template <metal::int_ TCol, typename TMatrixType>
 __host__ __device__
 auto col(TMatrixType&& matrix)
-RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset<0, TCol>(util::forward<TMatrixType>(matrix))));
+RETURN_AUTO(template_tensors::head<rows_v<TMatrixType>::value, 1>(template_tensors::offset<0, TCol>(std::forward<TMatrixType>(matrix))));
 
 /*!
  * @}

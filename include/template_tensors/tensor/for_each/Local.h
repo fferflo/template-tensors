@@ -11,10 +11,10 @@ struct LocalForEachHelper
   __host__ __device__
   static void for_each(TFunctor&& func, TTensorTypes&&... tensors, TCoords... coords)
   {
-    const metal::int_ MAX = util::first(util::forward<TTensorTypes>(tensors)...).template dim<I - 1>();
+    const metal::int_ MAX = util::first(std::forward<TTensorTypes>(tensors)...).template dim<I - 1>();
     for (metal::int_ i = 0; i < MAX; i++)
     {
-      LocalForEachHelper<I - 1, TCoordsRank, TTensorTypes...>::for_each(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)..., i, coords...);
+      LocalForEachHelper<I - 1, TCoordsRank, TTensorTypes...>::for_each(std::forward<TFunctor>(func), std::forward<TTensorTypes>(tensors)..., i, coords...);
     }
   }
 };
@@ -67,7 +67,7 @@ struct LocalForEach
     static_assert(math::landsc(are_compatible_dimseqs_v<dimseq_t<TTensorTypes>...>::value), "Incompatible static dimensions");
 
     const metal::int_ MAX_RANK = math::min(non_trivial_dimensions_num_v<TTensorTypes>::value...);
-    detail::LocalForEachHelper<MAX_RANK, TCoordsRank, TTensorTypes...>::for_each(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
+    detail::LocalForEachHelper<MAX_RANK, TCoordsRank, TTensorTypes...>::for_each(std::forward<TFunctor>(func), std::forward<TTensorTypes>(tensors)...);
   }
 
   TT_FOR_EACH_MAP_AND_COPY(__host__ __device__)

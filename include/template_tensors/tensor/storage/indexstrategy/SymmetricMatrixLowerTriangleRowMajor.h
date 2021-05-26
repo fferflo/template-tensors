@@ -11,10 +11,10 @@ struct SymmetricMatrixLowerTriangleRowMajor
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    const dim_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
-    const dim_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    const dim_t row = getNthCoordinate<0>(std::forward<TCoordArgTypes>(coords)...);
+    const dim_t col = getNthCoordinate<1>(std::forward<TCoordArgTypes>(coords)...);
     if (row >= col)
     {
       return ((row + 1) * row >> 1) + col;
@@ -32,7 +32,7 @@ struct SymmetricMatrixLowerTriangleRowMajor
   constexpr size_t getSize(TDimArgTypes&&... dims) const
   {
     // TODO: ASSERT is symmetric and rest of dimension are 1
-    const dim_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim0 = template_tensors::getNthDimension<0>(std::forward<TDimArgTypes>(dims)...);
     return (dim0 * dim0 + dim0) >> 1;
   }
 
@@ -45,7 +45,7 @@ struct SymmetricMatrixLowerTriangleRowMajor
     VectorXs<TDims> result;
     const dim_t row = (-3 + math::sqrt<float>(9 + 8 * index)) / 2;
     const dim_t col = index - row * (row + 1) / 2;
-    detail::ColMajorFromIndexHelper<1, TDims>::fromIndex(result, util::forward<TDimArgType>(dims), index);
+    detail::ColMajorFromIndexHelper<1, TDims>::fromIndex(result, std::forward<TDimArgType>(dims), index);
     return result;
   }
 
@@ -74,7 +74,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const SymmetricMatrixLowerTriangleRowMajor& index_strategy)
 {
   stream << "SymmetricMatrixLowerTriangleRowMajor";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

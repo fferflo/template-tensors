@@ -59,7 +59,7 @@ struct FromTensorflow
         ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
         dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(object);
       }
-      result.inner_result = InnerDispatcher(dlpack, "dltensor")(util::forward<TFunctor>(functor));
+      result.inner_result = InnerDispatcher(dlpack, "dltensor")(std::forward<TFunctor>(functor));
     }
     else
     {

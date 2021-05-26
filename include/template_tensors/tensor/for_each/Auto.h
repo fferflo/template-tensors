@@ -183,10 +183,10 @@ struct AutoForEach
 
 #if TT_IS_ON_HOST
     HostForEach dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::template for_each<TCoordsRank>(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
+    decltype(dummy)::template for_each<TCoordsRank>(std::forward<TFunctor>(func), std::forward<TTensorTypes>(tensors)...);
 #else
     DeviceForEach dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::template for_each<TCoordsRank>(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
+    decltype(dummy)::template for_each<TCoordsRank>(std::forward<TFunctor>(func), std::forward<TTensorTypes>(tensors)...);
 #endif
   }
 
@@ -210,10 +210,10 @@ struct AutoForEach
 
 #if TT_IS_ON_HOST
     HostMapper dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::map(util::forward<TOperation>(op), util::forward<TTensorDest>(dest), util::forward<TTensorSrcs>(srcs)...);
+    decltype(dummy)::map(std::forward<TOperation>(op), std::forward<TTensorDest>(dest), std::forward<TTensorSrcs>(srcs)...);
 #else
     DeviceMapper dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::map(util::forward<TOperation>(op), util::forward<TTensorDest>(dest), util::forward<TTensorSrcs>(srcs)...);
+    decltype(dummy)::map(std::forward<TOperation>(op), std::forward<TTensorDest>(dest), std::forward<TTensorSrcs>(srcs)...);
 #endif
   }
 
@@ -237,10 +237,10 @@ struct AutoForEach
 
 #if TT_IS_ON_HOST
     HostCopier dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
+    decltype(dummy)::copy(std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src));
 #else
     DeviceCopier dummy; // Doesn't compile without this hack for some reason
-    decltype(dummy)::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
+    decltype(dummy)::copy(std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src));
 #endif
   }
 };
@@ -251,14 +251,14 @@ template <metal::int_ TCoordsRank = DYN, typename TFunctor, typename... TTensorT
 __host__ __device__
 void for_each(TFunctor&& func, TTensorTypes&&... tensors)
 {
-  op::AutoForEach<>::for_each<TCoordsRank>(util::forward<TFunctor>(func), util::forward<TTensorTypes>(tensors)...);
+  op::AutoForEach<>::for_each<TCoordsRank>(std::forward<TFunctor>(func), std::forward<TTensorTypes>(tensors)...);
 }
 
 template <typename TOperation, typename TTensorDest, typename... TTensorSrcs>
 __host__ __device__
 void map(TOperation&& op, TTensorDest&& dest, TTensorSrcs&&... srcs)
 {
-  op::AutoForEach<>::map(util::forward<TOperation>(op), util::forward<TTensorDest>(dest), util::forward<TTensorSrcs>(srcs)...);
+  op::AutoForEach<>::map(std::forward<TOperation>(op), std::forward<TTensorDest>(dest), std::forward<TTensorSrcs>(srcs)...);
 }
 
 
@@ -273,14 +273,14 @@ struct OpAssign
   __host__ __device__
   static void op(TOp op, TTensorTypeDest&& dest, TTensorTypeSrc&& src)
   {
-    template_tensors::for_each(op, util::forward<TTensorTypeDest>(dest), util::forward<TTensorTypeSrc>(src));
+    template_tensors::for_each(op, std::forward<TTensorTypeDest>(dest), std::forward<TTensorTypeSrc>(src));
   }
 
   template <typename TOp, typename TTensorTypeDest, typename TScalarTypeSrc, ENABLE_IF(!is_tensor_v<TScalarTypeSrc>::value)>
   __host__ __device__
   static void op(TOp op, TTensorTypeDest&& dest, const TScalarTypeSrc& src)
   {
-    template_tensors::for_each(op, util::forward<TTensorTypeDest>(dest),
+    template_tensors::for_each(op, std::forward<TTensorTypeDest>(dest),
       template_tensors::broadcast<template_tensors::dimseq_t<TTensorTypeDest>>(template_tensors::SingletonT<typename std::decay<TScalarTypeSrc>::type>(src), dest.dims()));
   }
 };
@@ -292,8 +292,8 @@ struct OpAssign
   __host__ __device__ \
   TTensorTypeDest&& NAME (TTensorTypeDest&& dest, TSrcType&& src) \
   { \
-    template_tensors::detail::OpAssign::op(OPERATION(), util::forward<TTensorTypeDest>(dest), util::forward<TSrcType>(src)); \
-    return util::forward<TTensorTypeDest>(dest); \
+    template_tensors::detail::OpAssign::op(OPERATION(), std::forward<TTensorTypeDest>(dest), std::forward<TSrcType>(src)); \
+    return std::forward<TTensorTypeDest>(dest); \
   }
 
 ELWISE_OP_ASSIGN(operator+=, math::functor::addassign);

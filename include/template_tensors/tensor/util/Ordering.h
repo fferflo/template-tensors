@@ -42,13 +42,13 @@ public:
 template <typename TType1, typename TType2, typename TElwiseEqualsOp = math::functor::eq>
 __host__ __device__
 auto eq(TType1&& s1, TType2&& s2, TElwiseEqualsOp elwise_equals_op = TElwiseEqualsOp())
-RETURN_AUTO(template_tensors::functor::eq<TElwiseEqualsOp>(elwise_equals_op)(util::forward<TType1>(s1), util::forward<TType2>(s2)))
+RETURN_AUTO(template_tensors::functor::eq<TElwiseEqualsOp>(elwise_equals_op)(std::forward<TType1>(s1), std::forward<TType2>(s2)))
 
 template <typename TTensorType1, typename TTensorType2, typename TElwiseEqualsOp = math::functor::eq>
 __host__ __device__
 bool neq(TTensorType1&& tensor1, TTensorType2&& tensor2, TElwiseEqualsOp elwise_equals_op = TElwiseEqualsOp())
 {
-  return !eq(util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2), elwise_equals_op);
+  return !eq(std::forward<TTensorType1>(tensor1), std::forward<TTensorType2>(tensor2), elwise_equals_op);
 }
 
 namespace functor {
@@ -69,7 +69,7 @@ public:
   template <typename... TArgs>
   __host__ __device__
   auto operator()(TArgs&&... args)
-  RETURN_AUTO(template_tensors::neq(util::forward<TArgs>(args)..., m_op))
+  RETURN_AUTO(template_tensors::neq(std::forward<TArgs>(args)..., m_op))
 };
 
 } // end of ns functor
@@ -84,8 +84,8 @@ struct SameDimLessThanHelper
   __host__ __device__
   static int get(TTensorType1&& tensor1, TTensorType2&& tensor2)
   {
-    using E1 = decltype(util::forward<TTensorType1>(tensor1)());
-    using E2 = decltype(util::forward<TTensorType2>(tensor2)());
+    using E1 = decltype(std::forward<TTensorType1>(tensor1)());
+    using E2 = decltype(std::forward<TTensorType2>(tensor2)());
 
     int compare = 0;
     op::LocalForEach::for_each([&](E1 e1, E2 e2){
@@ -100,7 +100,7 @@ struct SameDimLessThanHelper
           compare = 1;
         }
       }
-    }, util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2));
+    }, std::forward<TTensorType1>(tensor1), std::forward<TTensorType2>(tensor2));
     return compare;
   }
 };
@@ -112,10 +112,10 @@ struct DynamicLessThanHelper
   static int get(TTensorType1&& tensor1, TTensorType2&& tensor2)
   {
     static const metal::int_ TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value);
-    int compare_dims = SameDimLessThanHelper::get(util::forward<TTensorType1>(tensor1).template dims<TMaxRank>(), util::forward<TTensorType2>(tensor2).template dims<TMaxRank>());
+    int compare_dims = SameDimLessThanHelper::get(std::forward<TTensorType1>(tensor1).template dims<TMaxRank>(), std::forward<TTensorType2>(tensor2).template dims<TMaxRank>());
     if (compare_dims == 0)
     {
-      compare_dims = SameDimLessThanHelper::get(util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2));
+      compare_dims = SameDimLessThanHelper::get(std::forward<TTensorType1>(tensor1), std::forward<TTensorType2>(tensor2));
     }
     return compare_dims;
   }
@@ -130,7 +130,7 @@ struct DynamicLessThanHelper
       && is_static_v<TTensorType1>::value && is_static_v<TTensorType2>::value)> \
   __host__ __device__ \
   auto NAME(TTensorType1&& tensor1, TTensorType2&& tensor2) \
-  RETURN_AUTO(detail::SameDimLessThanHelper::get(util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2)) OPERATOR 0) \
+  RETURN_AUTO(detail::SameDimLessThanHelper::get(std::forward<TTensorType1>(tensor1), std::forward<TTensorType2>(tensor2)) OPERATOR 0) \
    \
   template <typename TTensorType1, typename TTensorType2, \
     ENABLE_IF(are_compatible_dimseqs_v<dimseq_t<TTensorType1>, dimseq_t<TTensorType2>>::value \
@@ -138,7 +138,7 @@ struct DynamicLessThanHelper
       && (!is_static_v<TTensorType1>::value || !is_static_v<TTensorType2>::value))> \
   __host__ __device__ \
   auto NAME(TTensorType1&& tensor1, TTensorType2&& tensor2) \
-  RETURN_AUTO(detail::DynamicLessThanHelper::get(util::forward<TTensorType1>(tensor1), util::forward<TTensorType2>(tensor2)) OPERATOR 0) \
+  RETURN_AUTO(detail::DynamicLessThanHelper::get(std::forward<TTensorType1>(tensor1), std::forward<TTensorType2>(tensor2)) OPERATOR 0) \
    \
   template <typename TTensorType1, typename TTensorType2, \
     metal::int_ TMaxRank = math::max(non_trivial_dimensions_num_v<TTensorType1>::value, non_trivial_dimensions_num_v<TTensorType2>::value), \
@@ -161,7 +161,7 @@ struct DynamicLessThanHelper
     template <typename... TArgs> \
     __host__ __device__ \
     auto operator()(TArgs&&... args) \
-    RETURN_AUTO(template_tensors::NAME(util::forward<TArgs>(args)...)) \
+    RETURN_AUTO(template_tensors::NAME(std::forward<TArgs>(args)...)) \
   }; \
    \
   }

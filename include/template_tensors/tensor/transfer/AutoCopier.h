@@ -70,9 +70,9 @@ struct AutoCopier
     INSTANTIATE_DEVICE(DeviceCopier::copy, INSTANTIATE_ARG(TTensorDest&&), INSTANTIATE_ARG(TTensorSrc&&));
 
 #if TT_IS_ON_HOST
-    HostCopier::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
+    HostCopier::copy(std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src));
 #else
-    DeviceCopier::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
+    DeviceCopier::copy(std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src));
 #endif
   }
 };
@@ -83,7 +83,7 @@ template <typename TTensorDest, typename TTensorSrc>
 __host__ __device__
 void copy(TTensorDest&& dest, TTensorSrc&& src)
 {
-  op::AutoCopier<>::copy(util::forward<TTensorDest>(dest), util::forward<TTensorSrc>(src));
+  op::AutoCopier<>::copy(std::forward<TTensorDest>(dest), std::forward<TTensorSrc>(src));
 }
 
 } // end of ns template_tensors

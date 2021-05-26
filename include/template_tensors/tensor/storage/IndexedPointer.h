@@ -15,7 +15,7 @@ struct IndexedStorageElementAccess<true>
   RETURN_AUTO(
     util::decay_if<std::is_rvalue_reference<TThisType&&>::value>(
       ptr::toRawPointer(self.data())
-        [self.getIndexStrategy().toIndex(dimseq_t<TThisType>(), util::forward<TCoordArgTypes>(coords)...)]
+        [self.getIndexStrategy().toIndex(dimseq_t<TThisType>(), std::forward<TCoordArgTypes>(coords)...)]
     )
   )
 };
@@ -30,7 +30,7 @@ struct IndexedStorageElementAccess<false>
   RETURN_AUTO(
     util::decay_if<std::is_rvalue_reference<TThisType&&>::value>(
       ptr::toRawPointer(self.data())
-        [self.getIndexStrategy().toIndex(self.template dims<non_trivial_dimensions_num_v<TThisType>::value>(), util::forward<TCoordArgTypes>(coords)...)]
+        [self.getIndexStrategy().toIndex(self.template dims<non_trivial_dimensions_num_v<TThisType>::value>(), std::forward<TCoordArgTypes>(coords)...)]
     )
   )
 };
@@ -57,7 +57,7 @@ public:
     ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   IndexedPointerTensor(TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
     , TIndexStrategy()
   {
   }
@@ -66,8 +66,8 @@ public:
     ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value && !are_dim_args_v<TIndexStrategy>::value && std::is_constructible<TIndexStrategy, TIndexStrategy2&&>::value)>
   __host__ __device__
   IndexedPointerTensor(TIndexStrategy2&& index_strategy, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
-    , TIndexStrategy(util::forward<TIndexStrategy2>(index_strategy))
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
+    , TIndexStrategy(std::forward<TIndexStrategy2>(index_strategy))
   {
   }
 
@@ -88,18 +88,18 @@ public:
   template <typename... TDimArgTypes, typename TIndexStrategy2, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value && std::is_constructible<TIndexStrategy, TIndexStrategy2&&>::value)>
   __host__ __device__
   IndexedPointerTensor(ExplicitConstructWithDynDims, TIndexStrategy2&& index_strategy, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
-    , TIndexStrategy(util::forward<TIndexStrategy2>(index_strategy))
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
+    , TIndexStrategy(std::forward<TIndexStrategy2>(index_strategy))
   {
   }
 
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   IndexedPointerTensor(ExplicitConstructWithDynDims, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
     , TIndexStrategy()
   {
-    // TODO: ASSERT(index_strategy.getSize(util::forward<TDimArgTypes>(dim_args)...) == array.size()); if array has a size
+    // TODO: ASSERT(index_strategy.getSize(std::forward<TDimArgTypes>(dim_args)...) == array.size()); if array has a size
   }
 
   __host__ __device__
@@ -174,7 +174,7 @@ public:
   static TResultTensor toHost(TTensorType&& tensor)
   {
     TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
-    result = util::forward<TTensorType>(tensor);
+    result = std::forward<TTensorType>(tensor);
     return result;
   }
 
@@ -182,7 +182,7 @@ public:
   __host__
   static auto toHost(TTensorType&& tensor)
   RETURN_AUTO(
-    SuperType::toHost(util::forward<TTensorType>(tensor))
+    SuperType::toHost(std::forward<TTensorType>(tensor))
   )
 
 #ifdef __CUDACC__
@@ -194,7 +194,7 @@ public:
   static TResultTensor toDevice(TTensorType&& tensor)
   { // TODO: here and toHost -> copy with same memory layout and index strategy instead
     TResultTensor result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, tensor.getIndexStrategy(), tensor.dims());
-    result = util::forward<TTensorType>(tensor);
+    result = std::forward<TTensorType>(tensor);
     return result;
   }
 
@@ -202,7 +202,7 @@ public:
   __host__
   static auto toDevice(TTensorType&& tensor)
   RETURN_AUTO(
-    SuperType::toDevice(util::forward<TTensorType>(tensor))
+    SuperType::toDevice(std::forward<TTensorType>(tensor))
   )
 
   template <typename TTensorType, ENABLE_IF(mem::memorytype_v<TTensorType>::value == mem::LOCAL || mem::memorytype_v<TTensorType>::value == mem::HOST)>
@@ -218,7 +218,7 @@ public:
   __host__
   static auto toKernel(TTensorType&& tensor)
   RETURN_AUTO(
-    template_tensors::ref(util::forward<TTensorType>(tensor))
+    template_tensors::ref(std::forward<TTensorType>(tensor))
   )
 #endif
 };

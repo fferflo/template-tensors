@@ -72,7 +72,7 @@ struct ConcatDimsForTensor2
   __host__ __device__
   static dim_t getCoord(TTensorType1& tensor1, TCoordArgTypes&&... coords)
   {
-    return getNthCoordinate<I>(util::forward<TCoordArgTypes>(coords)...);
+    return getNthCoordinate<I>(std::forward<TCoordArgTypes>(coords)...);
   }
 };
 
@@ -83,7 +83,7 @@ struct ConcatDimsForTensor2<TConcatDim, TConcatDim>
   __host__ __device__
   static dim_t getCoord(TTensorType1& tensor1, TCoordArgTypes&&... coords)
   {
-    return getNthCoordinate<TConcatDim>(util::forward<TCoordArgTypes>(coords)...) - tensor1.template dim<TConcatDim>();
+    return getNthCoordinate<TConcatDim>(std::forward<TCoordArgTypes>(coords)...) - tensor1.template dim<TConcatDim>();
   }
 };
 
@@ -144,13 +144,13 @@ public:
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
     -> common_elementtype_t<decltype(self.m_tensor1), decltype(self.m_tensor2)>
   {
-    if (getNthCoordinate<TConcatDim>(util::forward<TCoordArgTypes>(coords)...) < self.m_tensor1.template dim<TConcatDim>())
+    if (getNthCoordinate<TConcatDim>(std::forward<TCoordArgTypes>(coords)...) < self.m_tensor1.template dim<TConcatDim>())
     {
-      return self.m_tensor1(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_tensor1(std::forward<TCoordArgTypes>(coords)...);
     }
     else
     {
-      return self.m_tensor2(detail::ConcatDimsForTensor2<TIndices, TConcatDim>::getCoord(self.m_tensor1, util::forward<TCoordArgTypes>(coords)...)...);
+      return self.m_tensor2(detail::ConcatDimsForTensor2<TIndices, TConcatDim>::getCoord(self.m_tensor1, std::forward<TCoordArgTypes>(coords)...)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
@@ -217,13 +217,13 @@ template <metal::int_ TConcatDim, typename TTensorTypeIn,
   ENABLE_IF(is_tensor_v<TTensorTypeIn>::value)>
 __host__ __device__
 auto concat(TTensorTypeIn&& tensor)
-RETURN_AUTO(util::forward_lvalue<TTensorTypeIn>(tensor))
+RETURN_AUTO(TTensorTypeIn(std::forward<TTensorTypeIn>(tensor)))
 
 template <metal::int_ TConcatDim, typename TNonTensorTypeIn,
   ENABLE_IF(!is_tensor_v<TNonTensorTypeIn>::value)>
 __host__ __device__
 auto concat(TNonTensorTypeIn&& tensor)
-RETURN_AUTO(template_tensors::singleton(util::forward<TNonTensorTypeIn>(tensor)))
+RETURN_AUTO(template_tensors::singleton(std::forward<TNonTensorTypeIn>(tensor)))
 
 template <metal::int_ TConcatDim, typename TTensorTypeIn1, typename TTensorTypeIn2,
   ENABLE_IF(is_tensor_v<TTensorTypeIn1>::value && is_tensor_v<TTensorTypeIn2>::value)>
@@ -234,8 +234,8 @@ RETURN_AUTO(
                 util::store_member_t<TTensorTypeIn1&&>,
                 util::store_member_t<TTensorTypeIn2&&>,
                 TConcatDim
-              >(util::forward<TTensorTypeIn1>(tensor1),
-                util::forward<TTensorTypeIn2>(tensor2))
+              >(std::forward<TTensorTypeIn1>(tensor1),
+                std::forward<TTensorTypeIn2>(tensor2))
 )
 
 template <metal::int_ TConcatDim, typename TNonTensorTypeIn1, typename TTensorTypeIn2,
@@ -243,7 +243,7 @@ template <metal::int_ TConcatDim, typename TNonTensorTypeIn1, typename TTensorTy
 __host__ __device__
 auto concat(TNonTensorTypeIn1&& tensor1, TTensorTypeIn2&& tensor2)
 RETURN_AUTO(
-  detail::concat<TConcatDim>(template_tensors::singleton(util::forward<TNonTensorTypeIn1>(tensor1)), util::forward<TTensorTypeIn2>(tensor2))
+  detail::concat<TConcatDim>(template_tensors::singleton(std::forward<TNonTensorTypeIn1>(tensor1)), std::forward<TTensorTypeIn2>(tensor2))
 )
 
 template <metal::int_ TConcatDim, typename TTensorTypeIn1, typename TNonTensorTypeIn2,
@@ -251,7 +251,7 @@ template <metal::int_ TConcatDim, typename TTensorTypeIn1, typename TNonTensorTy
 __host__ __device__
 auto concat(TTensorTypeIn1&& tensor1, TNonTensorTypeIn2&& tensor2)
 RETURN_AUTO(
-  detail::concat<TConcatDim>(util::forward<TTensorTypeIn1>(tensor1), template_tensors::singleton(util::forward<TNonTensorTypeIn2>(tensor2)))
+  detail::concat<TConcatDim>(std::forward<TTensorTypeIn1>(tensor1), template_tensors::singleton(std::forward<TNonTensorTypeIn2>(tensor2)))
 )
 
 template <metal::int_ TConcatDim, typename TNonTensorTypeIn1, typename TNonTensorTypeIn2,
@@ -259,7 +259,7 @@ template <metal::int_ TConcatDim, typename TNonTensorTypeIn1, typename TNonTenso
 __host__ __device__
 auto concat(TNonTensorTypeIn1&& tensor1, TNonTensorTypeIn2&& tensor2)
 RETURN_AUTO(
-  detail::concat<TConcatDim>(template_tensors::singleton(util::forward<TNonTensorTypeIn1>(tensor1)), template_tensors::singleton(util::forward<TNonTensorTypeIn2>(tensor2)))
+  detail::concat<TConcatDim>(template_tensors::singleton(std::forward<TNonTensorTypeIn1>(tensor1)), template_tensors::singleton(std::forward<TNonTensorTypeIn2>(tensor2)))
 )
 
 template <metal::int_ TConcatDim, typename TTensorTypeIn1, typename TTensorTypeIn2, typename TTensorTypeIn3, typename... TTensorTypeInRest>
@@ -267,9 +267,9 @@ __host__ __device__
 auto concat(TTensorTypeIn1&& tensor1, TTensorTypeIn2&& tensor2, TTensorTypeIn3&& tensor3, TTensorTypeInRest&&... rest)
 RETURN_AUTO(
   detail::concat<TConcatDim>(
-    detail::concat<TConcatDim>(util::forward<TTensorTypeIn1>(tensor1), util::forward<TTensorTypeIn2>(tensor2)),
-    util::forward<TTensorTypeIn3>(tensor3),
-    util::forward<TTensorTypeInRest>(rest)...
+    detail::concat<TConcatDim>(std::forward<TTensorTypeIn1>(tensor1), std::forward<TTensorTypeIn2>(tensor2)),
+    std::forward<TTensorTypeIn3>(tensor3),
+    std::forward<TTensorTypeInRest>(rest)...
   )
 )
 
@@ -294,7 +294,7 @@ template <metal::int_ TConcatDim, typename... TTensorTypesIn>
 __host__ __device__
 auto concat(TTensorTypesIn&&... tensors)
 RETURN_AUTO(
-  detail::concat<TConcatDim>(util::forward<TTensorTypesIn>(tensors)...)
+  detail::concat<TConcatDim>(std::forward<TTensorTypesIn>(tensors)...)
 )
 
 /*!

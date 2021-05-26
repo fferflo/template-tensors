@@ -23,7 +23,7 @@ struct PclElementAccess<true>
   __host__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.getPointCloud().at(getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...), getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...))
+    self.getPointCloud().at(getNthCoordinate<0>(std::forward<TCoordArgTypes>(coords)...), getNthCoordinate<1>(std::forward<TCoordArgTypes>(coords)...))
   )
 };
 
@@ -35,7 +35,7 @@ struct PclElementAccess<false>
   __host__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.getPointCloud().at(getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...))
+    self.getPointCloud().at(getNthCoordinate<0>(std::forward<TCoordArgTypes>(coords)...))
   )
 };
 

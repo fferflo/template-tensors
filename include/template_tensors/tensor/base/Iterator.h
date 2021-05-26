@@ -13,7 +13,7 @@ public:
   template <typename TTensorType2>
   __host__ __device__
   TensorElementAtIndex(TTensorType2&& tensor, TIndexStrategy index_strategy)
-    : tensor(util::forward<TTensorType2>(tensor))
+    : tensor(std::forward<TTensorType2>(tensor))
     , index_strategy(index_strategy)
   {
   }
@@ -39,11 +39,11 @@ __host__ __device__
   begin(TTensorType&& tensor, TIndexStrategy index_strategy = TIndexStrategy())
 {
   return ::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
-    ::iterator::counting_iterator<size_t>(0), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(util::forward<TTensorType>(tensor), index_strategy)
+    ::iterator::counting_iterator<size_t>(0), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
   );
 }
 // TODO: use ::iterator::count() and ::iterator::transform() here
-// TODO: when constructing begin and end iterators via util::forward, tensor might be moved in first call to begin and then be unusable in call to end
+// TODO: when constructing begin and end iterators via std::forward, tensor might be moved in first call to begin and then be unusable in call to end
 template <typename TIndexStrategy = template_tensors::RowMajor, typename TTensorType>
 __host__ __device__
 ::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>
@@ -51,7 +51,7 @@ __host__ __device__
 {
   size_t num = template_tensors::multiplyDimensions(tensor.dims()); // TODO: should depend on index strategy?
   return ::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
-    ::iterator::counting_iterator<size_t>(num), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(util::forward<TTensorType>(tensor), index_strategy)
+    ::iterator::counting_iterator<size_t>(num), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
   );
 }
 

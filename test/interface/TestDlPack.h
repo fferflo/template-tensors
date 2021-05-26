@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(dlpack_conversions_host)
   }, tensor1);
 
   auto dl = tt::toDlPack(tensor1);
-  auto tensor2 = tt::fromDlPack<int, 3, mem::HOST>(util::move(dl));
+  auto tensor2 = tt::fromDlPack<int, 3, mem::HOST>(std::move(dl));
 
   BOOST_CHECK(tt::eq(tensor1, tensor2));
 }
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(dlpack_conversions_device)
   }, tensor1);
 
   auto dl = tt::toDlPack(tensor1);
-  auto tensor2 = tt::fromDlPack<int, 3, mem::DEVICE>(util::move(dl));
+  auto tensor2 = tt::fromDlPack<int, 3, mem::DEVICE>(std::move(dl));
 
   BOOST_CHECK(tt::eq(mem::toHost(tensor1), mem::toHost(tensor2)));
 }

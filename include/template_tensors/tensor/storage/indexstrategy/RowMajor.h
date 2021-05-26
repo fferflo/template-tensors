@@ -9,8 +9,8 @@ struct RowMajorToIndexHelper
   __host__ __device__
   static size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords)
   {
-    return getNthCoordinate<N - I - 1>(util::forward<TCoordArgTypes>(coords)...) + getNthDimension<N - I - 1>(util::forward<TDimArgType>(dims)) * RowMajorToIndexHelper<I + 1, N>
-      ::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    return getNthCoordinate<N - I - 1>(std::forward<TCoordArgTypes>(coords)...) + getNthDimension<N - I - 1>(std::forward<TDimArgType>(dims)) * RowMajorToIndexHelper<I + 1, N>
+      ::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 
   template <typename TDimArgType>
@@ -41,8 +41,8 @@ struct RowMajorFromIndexHelper
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
-    index = RowMajorFromIndexHelper<I + 1, N>::fromIndex(dest, index, util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I - 1>(std::forward<TDimArgTypes>(dims)...);
+    index = RowMajorFromIndexHelper<I + 1, N>::fromIndex(dest, index, std::forward<TDimArgTypes>(dims)...);
     dest(I - 1) = index % dim;
     return index / dim;
   }
@@ -55,7 +55,7 @@ struct RowMajorFromIndexHelper<I, I>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I - 1>(std::forward<TDimArgTypes>(dims)...);
     dest(I - 1) = index % dim;
     return index / dim;
   }
@@ -68,8 +68,8 @@ struct RowMajorFromIndexHelper<1, N>
   __host__ __device__
   static size_t fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
-    index = RowMajorFromIndexHelper<2, N>::fromIndex(dest, index, util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<0>(std::forward<TDimArgTypes>(dims)...);
+    index = RowMajorFromIndexHelper<2, N>::fromIndex(dest, index, std::forward<TDimArgTypes>(dims)...);
     dest(0) = index % dim;
     return 0; // This return value is not used
   }
@@ -107,9 +107,9 @@ struct RowMajorToStrideHelper
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<N - I>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<N - I>(std::forward<TDimArgTypes>(dims)...);
     dest(N - I - 1) = dest(N - I) * dim;
-    RowMajorToStrideHelper<I + 1, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    RowMajorToStrideHelper<I + 1, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -130,9 +130,9 @@ struct RowMajorToStrideHelper<1, N>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<N - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<N - 1>(std::forward<TDimArgTypes>(dims)...);
     dest(N - 2) = dim;
-    RowMajorToStrideHelper<2, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    RowMajorToStrideHelper<2, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -144,7 +144,7 @@ struct RowMajorToStrideHelper<0, N>
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
     dest(N - 1) = 1;
-    RowMajorToStrideHelper<1, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    RowMajorToStrideHelper<1, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -185,8 +185,8 @@ struct RowMajor
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const volatile
   {
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    return detail::RowMajorToIndexHelper<0, dimension_num_v<TDimArgType>::value>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    return detail::RowMajorToIndexHelper<0, dimension_num_v<TDimArgType>::value>::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 
   TT_INDEXSTRATEGY_TO_INDEX_2
@@ -196,7 +196,7 @@ struct RowMajor
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
     VectorXs<TDims> result;
-    detail::RowMajorFromIndexHelper<1, TDims>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    detail::RowMajorFromIndexHelper<1, TDims>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 
@@ -206,7 +206,7 @@ struct RowMajor
   __host__ __device__
   constexpr size_t getSize(TDimArgTypes&&... dim_args) const volatile
   {
-    return multiplyDimensions(util::forward<TDimArgTypes>(dim_args)...);
+    return multiplyDimensions(std::forward<TDimArgTypes>(dim_args)...);
   }
 
   template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
@@ -214,7 +214,7 @@ struct RowMajor
   VectorXs<TDims> toStride(TDimArgTypes&&... dims) const volatile
   {
     VectorXs<TDims> result;
-    detail::RowMajorToStrideHelper<0, TDims>::toStride(result, util::forward<TDimArgTypes>(dims)...);
+    detail::RowMajorToStrideHelper<0, TDims>::toStride(result, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 };
@@ -231,7 +231,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const RowMajor& index_strategy)
 {
   stream << "RowMajor";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

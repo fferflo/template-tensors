@@ -168,8 +168,8 @@ __host__
 ::boost::python::numpy::ndarray toNumpy(TTensorType&& tensor)
 {
   FromPythonNumpyWrapper<decay_elementtype_t<TTensorType>, TRank> result_as_tensor(tensor.template dims<TRank>());
-  result_as_tensor = util::forward<TTensorType>(tensor);
-  return util::move(result_as_tensor.getNumpyArray());
+  result_as_tensor = std::forward<TTensorType>(tensor);
+  return std::move(result_as_tensor.getNumpyArray());
 }
 
 } // end of ns python

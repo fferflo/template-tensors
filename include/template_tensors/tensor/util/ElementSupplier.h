@@ -8,7 +8,7 @@ struct ApplyWrapperHelper
   template <typename TOperation, metal::int_... TIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto apply(TOperation&& op, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...)...))
+  RETURN_AUTO(std::forward<TOperation>(op)(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...)...))
 };
 
 template <>
@@ -17,16 +17,16 @@ struct ApplyWrapperHelper<true>
   template <typename TOperation, metal::int_... TIndices, typename... TCoordArgTypes>
   __host__ __device__
   static auto apply(TOperation&& op, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
-  RETURN_AUTO(util::forward<TOperation>(op)(VectorXs<sizeof...(TIndices)>(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...)...)))
+  RETURN_AUTO(std::forward<TOperation>(op)(VectorXs<sizeof...(TIndices)>(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...)...)))
 };
 
 template <metal::int_ TSupplierDims, typename TOperation, typename... TCoordArgTypes>
 __host__ __device__
 auto apply_supplier(TOperation&& op, TCoordArgTypes&&... coords)
 RETURN_AUTO(ApplyWrapperHelper<tmp::takes_arguments_v<TOperation, VectorXs<TSupplierDims>>::value>::apply(
-  util::forward<TOperation>(op),
+  std::forward<TOperation>(op),
   metal::iota<metal::number<0>, metal::number<TSupplierDims>>(),
-  util::forward<TCoordArgTypes>(coords)...
+  std::forward<TCoordArgTypes>(coords)...
 ))
 
 } // end of ns detail
@@ -47,8 +47,8 @@ public:
   template <typename... TDimArgTypes>
   __host__ __device__
   ElementSupplierTensor(TOperation supplier, TDimArgTypes&&... dim_args)
-    : SuperType(util::forward<TDimArgTypes>(dim_args)...)
-    , StoreDimensions<TDimSeq>(util::forward<TDimArgTypes>(dim_args)...)
+    : SuperType(std::forward<TDimArgTypes>(dim_args)...)
+    , StoreDimensions<TDimSeq>(std::forward<TDimArgTypes>(dim_args)...)
     , m_supplier(supplier)
   {
   }
@@ -77,7 +77,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    detail::apply_supplier<TSupplierDims>(self.m_supplier, util::forward<TCoordArgTypes>(coords)...)
+    detail::apply_supplier<TSupplierDims>(self.m_supplier, std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 };
@@ -101,17 +101,17 @@ public:
 template <metal::int_... TDims, typename TOperation>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, sizeof...(TDims), DimSeq<TDims...>>(util::forward<TOperation>(supplier)));
+RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, sizeof...(TDims), DimSeq<TDims...>>(std::forward<TOperation>(supplier)));
 
 template <typename TOperation, typename... TDimArgTypes, ENABLE_IF(sizeof...(TDimArgTypes) != 0)>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier, TDimArgTypes&&... dim_args)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, dimension_num_v<TDimArgTypes...>::value, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>(util::forward<TOperation>(supplier), util::forward<TDimArgTypes>(dim_args)...));
+RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, dimension_num_v<TDimArgTypes...>::value, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>(std::forward<TOperation>(supplier), std::forward<TDimArgTypes>(dim_args)...));
 
 template <typename TDimSeq, metal::int_ TSupplierDims = non_trivial_dimensions_num_v<TDimSeq>::value, typename TOperation>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, TSupplierDims, TDimSeq>(util::forward<TOperation>(supplier)));
+RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, TSupplierDims, TDimSeq>(std::forward<TOperation>(supplier)));
 
 template <metal::int_... TDims>
 __host__ __device__
@@ -121,7 +121,7 @@ RETURN_AUTO(fromSupplier<TDims...>(math::functor::id()))
 template <typename... TDimArgTypes, ENABLE_IF(sizeof...(TDimArgTypes) != 0)>
 __host__ __device__
 auto coordinates(TDimArgTypes&&... dim_args)
-RETURN_AUTO(fromSupplier(math::functor::id(), util::forward<TDimArgTypes>(dim_args)...))
+RETURN_AUTO(fromSupplier(math::functor::id(), std::forward<TDimArgTypes>(dim_args)...))
 
 template <typename TDimSeq, metal::int_ TSupplierDims = non_trivial_dimensions_num_v<TDimSeq>::value>
 __host__ __device__

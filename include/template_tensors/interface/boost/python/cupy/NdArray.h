@@ -197,7 +197,7 @@ __host__
     );
   }
 
-  fromCupy<ElementType, TRank>(cupy_array) = util::forward<TTensorType>(tensor);
+  fromCupy<ElementType, TRank>(cupy_array) = std::forward<TTensorType>(tensor);
 
   return cupy_array;
 }

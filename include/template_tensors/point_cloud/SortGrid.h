@@ -100,7 +100,7 @@ public:
   __host__
   SortGrid(TObjectVectorArg&& object_vector_arg, template_tensors::VectorXs<TRank> resolution, TIndexStrategy index_strategy = TIndexStrategy(), AtomicOps atomic_ops = AtomicOps())
     : SuperType(resolution)
-    , m_ordered_objects(util::forward<TObjectVectorArg>(object_vector_arg))
+    , m_ordered_objects(std::forward<TObjectVectorArg>(object_vector_arg))
     , m_ordered_cell_ids(m_ordered_objects.rows())
     , m_grid(index_strategy, resolution)
     , m_index_strategy(index_strategy)
@@ -128,11 +128,11 @@ public:
   __host__
   SortGrid(SortGrid<TObjectVector, TRank, TAllocator, TIndexStrategy, TAtomicOpsIn, TIsOnHost>&& other)
     : SuperType(static_cast<SuperType&&>(other))
-    , m_ordered_objects(util::move(other.m_ordered_objects))
-    , m_ordered_cell_ids(util::move(other.m_ordered_cell_ids))
-    , m_grid(util::move(other.m_grid))
-    , m_index_strategy(util::move(other.m_index_strategy))
-    , m_atomic_ops(util::move(other.m_atomic_ops))
+    , m_ordered_objects(std::move(other.m_ordered_objects))
+    , m_ordered_cell_ids(std::move(other.m_ordered_cell_ids))
+    , m_grid(std::move(other.m_grid))
+    , m_index_strategy(std::move(other.m_index_strategy))
+    , m_atomic_ops(std::move(other.m_atomic_ops))
   {
   }
 
@@ -150,7 +150,7 @@ public:
     // Create cell and object vectors
     TIndexStrategy index_strategy = m_index_strategy;
     template_tensors::VectorXs<TRank> dims = m_grid.template dims<TRank>();
-    auto get_coordinates_to_functor = util::wrap(mem::toFunctor<MEMORY_TYPE, TIsOnHost>(util::forward<TGetCoordinates>(get_coordinates)));
+    auto get_coordinates_to_functor = util::wrap(mem::toFunctor<MEMORY_TYPE, TIsOnHost>(std::forward<TGetCoordinates>(get_coordinates)));
     template_tensors::for_each([get_coordinates_to_functor, index_strategy, dims]
     __host__ __device__(size_t& cell_id, Object object_in){
         cell_id = index_strategy.toIndex(dims, get_coordinates_to_functor()(object_in));
@@ -200,7 +200,7 @@ public:
   __host__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_grid(util::forward<TCoordArgTypes>(coords)...)
+    self.m_grid(std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 

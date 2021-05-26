@@ -41,7 +41,7 @@ public:
     m_length += object.rows();
 
     node* new_node = new node(object.rows());
-    new_node->string = util::forward<T>(object);
+    new_node->string = std::forward<T>(object);
     if (m_root == nullptr)
     {
       m_root = new_node;
@@ -94,6 +94,6 @@ private:
 template <typename TChar, typename T>
 __host__ __device__
 auto operator<<(stringstream<TChar>& stream, T&& object)
-RETURN_AUTO(stream.append(to_string<TChar>(util::forward<T>(object))))
+RETURN_AUTO(stream.append(to_string<TChar>(std::forward<T>(object))))
 
 } // end of ns template_tensors

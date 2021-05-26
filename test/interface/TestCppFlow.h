@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(cppflow_conversions_host)
 
   auto cppflow = tt::toCppFlow(tensor1);
   cppflow = 2 * cppflow;
-  auto tensor2 = tt::fromCppFlow<int, 3, mem::HOST>(util::move(cppflow));
+  auto tensor2 = tt::fromCppFlow<int, 3, mem::HOST>(std::move(cppflow));
 
   BOOST_CHECK(tt::eq(2 * tensor1, tensor2));
 }

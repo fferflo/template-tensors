@@ -134,7 +134,7 @@ public:
         template_tensors::Stride<TRank>(template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(data->dl_tensor.strides)),
         template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(data->dl_tensor.shape)
       )
-    , m_data(util::move(data))
+    , m_data(std::move(data))
   {
   }
 
@@ -144,7 +144,7 @@ public:
   __host__
   FromDlPack(FromDlPack<TElementType, TRank, TMemoryType>&& other)
     : SuperType(static_cast<SuperType&&>(other))
-    , m_data(util::move(other.m_data))
+    , m_data(std::move(other.m_data))
   {
   }
 
@@ -155,7 +155,7 @@ public:
   FromDlPack<TElementType, TRank, TMemoryType>& operator=(FromDlPack<TElementType, TRank, TMemoryType>&& other)
   {
     static_cast<SuperType&>(*this) = static_cast<SuperType&&>(other);
-    m_data = util::move(other.m_data);
+    m_data = std::move(other.m_data);
   }
 
   TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
@@ -208,7 +208,7 @@ FromDlPack<TElementType, TRank, TMemoryType> fromDlPack(SafeDLManagedTensor&& dl
     throw InvalidDlPackMemoryType(dl->dl_tensor.device.device_type, dlpack_devicetype<TMemoryType>::value);
   }
 
-  return FromDlPack<TElementType, TRank, TMemoryType>(util::move(dl));
+  return FromDlPack<TElementType, TRank, TMemoryType>(std::move(dl));
 }
 
 namespace detail {
@@ -224,7 +224,7 @@ struct DLManagedTensorContext
 
   template <typename TTensorPtrIn>
   DLManagedTensorContext(TTensorPtrIn&& ptr)
-    : ptr(util::forward<TTensorPtrIn>(ptr))
+    : ptr(std::forward<TTensorPtrIn>(ptr))
   {
     static const metal::int_ RANK = non_trivial_dimensions_num_v<decltype(*ptr)>::value;
     shape.resize(RANK);
@@ -246,7 +246,7 @@ template <typename TTensorPtr,
 SafeDLManagedTensor toDlPack(TTensorPtr&& tensor)
 {
   using ManagerContext = detail::DLManagedTensorContext<typename std::decay<TTensorPtr>::type>;
-  auto* manager_ctx = new ManagerContext(util::forward<TTensorPtr>(tensor));
+  auto* manager_ctx = new ManagerContext(std::forward<TTensorPtr>(tensor));
 
   using TensorType = decltype(*tensor);
   using ElementType = template_tensors::decay_elementtype_t<TensorType>;
@@ -272,7 +272,7 @@ template <typename TTensorType,
   typename TDummy = decltype(indexstrategy_t<TTensorType>().toStride()), typename TDummy2 = void>
 SafeDLManagedTensor toDlPack(TTensorType&& tensor)
 {
-  return toDlPack(::boost::make_unique<typename std::decay<TTensorType>::type>(util::forward<TTensorType>(tensor)));
+  return toDlPack(::boost::make_unique<typename std::decay<TTensorType>::type>(std::forward<TTensorType>(tensor)));
 }
 
 } // end of ns template_tensors

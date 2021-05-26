@@ -19,7 +19,7 @@ struct construct
   __host__ __device__
   constexpr TResultType operator()(TArgs&&... args) const volatile
   {
-    return TResultType(util::forward<TArgs>(args)...);
+    return TResultType(std::forward<TArgs>(args)...);
   }
 };
 
@@ -30,7 +30,7 @@ struct construct_shared_ptr
   __host__
   std::shared_ptr<TResultType> operator()(TArgs&&... args) const volatile
   {
-    return std::make_shared<TResultType>(util::forward<TArgs>(args)...);
+    return std::make_shared<TResultType>(std::forward<TArgs>(args)...);
   }
 };
 
@@ -41,7 +41,7 @@ struct construct_unique_ptr
   __host__
   std::unique_ptr<TResultType> operator()(TArgs&&... args) const volatile
   {
-    return boost::make_unique<TResultType>(util::forward<TArgs>(args)...);
+    return boost::make_unique<TResultType>(std::forward<TArgs>(args)...);
   }
 };
 
@@ -86,7 +86,7 @@ struct id_forward
   __host__ __device__
   constexpr T&& operator()(T&& x) const volatile
   {
-    return util::forward<T>(x);
+    return std::forward<T>(x);
   }
 };
 
@@ -157,7 +157,7 @@ struct assign
   __host__ __device__
   void operator()(TDest&& dest, TSrc&& src) const volatile
   {
-    dest = util::forward<TSrc>(src);
+    dest = std::forward<TSrc>(src);
   }
 };
 
@@ -175,7 +175,7 @@ struct assign_mapped
   __host__ __device__
   void operator()(TDest&& dest, TSrcs&&... srcs)
   {
-    dest = op(util::forward<TSrcs>(srcs)...);
+    dest = op(std::forward<TSrcs>(srcs)...);
   }
 
   TOperation op;
@@ -195,7 +195,7 @@ struct assign_self_mapped
   __host__ __device__
   void operator()(TDest&& dest, TSrcs&&... srcs)
   {
-    dest = op(util::forward<TDest>(dest), util::forward<TSrcs>(srcs)...);
+    dest = op(std::forward<TDest>(dest), std::forward<TSrcs>(srcs)...);
   }
 
   TOperation op;
@@ -212,7 +212,7 @@ struct assign_to
   __host__ __device__
   void operator()(TSrc&& src)
   {
-    dest = util::forward<TSrc>(src);
+    dest = std::forward<TSrc>(src);
   }
 };
 
@@ -220,7 +220,7 @@ struct assign_to
 
 template <typename TDest>
 auto assign_to(TDest&& dest)
-RETURN_AUTO(detail::assign_to<util::store_member_t<TDest&&>>{util::forward<TDest>(dest)})
+RETURN_AUTO(detail::assign_to<util::store_member_t<TDest&&>>{std::forward<TDest>(dest)})
 
 struct address_of
 {
@@ -248,7 +248,7 @@ struct compose
   template <typename TThisType, typename... TArgs>
   __host__ __device__
   static auto get(TThisType&& self, TArgs&&... args)
-  RETURN_AUTO(self.left(self.right(util::forward<TArgs>(args)...)))
+  RETURN_AUTO(self.left(self.right(std::forward<TArgs>(args)...)))
 
   FORWARD_ALL_QUALIFIERS(operator(), get)
 
@@ -275,7 +275,7 @@ template <typename TLeft, typename TRight>
 __host__ __device__
 auto compose(TLeft&& left, TRight&& right)
 RETURN_AUTO(detail::compose<util::store_member_t<TLeft&&>, util::store_member_t<TRight&&>>
-  (util::forward<TLeft>(left), util::forward<TRight>(right)))
+  (std::forward<TLeft>(left), std::forward<TRight>(right)))
 
 namespace detail {
 
@@ -286,7 +286,7 @@ struct for_each
 
   __host__ __device__
   for_each(TOp&& op)
-    : op(util::forward<TOp>(op))
+    : op(std::forward<TOp>(op))
   {
   }
 
@@ -321,7 +321,7 @@ struct for_each
 template <typename TForEach = for_each::Sequential, typename TOp>
 __host__ __device__
 auto for_each(TOp&& op)
-RETURN_AUTO(detail::for_each<util::store_member_t<TOp&&>, TForEach>(util::forward<TOp>(op)))
+RETURN_AUTO(detail::for_each<util::store_member_t<TOp&&>, TForEach>(std::forward<TOp>(op)))
 
 } // end of ns functor
 

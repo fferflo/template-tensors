@@ -11,7 +11,7 @@ template <typename TVectorType, typename TScalar = decay_elementtype_t<TVectorTy
 __host__ __device__
 template_tensors::VectorXT<TScalar, 2> fromMercator(TVectorType&& mercator, size_t zoom)
 {
-  template_tensors::VectorXT<TScalar, 2> m = util::forward<TVectorType>(mercator);
+  template_tensors::VectorXT<TScalar, 2> m = std::forward<TVectorType>(mercator);
   m(1) = -m(1);
   return (1 << zoom) * (m / math::consts<TScalar>::PI + 1) / 2;
 }
@@ -29,14 +29,14 @@ template <typename TVectorType, typename TScalar = decay_elementtype_t<TVectorTy
 __host__ __device__
 template_tensors::VectorXT<TScalar, 2> fromLatLon(TVectorType&& latlon, size_t zoom)
 {
-  return slippy_maps::fromMercator(template_tensors::geo::latlon::toMercator(util::forward<TVectorType>(latlon)), zoom);
+  return slippy_maps::fromMercator(template_tensors::geo::latlon::toMercator(std::forward<TVectorType>(latlon)), zoom);
 }
 
 template <typename TVectorType, typename TScalar = decay_elementtype_t<TVectorType>>
 __host__ __device__
 template_tensors::VectorXT<TScalar, 2> toLatLon(TVectorType&& tilepos, size_t zoom)
 {
-  return template_tensors::geo::mercator::toLatLon(slippy_maps::toMercator(util::forward<TVectorType>(tilepos), zoom));
+  return template_tensors::geo::mercator::toLatLon(slippy_maps::toMercator(std::forward<TVectorType>(tilepos), zoom));
 }
 
 
@@ -73,7 +73,7 @@ public:
     {
       result = m_default_pixel;
     }
-    return util::move(result);
+    return std::move(result);
   }
 
 private:

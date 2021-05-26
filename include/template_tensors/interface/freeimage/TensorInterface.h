@@ -205,19 +205,19 @@ namespace detail {
 template <typename TUnpacker, typename TFreeImage>
 __host__
 auto fromFreeImage(TUnpacker&& unpacker, TFreeImage&& freeimage)
-RETURN_AUTO(template_tensors::elwise(util::forward<TUnpacker>(unpacker), detail::freeImageTensor(util::forward<TFreeImage>(freeimage))))
+RETURN_AUTO(template_tensors::elwise(std::forward<TUnpacker>(unpacker), detail::freeImageTensor(std::forward<TFreeImage>(freeimage))))
 
 } // end of ns detail
 
 template <typename TElementType = uint8_t, typename TFreeImage>
 __host__
 auto fromFreeImageRgba(TFreeImage&& freeimage)
-RETURN_AUTO(detail::fromFreeImage(detail::FreeImageRgbaUnpacker<true, TElementType>(freeimage), util::forward<TFreeImage>(freeimage)))
+RETURN_AUTO(detail::fromFreeImage(detail::FreeImageRgbaUnpacker<true, TElementType>(freeimage), std::forward<TFreeImage>(freeimage)))
 
 template <typename TElementType = uint8_t, typename TFreeImage>
 __host__
 auto fromFreeImageRgb(TFreeImage&& freeimage)
-RETURN_AUTO(detail::fromFreeImage(detail::FreeImageRgbaUnpacker<false, TElementType>(freeimage), util::forward<TFreeImage>(freeimage)))
+RETURN_AUTO(detail::fromFreeImage(detail::FreeImageRgbaUnpacker<false, TElementType>(freeimage), std::forward<TFreeImage>(freeimage)))
 
 } // end of ns template_tensors
 

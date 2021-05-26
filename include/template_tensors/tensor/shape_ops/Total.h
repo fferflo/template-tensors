@@ -66,7 +66,7 @@ struct NthTotalDimRuntime2
   __host__ __device__
   static dim_t get(TTensorTypeIn&& tensor)
   {
-    return NthTotalDimRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, keep ? TKeepSeqOffset + 1 : TKeepSeqOffset, I + 1, N>::get(util::forward<TTensorTypeIn>(tensor));
+    return NthTotalDimRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, keep ? TKeepSeqOffset + 1 : TKeepSeqOffset, I + 1, N>::get(std::forward<TTensorTypeIn>(tensor));
   }
 };
 
@@ -106,7 +106,7 @@ struct NthTotalDimRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, TKeepSeqOffset, N
   __host__ __device__
   static dim_t get(TTensorTypeIn&& tensor)
   {
-    return keep ? tensor.template dim<TKeepSeqOffset>() : NthElementDimension<is_static_v<decay_elementtype_t<TTensorTypeIn>>::value>::template get<drop_seq_offset>(util::forward<TTensorTypeIn>(tensor));
+    return keep ? tensor.template dim<TKeepSeqOffset>() : NthElementDimension<is_static_v<decay_elementtype_t<TTensorTypeIn>>::value>::template get<drop_seq_offset>(std::forward<TTensorTypeIn>(tensor));
   }
 };
 
@@ -117,7 +117,7 @@ struct NthTotalDimRuntime
   __host__ __device__
   static dim_t get(TTensorTypeIn&& tensor)
   {
-    return NthTotalDimRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, 0, 0, N>::get(util::forward<TTensorTypeIn>(tensor));
+    return NthTotalDimRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, 0, 0, N>::get(std::forward<TTensorTypeIn>(tensor));
   }
 };
 
@@ -135,7 +135,7 @@ struct TotalDimsRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, metal::numbers<TInd
   __host__ __device__
   static VectorXs<sizeof...(TIndices)> get(TTensorTypeIn&& tensor)
   {
-    return VectorXs<sizeof...(TIndices)>(NthTotalDimRuntime<TKeepDimSeq, TDropDimSeq, TKeepSeq, TIndices>::get(util::forward<TTensorTypeIn>(tensor))...);
+    return VectorXs<sizeof...(TIndices)>(NthTotalDimRuntime<TKeepDimSeq, TDropDimSeq, TKeepSeq, TIndices>::get(std::forward<TTensorTypeIn>(tensor))...);
   }
 };
 
@@ -146,7 +146,7 @@ struct TotalDimsRuntime
   __host__ __device__
   static VectorXs<TRank> get(TTensorTypeIn&& tensor)
   {
-    return TotalDimsRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, metal::iota<metal::number<0>, metal::number<TRank>>>::get(util::forward<TTensorTypeIn>(tensor));
+    return TotalDimsRuntime2<TKeepDimSeq, TDropDimSeq, TKeepSeq, metal::iota<metal::number<0>, metal::number<TRank>>>::get(std::forward<TTensorTypeIn>(tensor));
   }
 };
 
@@ -160,9 +160,9 @@ struct TotalCoordinateHelper<metal::numbers<TKeepIndices...>, metal::numbers<TDr
 {
   template <typename TTensorTypeIn, typename... TCoordArgTypes>
   __host__ __device__
-  static auto get(TTensorTypeIn&& tensor, TCoordArgTypes&&... coords) -> decltype(util::forward<TTensorTypeIn>(tensor)(getNthCoordinate<TKeepIndices>(util::forward<TCoordArgTypes>(coords)...)...)(getNthCoordinate<TDropIndices>(util::forward<TCoordArgTypes>(coords)...)...))
+  static auto get(TTensorTypeIn&& tensor, TCoordArgTypes&&... coords) -> decltype(std::forward<TTensorTypeIn>(tensor)(getNthCoordinate<TKeepIndices>(std::forward<TCoordArgTypes>(coords)...)...)(getNthCoordinate<TDropIndices>(std::forward<TCoordArgTypes>(coords)...)...))
   {
-    return util::forward<TTensorTypeIn>(tensor)(getNthCoordinate<TKeepIndices>(util::forward<TCoordArgTypes>(coords)...)...)(getNthCoordinate<TDropIndices>(util::forward<TCoordArgTypes>(coords)...)...);
+    return std::forward<TTensorTypeIn>(tensor)(getNthCoordinate<TKeepIndices>(std::forward<TCoordArgTypes>(coords)...)...)(getNthCoordinate<TDropIndices>(std::forward<TCoordArgTypes>(coords)...)...);
   }
 };
 
@@ -205,7 +205,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    detail::TotalCoordinateHelper<TKeepSeq, DropSeq>::get(self.m_tensor, util::forward<TCoordArgTypes>(coords)...)
+    detail::TotalCoordinateHelper<TKeepSeq, DropSeq>::get(self.m_tensor, std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
@@ -251,7 +251,7 @@ TDropSeq>>
 __host__ __device__
 auto total(TOtherTensorType&& tensor)
 RETURN_AUTO(TotalTensor<util::store_member_t<TOtherTensorType&&>, TKeepSeq>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 namespace functor {
@@ -261,7 +261,7 @@ struct total_ex
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& tensor)
-  RETURN_AUTO(template_tensors::total<TDropSeq>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::total<TDropSeq>(std::forward<TTensorType>(tensor)))
 };
 } // end of ns functor
 
@@ -269,7 +269,7 @@ template <metal::int_... TDropDims, typename TOtherTensorType>
 __host__ __device__
 auto total(TOtherTensorType&& tensor)
 RETURN_AUTO(total<metal::numbers<TDropDims...>>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 namespace functor {
@@ -279,7 +279,7 @@ struct total
   template <typename TTensorType>
   __host__ __device__
   auto operator()(TTensorType&& tensor)
-  RETURN_AUTO(template_tensors::total<metal::numbers<TDropDims...>>(util::forward<TTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::total<metal::numbers<TDropDims...>>(std::forward<TTensorType>(tensor)))
 };
 } // end of ns functor
 

@@ -20,11 +20,11 @@ public:
 
     LocalOrAllocTensorT<TScalar, mem::alloc::heap, ColMajor, DimSeq<RANK, COLS_TOTAL>>
       Ab_copy(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, Ab.dims());
-    Ab_copy = util::forward<TMatrixTypeAb>(Ab);
+    Ab_copy = std::forward<TMatrixTypeAb>(Ab);
 
     gaussian_elimination(Ab_copy, m_epsilon); // TODO: try index strategies for this
     back_substitution(Ab_copy, x.cols(), m_epsilon); // and this?
-    return find_unique_solution(util::forward<TMatrixTypeX>(x), Ab_copy, m_epsilon);
+    return find_unique_solution(std::forward<TMatrixTypeX>(x), Ab_copy, m_epsilon);
   }
 
   TT_SOLVER_FORWARD_X_A_B(__host__ __device__)

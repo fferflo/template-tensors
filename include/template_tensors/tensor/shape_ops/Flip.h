@@ -50,7 +50,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, metal::numbers<TIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_tensor(detail::FlipIndexHelper<TIndices, TFlipDim>::get(getNthCoordinate<TIndices>(util::forward<TCoordArgTypes>(coords)...), self.m_tensor.template dim<TIndices>())...)
+    self.m_tensor(detail::FlipIndexHelper<TIndices, TFlipDim>::get(getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...), self.m_tensor.template dim<TIndices>())...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
@@ -95,7 +95,7 @@ template <metal::int_ TFlipDim, typename TOtherTensorType>
 __host__ __device__
 auto flip(TOtherTensorType&& tensor)
 RETURN_AUTO(FlipTensor<util::store_member_t<TOtherTensorType&&>, TFlipDim>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 namespace functor {
@@ -106,7 +106,7 @@ struct flip
   template <typename TOtherTensorType>
   __host__ __device__
   auto operator()(TOtherTensorType&& tensor) const
-  RETURN_AUTO(template_tensors::flip<TFlipDim>(util::forward<TOtherTensorType>(tensor)))
+  RETURN_AUTO(template_tensors::flip<TFlipDim>(std::forward<TOtherTensorType>(tensor)))
 };
 
 } // end of ns functor

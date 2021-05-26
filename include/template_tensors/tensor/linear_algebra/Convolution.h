@@ -67,7 +67,7 @@ public:
     dot(
       self.m_kernel,
       headEx<dimseq_t<TKernelType>>(
-        offset(self.m_input, util::forward<TCoordArgTypes>(coords)...),
+        offset(self.m_input, std::forward<TCoordArgTypes>(coords)...),
         self.m_kernel.dims()
       )
     )
@@ -113,7 +113,7 @@ template <typename TInputType, typename TKernelType>
 __host__ __device__
 auto conv(TInputType&& input, TKernelType&& kernel)
 RETURN_AUTO(ConvolutionTensor<util::store_member_t<TInputType&&>, util::store_member_t<TKernelType&&>>
-  (util::forward<TInputType>(input), util::forward<TKernelType>(kernel))
+  (std::forward<TInputType>(input), std::forward<TKernelType>(kernel))
 );
 
 } // end of ns template_tensors

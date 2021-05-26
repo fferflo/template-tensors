@@ -19,7 +19,7 @@ public:
     TT_MATRIX_INVERSE_CHECK_DIMS
 
     return GaussSolver<TScalar>(m_epsilon)
-      (util::forward<TMatrixTypeDest>(dest), util::forward<TMatrixTypeSrc>(src), template_tensors::IdentityMatrix<TScalar, RANK>(dest.rows()));
+      (std::forward<TMatrixTypeDest>(dest), std::forward<TMatrixTypeSrc>(src), template_tensors::IdentityMatrix<TScalar, RANK>(dest.rows()));
   }
 
 private:

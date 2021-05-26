@@ -24,7 +24,7 @@ private:
 public:
   __host__ __device__
   multi(TAggregators&&... aggregators)
-    : m_aggregators(jtuple::tuple<TAggregators...>(util::forward<TAggregators>(aggregators)...))
+    : m_aggregators(jtuple::tuple<TAggregators...>(std::forward<TAggregators>(aggregators)...))
   {
   }
 
@@ -50,6 +50,6 @@ public:
 template <typename... TAggregators>
 __host__ __device__
 auto multi(TAggregators&&... aggregators)
-RETURN_AUTO(detail::multi<util::store_member_t<TAggregators&&>...>(util::forward<TAggregators>(aggregators)...))
+RETURN_AUTO(detail::multi<util::store_member_t<TAggregators&&>...>(std::forward<TAggregators>(aggregators)...))
 
 } // end of ns aggregator

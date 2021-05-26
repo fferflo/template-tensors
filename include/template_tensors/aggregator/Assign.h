@@ -28,7 +28,7 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    jtuple::get<0>(m_functor_and_value)(jtuple::get<1>(m_functor_and_value), util::forward<TInput>(input)...);
+    jtuple::get<0>(m_functor_and_value)(jtuple::get<1>(m_functor_and_value), std::forward<TInput>(input)...);
   }
 
   __host__ __device__
@@ -53,6 +53,6 @@ template <typename TResultType, typename TFunctor>
 __host__ __device__
 auto assign(TFunctor&& functor, TResultType initial_value)
 RETURN_AUTO(detail::assign<typename std::decay<TResultType>::type, util::store_member_t<TFunctor&&>>(
-  util::forward<TFunctor>(functor), initial_value))
+  std::forward<TFunctor>(functor), initial_value))
 
 } // end of ns aggregator

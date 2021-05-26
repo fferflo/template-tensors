@@ -8,7 +8,7 @@ __host__ __device__
 TResultType eval(TTensorType&& tensor, TIndexStrategy index_strategy = TIndexStrategy())
 {
   TResultType result(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, index_strategy, tensor.dims());
-  result = util::forward<TTensorType>(tensor);
+  result = std::forward<TTensorType>(tensor);
   return result;
 }
 

@@ -15,7 +15,7 @@ private:
   template <typename TThisType, typename TCoordVector>
   __host__ __device__
   static auto get(TThisType&& self, TCoordVector&& coords)
-  RETURN_AUTO(template_tensors::elwise(math::functor::positive_fmod(), util::forward<TCoordVector>(coords), util::forward<TThisType>(self).dims))
+  RETURN_AUTO(template_tensors::elwise(math::functor::positive_fmod(), std::forward<TCoordVector>(coords), std::forward<TThisType>(self).dims))
 
 public:
   __host__ __device__
@@ -36,7 +36,7 @@ private:
   template <typename TThisType, typename TCoordVector>
   __host__ __device__
   static auto get(TThisType&& self, TCoordVector&& coords)
-  RETURN_AUTO(template_tensors::elwise(math::functor::positive_mod(), template_tensors::static_cast_to<TIntType>(util::forward<TCoordVector>(coords)), template_tensors::static_cast_to<TIntType>(util::forward<TThisType>(self).dims)))
+  RETURN_AUTO(template_tensors::elwise(math::functor::positive_mod(), template_tensors::static_cast_to<TIntType>(std::forward<TCoordVector>(coords)), template_tensors::static_cast_to<TIntType>(std::forward<TThisType>(self).dims)))
 
 public:
   __host__ __device__
@@ -54,14 +54,14 @@ template <typename TField, typename TDims>
 __host__ __device__
 auto repeat(TField&& field, TDims&& dims)
 RETURN_AUTO(
-  field::transform(util::forward<TField>(field), detail::repeatf<util::store_member_t<TDims&&>>(util::forward<TDims>(dims)))
+  field::transform(std::forward<TField>(field), detail::repeatf<util::store_member_t<TDims&&>>(std::forward<TDims>(dims)))
 )
 
 template <typename TIntType = int32_t, typename TField, typename TDims>
 __host__ __device__
 auto repeat_discrete(TField&& field, TDims&& dims)
 RETURN_AUTO(
-  field::transform(util::forward<TField>(field), detail::repeati<util::store_member_t<TDims&&>, TIntType>(util::forward<TDims>(dims)))
+  field::transform(std::forward<TField>(field), detail::repeati<util::store_member_t<TDims&&>, TIntType>(std::forward<TDims>(dims)))
 )
 
 namespace detail {
@@ -70,7 +70,7 @@ template <metal::int_ TRank, typename TIntType = int32_t, typename TTensorType, 
 __host__ __device__
 auto repeat(TTensorType&& tensor, TDims&& dims)
 RETURN_AUTO(
-  field::wrap::repeat_discrete<TIntType>(field::fromSupplier<TRank>(util::forward<TTensorType>(tensor)), util::forward<TDims>(dims))
+  field::wrap::repeat_discrete<TIntType>(field::fromSupplier<TRank>(std::forward<TTensorType>(tensor)), std::forward<TDims>(dims))
 )
 
 } // end of ns detail
@@ -79,7 +79,7 @@ template <metal::int_ TRank, typename TIntType = int32_t, typename TTensorType, 
 __host__ __device__
 auto repeat(TTensorType&& tensor)
 RETURN_AUTO(
-  detail::repeat<TRank, TIntType>(util::forward<TTensorType>(tensor), template_tensors::eval(util::forward<TTensorType>(tensor).template dims<TRank>()))
+  detail::repeat<TRank, TIntType>(std::forward<TTensorType>(tensor), template_tensors::eval(std::forward<TTensorType>(tensor).template dims<TRank>()))
 )
 
 
@@ -88,7 +88,7 @@ template <typename TField, typename TSize>
 __host__ __device__
 auto clamp(TField&& field, TSize&& size)
 RETURN_AUTO(
-  field::transform(util::forward<TField>(field), template_tensors::functor::clamp(template_tensors::VectorXT<template_tensors::decay_elementtype_t<TSize>, template_tensors::rows_v<TSize>::value>(0), util::forward<TSize>(size)))
+  field::transform(std::forward<TField>(field), template_tensors::functor::clamp(template_tensors::VectorXT<template_tensors::decay_elementtype_t<TSize>, template_tensors::rows_v<TSize>::value>(0), std::forward<TSize>(size)))
 )
 
 namespace detail {
@@ -97,7 +97,7 @@ template <metal::int_ TRank, typename TTensorType, typename TDims>
 __host__ __device__
 auto clamp(TTensorType&& tensor, TDims&& dims)
 RETURN_AUTO(
-  field::wrap::clamp(field::fromSupplier<TRank>(util::forward<TTensorType>(tensor)), util::forward<TDims>(dims))
+  field::wrap::clamp(field::fromSupplier<TRank>(std::forward<TTensorType>(tensor)), std::forward<TDims>(dims))
 )
 
 } // end of ns detail
@@ -106,7 +106,7 @@ template <metal::int_ TRank, typename TTensorType, ENABLE_IF(template_tensors::i
 __host__ __device__
 auto clamp(TTensorType&& tensor)
 RETURN_AUTO(
-  detail::clamp<TRank>(util::forward<TTensorType>(tensor), template_tensors::eval(util::forward<TTensorType>(tensor).template dims<TRank>() - 1))
+  detail::clamp<TRank>(std::forward<TTensorType>(tensor), template_tensors::eval(std::forward<TTensorType>(tensor).template dims<TRank>() - 1))
 )
 
 
@@ -125,7 +125,7 @@ private:
   {
     if (template_tensors::all(0 <= coords && coords < self.m_size))
     {
-      return self.m_field(util::forward<TCoordVector>(coords));
+      return self.m_field(std::forward<TCoordVector>(coords));
     }
     else
     {
@@ -152,7 +152,7 @@ __host__ __device__
 auto constant(TField&& field, TSize&& size, TConstant&& constant)
 RETURN_AUTO(
   Constant<util::store_member_t<TField&&>, util::store_member_t<TSize&&>, typename std::decay<TConstant&&>::type>
-    (util::forward<TField>(field), util::forward<TSize>(size), util::forward<TConstant>(constant))
+    (std::forward<TField>(field), std::forward<TSize>(size), std::forward<TConstant>(constant))
 )
 
 namespace detail {
@@ -161,7 +161,7 @@ template <metal::int_ TRank, typename TTensorType, typename TDims, typename TCon
 __host__ __device__
 auto constant_helper(TTensorType&& tensor, TDims&& dims, TConstant&& constant)
 RETURN_AUTO(
-  field::wrap::constant(field::fromSupplier<TRank>(util::forward<TTensorType>(tensor)), util::forward<TDims>(dims), util::forward<TConstant>(constant))
+  field::wrap::constant(field::fromSupplier<TRank>(std::forward<TTensorType>(tensor)), std::forward<TDims>(dims), std::forward<TConstant>(constant))
 )
 
 } // end of ns detail
@@ -170,7 +170,7 @@ template <metal::int_ TRank, typename TTensorType, typename TConstant, ENABLE_IF
 __host__ __device__
 auto constant(TTensorType&& tensor, TConstant&& constant)
 RETURN_AUTO(
-  detail::constant_helper<TRank>(util::forward<TTensorType>(tensor), template_tensors::eval(tensor.template dims<TRank>()), util::forward<TConstant>(constant))
+  detail::constant_helper<TRank>(std::forward<TTensorType>(tensor), template_tensors::eval(tensor.template dims<TRank>()), std::forward<TConstant>(constant))
 )
 
 } // end of ns wrap

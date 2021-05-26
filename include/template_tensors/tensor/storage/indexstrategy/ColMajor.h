@@ -9,8 +9,8 @@ struct ColMajorToIndexHelper
   __host__ __device__
   static size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords)
   {
-    return getNthCoordinate<I>(util::forward<TCoordArgTypes>(coords)...) + getNthDimension<I>(util::forward<TDimArgType>(dims)) * ColMajorToIndexHelper<I + 1, N>
-      ::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    return getNthCoordinate<I>(std::forward<TCoordArgTypes>(coords)...) + getNthDimension<I>(std::forward<TDimArgType>(dims)) * ColMajorToIndexHelper<I + 1, N>
+      ::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 
   template <typename TDimArgType>
@@ -41,9 +41,9 @@ struct ColMajorFromIndexHelper
   __host__ __device__
   static void fromIndex(VectorXs<TRank>& dest, size_t index, TDimArgTypes&&... dims)
   {
-    const dim_t dim = getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim = getNthDimension<I - 1>(std::forward<TDimArgTypes>(dims)...);
     dest(I - 1) = index % dim;
-    ColMajorFromIndexHelper<I + 1, N>::fromIndex(dest, index / dim, util::forward<TDimArgTypes>(dims)...);
+    ColMajorFromIndexHelper<I + 1, N>::fromIndex(dest, index / dim, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -77,8 +77,8 @@ struct ColMajorToStrideHelper
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    dest(I) = dest(I - 1) * getNthDimension<I - 1>(util::forward<TDimArgTypes>(dims)...);
-    ColMajorToStrideHelper<I + 1, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    dest(I) = dest(I - 1) * getNthDimension<I - 1>(std::forward<TDimArgTypes>(dims)...);
+    ColMajorToStrideHelper<I + 1, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -99,8 +99,8 @@ struct ColMajorToStrideHelper<1, N>
   __host__ __device__
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
-    dest(1) = getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
-    ColMajorToStrideHelper<2, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    dest(1) = getNthDimension<0>(std::forward<TDimArgTypes>(dims)...);
+    ColMajorToStrideHelper<2, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -112,7 +112,7 @@ struct ColMajorToStrideHelper<0, N>
   static void toStride(VectorXs<TRank>& dest, TDimArgTypes&&... dims)
   {
     dest(0) = 1;
-    ColMajorToStrideHelper<1, N>::toStride(dest, util::forward<TDimArgTypes>(dims)...);
+    ColMajorToStrideHelper<1, N>::toStride(dest, std::forward<TDimArgTypes>(dims)...);
   }
 };
 
@@ -153,8 +153,8 @@ struct ColMajor
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const volatile
   {
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    return detail::ColMajorToIndexHelper<0, dimension_num_v<TDimArgType>::value>::toIndex(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    return detail::ColMajorToIndexHelper<0, dimension_num_v<TDimArgType>::value>::toIndex(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...);
   }
 
   TT_INDEXSTRATEGY_TO_INDEX_2
@@ -164,7 +164,7 @@ struct ColMajor
   VectorXs<TDims> fromIndex(size_t index, TDimArgTypes&&... dims) const volatile
   {
     VectorXs<TDims> result;
-    detail::ColMajorFromIndexHelper<1, TDims>::fromIndex(result, index, util::forward<TDimArgTypes>(dims)...);
+    detail::ColMajorFromIndexHelper<1, TDims>::fromIndex(result, index, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 
@@ -174,7 +174,7 @@ struct ColMajor
   __host__ __device__
   constexpr size_t getSize(TDimArgTypes&&... dim_args) const volatile
   {
-    return multiplyDimensions(util::forward<TDimArgTypes>(dim_args)...);
+    return multiplyDimensions(std::forward<TDimArgTypes>(dim_args)...);
   }
 
   template <metal::int_ TDimsArg = DYN, typename... TDimArgTypes, metal::int_ TDims = TDimsArg == DYN ? dimension_num_v<TDimArgTypes&&...>::value : TDimsArg>
@@ -182,7 +182,7 @@ struct ColMajor
   VectorXs<TDims> toStride(TDimArgTypes&&... dims) const volatile
   {
     VectorXs<TDims> result;
-    detail::ColMajorToStrideHelper<0, TDims>::toStride(result, util::forward<TDimArgTypes>(dims)...);
+    detail::ColMajorToStrideHelper<0, TDims>::toStride(result, std::forward<TDimArgTypes>(dims)...);
     return result;
   }
 };
@@ -199,7 +199,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const ColMajor& index_strategy)
 {
   stream << "ColMajor";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

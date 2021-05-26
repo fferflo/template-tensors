@@ -43,7 +43,7 @@ private:
   __host__ __device__
   static auto getHelper(TThisType&& self, metal::numbers<TTransposeIndices...>, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    self.m_tensor(getNthCoordinate<TTransposeDims - 1 - TTransposeIndices>(util::forward<TCoordArgTypes>(coords)...)...)
+    self.m_tensor(getNthCoordinate<TTransposeDims - 1 - TTransposeIndices>(std::forward<TCoordArgTypes>(coords)...)...)
   )
 
 public:
@@ -52,7 +52,7 @@ public:
   __host__ __device__
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
   RETURN_AUTO(
-    getHelper(util::forward<TThisType>(self), metal::iota<metal::number<0>, metal::number<TTransposeDims>>(), util::forward<TCoordArgTypes>(coords)...)
+    getHelper(std::forward<TThisType>(self), metal::iota<metal::number<0>, metal::number<TTransposeDims>>(), std::forward<TCoordArgTypes>(coords)...)
   )
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
@@ -79,7 +79,7 @@ template <metal::int_ TTransposeDims, typename TOtherTensorType>
 __host__ __device__
 auto transpose(TOtherTensorType&& tensor)
 RETURN_AUTO(TransposedTensor<util::store_member_t<TOtherTensorType&&>, TTransposeDims>
-  (util::forward<TOtherTensorType>(tensor))
+  (std::forward<TOtherTensorType>(tensor))
 );
 
 } // end of ns template_tensors

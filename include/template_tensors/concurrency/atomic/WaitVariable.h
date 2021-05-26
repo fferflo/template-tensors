@@ -16,7 +16,7 @@ public:
   template <typename TData2, ENABLE_IF(std::is_constructible<TData, TData2&&>::value)>
   __host__ __device__
   Variable(TData2&& data)
-    : m_data(util::forward<TData2>(data))
+    : m_data(std::forward<TData2>(data))
     , m_atomic_ops()
   {
   }

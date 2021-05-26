@@ -30,9 +30,9 @@ struct DeviceArrayForEachHelper
     block = dim3(TBlockSize);
     grid = dim3(TGridSize);
     TT_CUDA_SAFE_CALL((detail::kernel_for_each_array_element_with_coords<TBlockSize * TGridSize, IndexStrategy, TCoordsRank><<<grid, block>>>(
-      mem::toKernel(util::forward<TFunctor>(func)),
-      util::first(util::forward<TTensorTypes>(tensors)...).getIndexStrategy(),
-      util::first(util::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>(),
+      mem::toKernel(std::forward<TFunctor>(func)),
+      util::first(std::forward<TTensorTypes>(tensors)...).getIndexStrategy(),
+      util::first(std::forward<TTensorTypes>(tensors)...).template dims<TCoordsRank>(),
       size,
       tensors.data()...
     )));
@@ -61,7 +61,7 @@ struct DeviceArrayForEachHelper<DYN>
     block = dim3(TBlockSize);
     grid = dim3(TGridSize);
     TT_CUDA_SAFE_CALL((detail::kernel_for_each_array_element<TBlockSize * TGridSize><<<grid, block>>>(
-      mem::toKernel(util::forward<TFunctor>(func)),
+      mem::toKernel(std::forward<TFunctor>(func)),
       size,
       tensors.data()...
     )));
@@ -104,9 +104,9 @@ struct DeviceArrayForEach
     static_assert(metal::same<indexstrategy_t<TTensorTypes>...>::value, "Storages must have the same indexing strategy");
 
     detail::DeviceArrayForEachHelper<TCoordsRank>::template for_each<TBlockSize, TGridSize>(
-      util::forward<TFunctor>(func),
-      util::first(util::forward<TTensorTypes>(tensors)...).size(),
-      util::forward<TTensorTypes>(tensors)...
+      std::forward<TFunctor>(func),
+      util::first(std::forward<TTensorTypes>(tensors)...).size(),
+      std::forward<TTensorTypes>(tensors)...
     );
   }
 

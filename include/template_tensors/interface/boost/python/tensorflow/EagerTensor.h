@@ -26,7 +26,7 @@ template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TR
 __host__
 ::boost::python::object toTensorflow(TTensorType&& tensor)
 {
-  ::boost::python::object dlpack = template_tensors::boost::python::fromDlPack(template_tensors::toDlPack(util::forward<TTensorType>(tensor)), "dltensor");
+  ::boost::python::object dlpack = template_tensors::boost::python::fromDlPack(template_tensors::toDlPack(std::forward<TTensorType>(tensor)), "dltensor");
   ::boost::python::object tensorflow;
   {
     template_tensors::boost::python::with_gil guard;

@@ -112,7 +112,7 @@ struct FromDlPack
     template <typename TElementType, metal::int_ TRank, mem::MemoryType TMemoryType>
     void operator()(metal::value<TElementType>, std::integral_constant<metal::int_, TRank>, std::integral_constant<mem::MemoryType, TMemoryType>)
     {
-      functor(template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(util::move(dl)));
+      functor(template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(std::move(dl)));
     }
   };
 
@@ -131,7 +131,7 @@ struct FromDlPack
       if (names.empty() || std::find(names.begin(), names.end(), name) != names.end())
       {
         template_tensors::SafeDLManagedTensor dl = template_tensors::boost::python::toDlPack(object, name.c_str());
-        result.inner_result = inner_dispatcher(dl)(Forward<TFunctor&&>{dl, util::forward<TFunctor>(functor)});
+        result.inner_result = inner_dispatcher(dl)(Forward<TFunctor&&>{dl, std::forward<TFunctor>(functor)});
       }
       else
       {

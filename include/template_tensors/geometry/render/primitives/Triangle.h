@@ -156,7 +156,7 @@ public:
     for (size_t index = offset; index < num; index += step)
     {
       template_tensors::Vector2i pos = data.lower_bound + index_strategy.fromIndex(index, screen_aabb_dims);
-      if (!intersect(pos, data, util::forward<THandler>(handler), camera_pose, projection))
+      if (!intersect(pos, data, std::forward<THandler>(handler), camera_pose, projection))
       {
         index -= step;
       }

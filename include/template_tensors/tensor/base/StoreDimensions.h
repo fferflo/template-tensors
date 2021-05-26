@@ -23,7 +23,7 @@ public:
   template <typename... TDimArgTypes, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value)>
   __host__ __device__
   StoreDimensionsImpl(TDimArgTypes&&... args)
-    : m_dims(toDimVector<non_trivial_dimensions_num_v<TDimSeq>::value>(util::forward<TDimArgTypes>(args)...))
+    : m_dims(toDimVector<non_trivial_dimensions_num_v<TDimSeq>::value>(std::forward<TDimArgTypes>(args)...))
   {
   }
 

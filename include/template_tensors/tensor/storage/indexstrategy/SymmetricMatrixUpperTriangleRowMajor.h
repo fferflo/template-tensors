@@ -11,11 +11,11 @@ struct SymmetricMatrixUpperTriangleRowMajor
   __host__ __device__
   size_t toIndex(TDimArgType&& dims, TCoordArgTypes&&... coords) const
   {
-    ASSERT(getNonTrivialDimensionsNum(util::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
-    ASSERT(coordsAreInRange(util::forward<TDimArgType>(dims), util::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
-    const dim_t rows = getNthDimension<0>(util::forward<TDimArgType>(dims));
-    const dim_t row = getNthCoordinate<0>(util::forward<TCoordArgTypes>(coords)...);
-    const dim_t col = getNthCoordinate<1>(util::forward<TCoordArgTypes>(coords)...);
+    ASSERT(getNonTrivialDimensionsNum(std::forward<TDimArgType>(dims)) <= 2, "Not a matrix");
+    ASSERT(coordsAreInRange(std::forward<TDimArgType>(dims), std::forward<TCoordArgTypes>(coords)...), "Coordinates are out of range");
+    const dim_t rows = getNthDimension<0>(std::forward<TDimArgType>(dims));
+    const dim_t row = getNthCoordinate<0>(std::forward<TCoordArgTypes>(coords)...);
+    const dim_t col = getNthCoordinate<1>(std::forward<TCoordArgTypes>(coords)...);
     if (col >= row)
     {
       return row * (rows - 1) - ((row - 1) * row >> 1) + col;
@@ -33,7 +33,7 @@ struct SymmetricMatrixUpperTriangleRowMajor
   constexpr size_t getSize(TDimArgTypes&&... dims) const
   {
     // TODO: ASSERT is symmetric and rest of dimension are 1
-    const dim_t dim0 = template_tensors::getNthDimension<0>(util::forward<TDimArgTypes>(dims)...);
+    const dim_t dim0 = template_tensors::getNthDimension<0>(std::forward<TDimArgTypes>(dims)...);
     return (dim0 * dim0 + dim0) >> 1;
   }
 
@@ -66,7 +66,7 @@ __host__ __device__
 TStreamType&& operator<<(TStreamType&& stream, const SymmetricMatrixUpperTriangleRowMajor& index_strategy)
 {
   stream << "SymmetricMatrixUpperTriangleRowMajor";
-  return util::forward<TStreamType>(stream);
+  return std::forward<TStreamType>(stream);
 }
 
 #ifdef CEREAL_INCLUDED

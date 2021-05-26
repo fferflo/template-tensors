@@ -14,8 +14,8 @@ public:
   template <typename TOriginalTensor2, typename TMaskTensor2>
   __host__ __device__
   BooleanMaskedTensor(TOriginalTensor2&& original_tensor, TMaskTensor2&& mask_tensor)
-    : m_original_tensor(util::forward<TOriginalTensor2>(original_tensor))
-    , m_mask_tensor(util::forward<TMaskTensor2>(mask_tensor))
+    : m_original_tensor(std::forward<TOriginalTensor2>(original_tensor))
+    , m_mask_tensor(std::forward<TMaskTensor2>(mask_tensor))
   {
   }
 
@@ -39,7 +39,7 @@ public:
     {
       if (mask)
       {
-        util::forward<TDest>(dest) = src();
+        std::forward<TDest>(dest) = src();
       }
     }
   };
@@ -49,7 +49,7 @@ public:
   BooleanMaskedTensor<TOriginalTensor, TMaskTensor>& operator=(TTensorType2&& other)
   {
     using ForEach = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoForEach<>>::type;
-    ForEach::for_each(Assign(), m_original_tensor, template_tensors::partial<>(util::forward<TTensorType2>(other)), m_mask_tensor);
+    ForEach::for_each(Assign(), m_original_tensor, template_tensors::partial<>(std::forward<TTensorType2>(other)), m_mask_tensor);
     return *this;
   }
 
@@ -58,21 +58,21 @@ public:
   void operator=(TTensorType2&& other) volatile
   {
     using ForEach = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoForEach<>>::type;
-    ForEach::for_each(Assign(), m_original_tensor, template_tensors::partial<>(util::forward<TTensorType2>(other)), m_mask_tensor);
+    ForEach::for_each(Assign(), m_original_tensor, template_tensors::partial<>(std::forward<TTensorType2>(other)), m_mask_tensor);
   }
 
   template <typename TNonTensorType, bool TDummy = true, ENABLE_IF(!template_tensors::is_tensor_v<TNonTensorType>::value)>
   __host__ __device__
   BooleanMaskedTensor<TOriginalTensor, TMaskTensor>& operator=(TNonTensorType&& other)
   {
-    return *this = template_tensors::broadcast<dimseq_t<TOriginalTensor>>(template_tensors::singleton(util::forward<TNonTensorType>(other)), m_original_tensor.dims());
+    return *this = template_tensors::broadcast<dimseq_t<TOriginalTensor>>(template_tensors::singleton(std::forward<TNonTensorType>(other)), m_original_tensor.dims());
   }
 
   template <typename TNonTensorType, bool TDummy = true, ENABLE_IF(!template_tensors::is_tensor_v<TNonTensorType>::value)>
   __host__ __device__
   void operator=(TNonTensorType&& other) volatile
   {
-    *this = template_tensors::broadcast<dimseq_t<TOriginalTensor>>(template_tensors::singleton(util::forward<TNonTensorType>(other)), m_original_tensor.dims());
+    *this = template_tensors::broadcast<dimseq_t<TOriginalTensor>>(template_tensors::singleton(std::forward<TNonTensorType>(other)), m_original_tensor.dims());
   }
 
 #ifdef __CUDACC__
@@ -102,8 +102,8 @@ public:
   __host__ __device__
   BooleanMaskedTensor<TOriginalTensor, TMaskTensor>& operator=(BooleanMaskedTensor<TOriginalTensor, TMaskTensor>&& other)
   {
-    m_original_tensor = util::move(other.m_original_tensor);
-    m_mask_tensor = util::move(other.m_mask_tensor);
+    m_original_tensor = std::move(other.m_original_tensor);
+    m_mask_tensor = std::move(other.m_mask_tensor);
     return *this;
   }
 
@@ -117,7 +117,7 @@ __host__ __device__
 auto mask(TTensorType&& tensor, TMaskTensor&& mask)
 RETURN_AUTO(
   BooleanMaskedTensor<util::store_member_t<TTensorType&&>, util::store_member_t<TMaskTensor&&>>
-  (util::forward<TTensorType>(tensor), util::forward<TMaskTensor>(mask))
+  (std::forward<TTensorType>(tensor), std::forward<TMaskTensor>(mask))
 )
 
 } // end of ns template_tensors

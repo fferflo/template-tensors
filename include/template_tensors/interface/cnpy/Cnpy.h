@@ -199,11 +199,11 @@ void save(const boost::filesystem::path& path, TTensorType&& tensor)
 {
   if (boost::filesystem::extension(path) == ".npy")
   {
-    return save_npy<TRank>(path, util::forward<TTensorType>(tensor));
+    return save_npy<TRank>(path, std::forward<TTensorType>(tensor));
   }
   else if (boost::filesystem::extension(path) == ".npz")
   {
-    return save_npz<TRank>(path, util::forward<TTensorType>(tensor));
+    return save_npz<TRank>(path, std::forward<TTensorType>(tensor));
   }
   else
   { // TODO: replace with correct filesystem exception everywhere

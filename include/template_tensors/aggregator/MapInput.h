@@ -17,7 +17,7 @@ public:
   template <typename TFunctor2, typename TAggregator2>
   __host__ __device__
   map_input(TFunctor2&& functor, TAggregator2&& aggregator)
-    : m_functor_and_aggregator(util::forward<TFunctor2>(functor), util::forward<TAggregator2>(aggregator))
+    : m_functor_and_aggregator(std::forward<TFunctor2>(functor), std::forward<TAggregator2>(aggregator))
   {
   }
 
@@ -30,7 +30,7 @@ public:
   __host__ __device__
   void operator()(TInput&&... input)
   {
-    jtuple::get<1>(m_functor_and_aggregator)(jtuple::get<0>(m_functor_and_aggregator)(util::forward<TInput>(input)...));
+    jtuple::get<1>(m_functor_and_aggregator)(jtuple::get<0>(m_functor_and_aggregator)(std::forward<TInput>(input)...));
   }
 
   __host__ __device__
@@ -43,6 +43,6 @@ public:
 template <typename TFunctor, typename TAggregator>
 __host__ __device__
 auto map_input(TFunctor&& functor, TAggregator&& aggregator)
-RETURN_AUTO(detail::map_input<util::store_member_t<TFunctor&&>, util::store_member_t<TAggregator&&>>(util::forward<TFunctor>(functor), util::forward<TAggregator>(aggregator)))
+RETURN_AUTO(detail::map_input<util::store_member_t<TFunctor&&>, util::store_member_t<TAggregator&&>>(std::forward<TFunctor>(functor), std::forward<TAggregator>(aggregator)))
 
 } // end of ns aggregator

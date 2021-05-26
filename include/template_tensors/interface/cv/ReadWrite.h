@@ -29,7 +29,7 @@ template <typename TTensorType>
 void save(const boost::filesystem::path& path, TTensorType&& tensor)
 {
   // TODO: error if folder does not exist/ create folder if necessary
-  ::cv::imwrite(path.string(), template_tensors::toCv(util::forward<TTensorType>(tensor)));
+  ::cv::imwrite(path.string(), template_tensors::toCv(std::forward<TTensorType>(tensor)));
 }
 
 } // end of ns opencv

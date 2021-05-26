@@ -99,7 +99,7 @@ public:
   __device__
   TInt operator()(TGenerator&& generator)
   {
-    return static_cast<TInt>(m_uniform_real_distribution(util::forward<TGenerator>(generator)));
+    return static_cast<TInt>(m_uniform_real_distribution(std::forward<TGenerator>(generator)));
   }
 
 private:

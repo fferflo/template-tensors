@@ -47,7 +47,7 @@ public:
 
   __host__ __device__
   StaticDilatedTensor(TTensorTypeOverlay overlay, TBackgroundFunctor background)
-    : SuperType(detail::StaticDilatedDims<dimseq_t<SuperType>, TFactorSeq>::get(util::forward<TTensorTypeOverlay>(overlay)))
+    : SuperType(detail::StaticDilatedDims<dimseq_t<SuperType>, TFactorSeq>::get(std::forward<TTensorTypeOverlay>(overlay)))
     , m_overlay(overlay)
     , m_background(background)
   {
@@ -61,7 +61,7 @@ public:
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
     -> typename detail::CombineTensorMemberElementTypesHelper<decltype(self.m_overlay), decltype(self.m_background)>::type
   {
-    VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> dilated_coords = toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(util::forward<TCoordArgTypes>(coords)...);
+    VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> dilated_coords = toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(std::forward<TCoordArgTypes>(coords)...);
     VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> factor = toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(TFactorSeq());
     VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> original_coords = dilated_coords / factor;
     if (template_tensors::all(original_coords * factor == dilated_coords))
@@ -70,7 +70,7 @@ public:
     }
     else
     {
-      return self.m_background(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_background(std::forward<TCoordArgTypes>(coords)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
@@ -147,7 +147,7 @@ public:
   static auto getElement(TThisType&& self, TCoordArgTypes&&... coords)
     -> typename detail::CombineTensorMemberElementTypesHelper<decltype(self.m_overlay), decltype(self.m_background)>::type
   {
-    VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> dilated_coords = toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(util::forward<TCoordArgTypes>(coords)...);
+    VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> dilated_coords = toCoordVector<NON_TRIVIAL_DIMENSIONS_NUM>(std::forward<TCoordArgTypes>(coords)...);
     VectorXs<NON_TRIVIAL_DIMENSIONS_NUM> original_coords = dilated_coords / self.m_factor;
     if (template_tensors::all(original_coords * self.m_factor == dilated_coords))
     {
@@ -155,7 +155,7 @@ public:
     }
     else
     {
-      return self.m_background(util::forward<TCoordArgTypes>(coords)...);
+      return self.m_background(std::forward<TCoordArgTypes>(coords)...);
     }
   }
   TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
@@ -205,25 +205,25 @@ template <typename TFactorSeq, typename TOtherTensorType, typename TBackgroundFu
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(StaticDilatedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, TFactorSeq>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
 template <metal::int_ TFactor, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(dilate<repeat_dimseq_t<TFactor, non_trivial_dimensions_num_v<TOtherTensorType>::value>>(util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(dilate<repeat_dimseq_t<TFactor, non_trivial_dimensions_num_v<TOtherTensorType>::value>>(std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background)))
 
 
 template <typename TDummy = void, typename TFactorVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_tensor_v<TFactorVector>::value && std::is_same<TDummy, void>::value)>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TFactorVector&& factor, TBackgroundFunctor&& background = TBackgroundFunctor())
 RETURN_AUTO(DynamicDilatedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TFactorVector&&>>
-  (util::forward<TOtherTensorType>(tensor), util::forward<TBackgroundFunctor>(background), util::forward<TFactorVector>(factor))
+  (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TFactorVector>(factor))
 )
 
 template <typename TDummy = void, typename TFactorScalar, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, bool TDummy2 = true, ENABLE_IF(!is_tensor_v<TFactorScalar>::value && std::is_same<TDummy, void>::value)>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TFactorScalar&& scalar, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(dilate(util::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(util::forward<TFactorScalar>(scalar)), util::forward<TBackgroundFunctor>(background)))
+RETURN_AUTO(dilate(std::forward<TOtherTensorType>(tensor), broadcast<non_trivial_dimensions_num_v<TOtherTensorType>::value>(std::forward<TFactorScalar>(scalar)), std::forward<TBackgroundFunctor>(background)))
 
 } // end of ns template_tensors

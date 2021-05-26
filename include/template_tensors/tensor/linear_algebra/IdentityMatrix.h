@@ -118,6 +118,6 @@ private:
 template <typename TElementType, metal::int_ TRank = template_tensors::DYN, typename... TDimArgTypes>
 __host__ __device__
 auto eye(TDimArgTypes&&... dim_args)
-RETURN_AUTO(IdentityMatrix<TElementType, TRank>(util::forward<TDimArgTypes>(dim_args)...))
+RETURN_AUTO(IdentityMatrix<TElementType, TRank>(std::forward<TDimArgTypes>(dim_args)...))
 
 } // end of ns template_tensors

@@ -60,7 +60,7 @@ struct make_tuple
   ::boost::python::tuple operator()(TArgs&&... args)
   {
     template_tensors::boost::python::with_gil guard;
-    return ::boost::python::make_tuple((static_cast<size_t>(util::forward<TArgs>(args)))...);
+    return ::boost::python::make_tuple((static_cast<size_t>(std::forward<TArgs>(args)))...);
   }
 };
 
