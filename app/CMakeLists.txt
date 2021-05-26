@@ -1,17 +1,17 @@
 option(BUILD_APPS "Build apps" OFF)
 
 if(BUILD_APPS)
-  find_package(Profiler)
+  find_package(nanobench)
   find_package(Boost REQUIRED program_options filesystem)
 
   if(CMAKE_CUDA_COMPILER)
-    if(TARGET Profiler::profiler)
+    if(TARGET nanobench::nanobench)
       add_executable(profile_memcpy profile_memcpy.cu)
-      target_link_libraries(profile_memcpy PRIVATE base Profiler::profiler)
+      target_link_libraries(profile_memcpy PRIVATE base nanobench::nanobench)
       set_target_properties(profile_memcpy PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/app")
 
-      add_executable(profile_indexstrategy profile_indexstrategy.cu)
-      target_link_libraries(profile_indexstrategy PRIVATE base Profiler::profiler)
+      add_executable(profile_indexstrategy profile_indexstrategy.cpp)
+      target_link_libraries(profile_indexstrategy PRIVATE base nanobench::nanobench)
       set_target_properties(profile_indexstrategy PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/app")
     endif()
 

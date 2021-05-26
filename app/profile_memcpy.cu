@@ -1,5 +1,6 @@
 #include <template_tensors/TemplateTensors.h>
-#include <profiler/Profiler.h>
+
+#include <nanobench.h>
 
 __global__
 void kernel_single_forloop(uint8_t* dest, uint8_t* src, size_t num)
@@ -43,37 +44,43 @@ void kernel_gridstride_memcpy(uint8_t* dest, uint8_t* src, size_t num, size_t ba
 
 int main(int argc, char** argv)
 {
+  ankerl::nanobench::Bench bench;
   size_t bytes = 2UL << 28;
 
   {
     array::AllocArray<uint8_t, mem::alloc::heap> src(bytes);
     array::AllocArray<uint8_t, mem::alloc::heap> dest(bytes);
-    PROFILE("host memmove");
-    memmove(dest.data(), src.data(), src.size());
+    bench.run("host memmove", [&]{
+        memmove(dest.data(), src.data(), src.size());
+    });
   }
 
   {
     array::AllocArray<uint8_t, mem::alloc::heap> src(bytes);
     array::AllocArray<uint8_t, mem::alloc::heap> dest(bytes);
-    PROFILE("host memcpy");
-    memcpy(dest.data(), src.data(), src.size());
+    bench.run("host memmove", [&]{
+        memcpy(dest.data(), src.data(), src.size());
+    });
   }
 
   {
     array::AllocArray<uint8_t, mem::alloc::heap> src(bytes);
     array::AllocArray<uint8_t, mem::alloc::heap> dest(bytes);
-    PROFILE("host for-loop");
-    for (size_t i = 0; i < src.size(); i++)
-    {
-      dest[i] = src[i];
-    }
+    bench.run("host for-loop", [&]{
+      for (size_t i = 0; i < src.size(); i++)
+      {
+        ankerl::nanobench::doNotOptimizeAway(dest[i] = src[i]);
+      }
+      ankerl::nanobench::doNotOptimizeAway(dest);
+    });
   }
 
   {
     array::AllocArray<uint8_t, mem::alloc::heap> src(bytes);
     array::AllocArray<uint8_t, mem::alloc::heap> dest(bytes);
-    PROFILE("host std::copy");
-    std::copy(src.begin(), src.end(), dest.begin());
+    bench.run("host std::copy", [&]{
+      std::copy(src.begin(), src.end(), dest.begin());
+    });
   }
 
   bytes = 2 << 26;
@@ -90,10 +97,12 @@ int main(int argc, char** argv)
         dim3 block, grid;
         block = dim3(block_size);
         grid = dim3(grid_size);
-        PROFILE("device grid-stride forloop (grid=" << std::setw(3) << grid_size << " block=" << std::setw(3) << block_size <<
-                " batch_size=" << std::setw(3) << batch_size << ")");
-        TT_CUDA_SAFE_CALL((kernel_gridstride_forloop<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+        bench.run("device grid-stride forloop (grid=" + std::to_string(grid_size) + " block=" + std::to_string(block_size) + " batch_size=" + std::to_string(batch_size) + ")",
+          [&]{
+            TT_CUDA_SAFE_CALL((kernel_gridstride_forloop<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+            TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+          }
+        );
       }
     }
   }
@@ -110,10 +119,12 @@ int main(int argc, char** argv)
         dim3 block, grid;
         block = dim3(256);
         grid = dim3(256);
-        PROFILE("device grid-stride memcpy (grid=" << std::setw(3) << grid_size << " block=" << std::setw(3) << block_size <<
-                " batch_size=" << std::setw(3) << batch_size << ")");
-        TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+        bench.run("device grid-stride memcpy (grid=" + std::to_string(grid_size) + " block=" + std::to_string(block_size) + " batch_size=" + std::to_string(batch_size) + ")",
+          [&]{
+            TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+            TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+          }
+        );
       }
     }
   }
@@ -127,9 +138,12 @@ int main(int argc, char** argv)
     dim3 block, grid;
     block = dim3(1);
     grid = dim3(1);
-    PROFILE("device single forloop");
-    TT_CUDA_SAFE_CALL((kernel_single_forloop<<<grid, block>>>(dest.data(), src.data(), src.size())));
-    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    bench.run("device single forloop",
+      [&]{
+        TT_CUDA_SAFE_CALL((kernel_single_forloop<<<grid, block>>>(dest.data(), src.data(), src.size())));
+        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+      }
+    );
   }
 
   for (size_t batch_size = 1; batch_size <= 2 << 5; batch_size *= 2)
@@ -140,9 +154,12 @@ int main(int argc, char** argv)
     dim3 block, grid;
     block = dim3(1);
     grid = dim3(1);
-    PROFILE("device single memcpy (batch_size=" << std::setw(3) << batch_size << ")");
-    TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
-    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    bench.run("device single memcpy (batch_size=" + std::to_string(batch_size) + ")",
+      [&]{
+        TT_CUDA_SAFE_CALL((kernel_gridstride_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size(), batch_size)));
+        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+      }
+    );
   }
 
   {
@@ -152,10 +169,11 @@ int main(int argc, char** argv)
     dim3 block, grid;
     block = dim3(1);
     grid = dim3(1);
-    PROFILE("device single memcpy");
-    TT_CUDA_SAFE_CALL((kernel_single_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size())));
-    TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+    bench.run("device single memcpy",
+      [&]{
+        TT_CUDA_SAFE_CALL((kernel_single_memcpy<<<grid, block>>>(dest.data(), src.data(), src.size())));
+        TT_CUDA_SAFE_CALL(cudaDeviceSynchronize());
+      }
+    );
   }
-
-  profiler::print();
 }
