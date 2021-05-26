@@ -9,7 +9,7 @@ function(git_submodule NAME)
       message(FATAL_ERROR "Project is not a git directory")
     endif()
     execute_process(
-      COMMAND ${GIT_EXECUTABLE} submodule update --init --remote extern/${NAME}
+      COMMAND ${GIT_EXECUTABLE} submodule update --init extern/${NAME}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
       COMMAND_ERROR_IS_FATAL ANY
     )
