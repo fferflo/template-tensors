@@ -52,7 +52,7 @@ private:
 template <typename TResultType, typename TFunctor>
 __host__ __device__
 auto assign(TFunctor&& functor, TResultType initial_value)
-RETURN_AUTO(detail::assign<typename std::decay<TResultType>::type, util::store_member_t<TFunctor&&>>(
+RETURN_AUTO(detail::assign<typename std::decay<TResultType>::type, TFunctor>(
   std::forward<TFunctor>(functor), initial_value))
 
 } // end of ns aggregator

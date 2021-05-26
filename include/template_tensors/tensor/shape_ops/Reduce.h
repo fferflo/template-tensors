@@ -273,8 +273,8 @@ __host__ __device__
 auto reduceAll(TTensorType&& tensor, TAggregator&& aggregator)
 RETURN_AUTO(
   ReductionTensor<
-              util::store_member_t<TAggregator&&>,
-              util::store_member_t<TTensorType&&>,
+              TAggregator,
+              TTensorType,
               metal::iota<metal::number<0>, metal::number<non_trivial_dimensions_num_v<dimseq_t<TTensorType>>::value>>
             >(std::forward<TTensorType>(tensor), std::forward<TAggregator>(aggregator))
 );
@@ -292,8 +292,8 @@ __host__ __device__
 auto reduce(TTensorType&& tensor, TAggregator&& aggregator)
 RETURN_AUTO(
   ReductionTensor<
-              util::store_member_t<TAggregator&&>,
-              util::store_member_t<TTensorType&&>,
+              TAggregator,
+              TTensorType,
               metal::numbers<TReducedDims...>
             >(std::forward<TTensorType>(tensor), std::forward<TAggregator>(aggregator))
 );

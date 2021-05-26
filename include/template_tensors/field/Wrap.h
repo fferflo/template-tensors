@@ -54,14 +54,14 @@ template <typename TField, typename TDims>
 __host__ __device__
 auto repeat(TField&& field, TDims&& dims)
 RETURN_AUTO(
-  field::transform(std::forward<TField>(field), detail::repeatf<util::store_member_t<TDims&&>>(std::forward<TDims>(dims)))
+  field::transform(std::forward<TField>(field), detail::repeatf<TDims>(std::forward<TDims>(dims)))
 )
 
 template <typename TIntType = int32_t, typename TField, typename TDims>
 __host__ __device__
 auto repeat_discrete(TField&& field, TDims&& dims)
 RETURN_AUTO(
-  field::transform(std::forward<TField>(field), detail::repeati<util::store_member_t<TDims&&>, TIntType>(std::forward<TDims>(dims)))
+  field::transform(std::forward<TField>(field), detail::repeati<TDims, TIntType>(std::forward<TDims>(dims)))
 )
 
 namespace detail {
@@ -151,7 +151,7 @@ template <typename TField, typename TSize, typename TConstant>
 __host__ __device__
 auto constant(TField&& field, TSize&& size, TConstant&& constant)
 RETURN_AUTO(
-  Constant<util::store_member_t<TField&&>, util::store_member_t<TSize&&>, typename std::decay<TConstant&&>::type>
+  Constant<TField, TSize, typename std::decay<TConstant&&>::type>
     (std::forward<TField>(field), std::forward<TSize>(size), std::forward<TConstant>(constant))
 )
 

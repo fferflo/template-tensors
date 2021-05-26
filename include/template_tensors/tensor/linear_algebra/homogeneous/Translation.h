@@ -87,7 +87,7 @@ template <typename TVectorType>
 __host__ __device__
 auto homogenizeTranslation(TVectorType&& translation)
 RETURN_AUTO(
-  HomogenizedTranslation<util::store_member_t<TVectorType&&>>(std::forward<TVectorType>(translation))
+  HomogenizedTranslation<TVectorType>(std::forward<TVectorType>(translation))
 )
 
 } // end of ns template_tensors

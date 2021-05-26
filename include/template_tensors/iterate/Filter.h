@@ -70,7 +70,7 @@ template <typename TIterator, typename TPredicate>
 __host__ __device__
 auto filter(TIterator&& begin, TIterator&& end, TPredicate&& pred)
 RETURN_AUTO(
-  Filter<util::store_member_t<TIterator&&>, util::store_member_t<TPredicate&&>>
+  Filter<TIterator, TPredicate>
     (std::forward<TIterator>(begin), std::forward<TIterator>(end), std::forward<TPredicate>(pred))
 )
 
@@ -107,7 +107,7 @@ template <typename TIterable, typename TPredicate>
 __host__ __device__
 auto filter(TIterable&& in, TPredicate&& pred)
 RETURN_AUTO(
-  Filter<util::store_member_t<TIterable&&>, util::store_member_t<TPredicate&&>>
+  Filter<TIterable, TPredicate>
     (std::forward<TIterable>(in), std::forward<TPredicate>(pred))
 )
 

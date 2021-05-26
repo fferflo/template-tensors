@@ -116,7 +116,7 @@ template <typename TTensorType, typename TMaskTensor, ENABLE_IF(std::is_assignab
 __host__ __device__
 auto mask(TTensorType&& tensor, TMaskTensor&& mask)
 RETURN_AUTO(
-  BooleanMaskedTensor<util::store_member_t<TTensorType&&>, util::store_member_t<TMaskTensor&&>>
+  BooleanMaskedTensor<TTensorType, TMaskTensor>
   (std::forward<TTensorType>(tensor), std::forward<TMaskTensor>(mask))
 )
 

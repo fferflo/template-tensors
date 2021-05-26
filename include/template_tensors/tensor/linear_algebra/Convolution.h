@@ -112,7 +112,7 @@ public:
 template <typename TInputType, typename TKernelType>
 __host__ __device__
 auto conv(TInputType&& input, TKernelType&& kernel)
-RETURN_AUTO(ConvolutionTensor<util::store_member_t<TInputType&&>, util::store_member_t<TKernelType&&>>
+RETURN_AUTO(ConvolutionTensor<TInputType, TKernelType>
   (std::forward<TInputType>(input), std::forward<TKernelType>(kernel))
 );
 

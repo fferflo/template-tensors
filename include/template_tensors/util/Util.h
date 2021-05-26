@@ -298,65 +298,6 @@ std::string to_string(TType object)
 
 
 
-namespace detail {
-
-struct StoreMemberHelper
-{
-  template <typename TInput>
-  static typename std::decay<TInput>::type& deduce(TInput& in)
-  {
-    return std::declval<typename std::decay<TInput>::type&>();
-  }
-
-  template <typename TInput>
-  static typename std::decay<TInput>::type deduce(TInput&& in)
-  {
-    return std::declval<typename std::decay<TInput>::type>();
-  }
-
-  template <typename TInput>
-  static const typename std::decay<TInput>::type& deduce(const TInput& in)
-  {
-    return std::declval<const typename std::decay<TInput>::type&>();
-  }
-
-  template <typename TInput>
-  static typename std::decay<TInput>::type deduce(const TInput&& in)
-  {
-    return std::declval<typename std::decay<TInput>::type>();
-  }
-
-  template <typename TInput>
-  static volatile typename std::decay<TInput>::type& deduce(volatile TInput& in)
-  {
-    return std::declval<volatile typename std::decay<TInput>::type&>();
-  }
-
-  template <typename TInput>
-  static typename std::decay<TInput>::type deduce(volatile TInput&& in)
-  {
-    return std::declval<typename std::decay<TInput>::type>();
-  }
-
-  template <typename TInput>
-  static const volatile typename std::decay<TInput>::type& deduce(const volatile TInput& in)
-  {
-    return std::declval<const volatile typename std::decay<TInput>::type&>();
-  }
-
-  template <typename TInput>
-  static typename std::decay<TInput>::type deduce(const volatile TInput&& in)
-  {
-    return std::declval<typename std::decay<TInput>::type>();
-  }
-};
-
-} // end of ns detail
-
-template <typename TType>
-using store_member_t = decltype(detail::StoreMemberHelper::deduce(std::declval<TType>()));
-
-
 
 
 namespace detail {
@@ -449,7 +390,7 @@ struct wrapper // TODO: reference forwarding c++20
 template <typename T>
 __host__ __device__
 auto wrap(T&& object)
-RETURN_AUTO(wrapper<util::store_member_t<T&&>>(std::forward<T>(object)))
+RETURN_AUTO(wrapper<T>(std::forward<T>(object)))
 
 template <typename T>
 struct functor_wrapper // TODO: reference forwarding c++20
@@ -473,7 +414,7 @@ struct functor_wrapper // TODO: reference forwarding c++20
 template <typename T>
 __host__ __device__
 auto wrap_functor(T&& functor)
-RETURN_AUTO(functor_wrapper<util::store_member_t<T&&>>(std::forward<T>(functor)))
+RETURN_AUTO(functor_wrapper<T>(std::forward<T>(functor)))
 
 
 

@@ -78,7 +78,7 @@ public:
 template <metal::int_ TTransposeDims, typename TOtherTensorType>
 __host__ __device__
 auto transpose(TOtherTensorType&& tensor)
-RETURN_AUTO(TransposedTensor<util::store_member_t<TOtherTensorType&&>, TTransposeDims>
+RETURN_AUTO(TransposedTensor<TOtherTensorType, TTransposeDims>
   (std::forward<TOtherTensorType>(tensor))
 );
 

@@ -72,7 +72,7 @@ public:
 template <typename TMatrixType>
 __host__ __device__
 auto diag(TMatrixType&& matrix)
-RETURN_AUTO(DiagTensor<util::store_member_t<TMatrixType&&>>
+RETURN_AUTO(DiagTensor<TMatrixType>
   (std::forward<TMatrixType>(matrix))
 )
 

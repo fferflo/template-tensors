@@ -177,14 +177,14 @@ template <typename TVectorType>
 __host__ __device__
 auto homogenize(TVectorType&& vector)
 RETURN_AUTO(
-  HomogenizedVector<util::store_member_t<TVectorType&&>>(std::forward<TVectorType>(vector))
+  HomogenizedVector<TVectorType>(std::forward<TVectorType>(vector))
 )
 
 template <typename TVectorType>
 __host__ __device__
 auto dehomogenize(TVectorType&& vector)
 RETURN_AUTO(
-  DehomogenizedVector<util::store_member_t<TVectorType&&>>(std::forward<TVectorType>(vector))
+  DehomogenizedVector<TVectorType>(std::forward<TVectorType>(vector))
 )
 
 } // end of ns template_tensors

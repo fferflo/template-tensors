@@ -230,7 +230,7 @@ public:
 template <typename TThrustVector>
 __host__
 auto fromThrust(TThrustVector&& vector)
-RETURN_AUTO(FromThrustVector<util::store_member_t<TThrustVector>>(std::forward<TThrustVector>(vector)))
+RETURN_AUTO(FromThrustVector<TThrustVector>(std::forward<TThrustVector>(vector)))
 
 template <typename TElementTypeIn = util::EmptyDefaultType, typename TTensorType, ENABLE_IF(mem::isOnHost<mem::memorytype_v<TTensorType>::value>()),
   typename TElementType = TT_WITH_DEFAULT_TYPE(TElementTypeIn, decay_elementtype_t<TTensorType>)>

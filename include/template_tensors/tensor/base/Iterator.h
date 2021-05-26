@@ -35,23 +35,23 @@ public:
 
 template <typename TIndexStrategy = template_tensors::RowMajor, typename TTensorType>
 __host__ __device__
-::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>
+::iterator::transform_iterator<detail::TensorElementAtIndex<TTensorType, TIndexStrategy>, ::iterator::counting_iterator<size_t>>
   begin(TTensorType&& tensor, TIndexStrategy index_strategy = TIndexStrategy())
 {
-  return ::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
-    ::iterator::counting_iterator<size_t>(0), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
+  return ::iterator::transform_iterator<detail::TensorElementAtIndex<TTensorType, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
+    ::iterator::counting_iterator<size_t>(0), detail::TensorElementAtIndex<TTensorType, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
   );
 }
 // TODO: use ::iterator::count() and ::iterator::transform() here
 // TODO: when constructing begin and end iterators via std::forward, tensor might be moved in first call to begin and then be unusable in call to end
 template <typename TIndexStrategy = template_tensors::RowMajor, typename TTensorType>
 __host__ __device__
-::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>
+::iterator::transform_iterator<detail::TensorElementAtIndex<TTensorType, TIndexStrategy>, ::iterator::counting_iterator<size_t>>
   end(TTensorType&& tensor, TIndexStrategy index_strategy = TIndexStrategy())
 {
   size_t num = template_tensors::multiplyDimensions(tensor.dims()); // TODO: should depend on index strategy?
-  return ::iterator::transform_iterator<detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
-    ::iterator::counting_iterator<size_t>(num), detail::TensorElementAtIndex<util::store_member_t<TTensorType&&>, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
+  return ::iterator::transform_iterator<detail::TensorElementAtIndex<TTensorType, TIndexStrategy>, ::iterator::counting_iterator<size_t>>(
+    ::iterator::counting_iterator<size_t>(num), detail::TensorElementAtIndex<TTensorType, TIndexStrategy>(std::forward<TTensorType>(tensor), index_strategy)
   );
 }
 

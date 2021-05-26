@@ -220,7 +220,7 @@ struct assign_to
 
 template <typename TDest>
 auto assign_to(TDest&& dest)
-RETURN_AUTO(detail::assign_to<util::store_member_t<TDest&&>>{std::forward<TDest>(dest)})
+RETURN_AUTO(detail::assign_to<TDest>{std::forward<TDest>(dest)})
 
 struct address_of
 {
@@ -274,7 +274,7 @@ struct compose
 template <typename TLeft, typename TRight>
 __host__ __device__
 auto compose(TLeft&& left, TRight&& right)
-RETURN_AUTO(detail::compose<util::store_member_t<TLeft&&>, util::store_member_t<TRight&&>>
+RETURN_AUTO(detail::compose<TLeft, TRight>
   (std::forward<TLeft>(left), std::forward<TRight>(right)))
 
 namespace detail {
@@ -321,7 +321,7 @@ struct for_each
 template <typename TForEach = for_each::Sequential, typename TOp>
 __host__ __device__
 auto for_each(TOp&& op)
-RETURN_AUTO(detail::for_each<util::store_member_t<TOp&&>, TForEach>(std::forward<TOp>(op)))
+RETURN_AUTO(detail::for_each<TOp, TForEach>(std::forward<TOp>(op)))
 
 } // end of ns functor
 

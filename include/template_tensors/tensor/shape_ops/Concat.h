@@ -231,8 +231,8 @@ __host__ __device__
 auto concat(TTensorTypeIn1&& tensor1, TTensorTypeIn2&& tensor2)
 RETURN_AUTO(
   ConcatTensor<
-                util::store_member_t<TTensorTypeIn1&&>,
-                util::store_member_t<TTensorTypeIn2&&>,
+                TTensorTypeIn1,
+                TTensorTypeIn2,
                 TConcatDim
               >(std::forward<TTensorTypeIn1>(tensor1),
                 std::forward<TTensorTypeIn2>(tensor2))

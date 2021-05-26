@@ -47,7 +47,7 @@ public:
 template <typename TPredicate, typename TAggregator>
 __host__ __device__
 auto filter(TPredicate&& predicate, TAggregator&& aggregator)
-RETURN_AUTO(detail::filter<util::store_member_t<TPredicate&&>, util::store_member_t<TAggregator&&>>(std::forward<TPredicate>(predicate), std::forward<TAggregator>(aggregator)))
+RETURN_AUTO(detail::filter<TPredicate, TAggregator>(std::forward<TPredicate>(predicate), std::forward<TAggregator>(aggregator)))
 
 
 } // end of ns aggregator

@@ -43,6 +43,6 @@ public:
 template <typename TFunctor, typename TAggregator>
 __host__ __device__
 auto map_input(TFunctor&& functor, TAggregator&& aggregator)
-RETURN_AUTO(detail::map_input<util::store_member_t<TFunctor&&>, util::store_member_t<TAggregator&&>>(std::forward<TFunctor>(functor), std::forward<TAggregator>(aggregator)))
+RETURN_AUTO(detail::map_input<TFunctor, TAggregator>(std::forward<TFunctor>(functor), std::forward<TAggregator>(aggregator)))
 
 } // end of ns aggregator

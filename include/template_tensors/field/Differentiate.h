@@ -53,6 +53,6 @@ public:
 template <typename TField>
 __host__ __device__
 auto differentiate(TField&& field)
-RETURN_AUTO(StaticDifferentiatedField<util::store_member_t<TField&&>>(std::forward<TField>(field)))
+RETURN_AUTO(StaticDifferentiatedField<TField>(std::forward<TField>(field)))
 
 } // end of ns field

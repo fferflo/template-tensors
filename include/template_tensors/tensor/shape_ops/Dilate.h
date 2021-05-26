@@ -204,7 +204,7 @@ public:
 template <typename TFactorSeq, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_dimseq_v<TFactorSeq>::value)>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(StaticDilatedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, TFactorSeq>
+RETURN_AUTO(StaticDilatedTensor<TOtherTensorType, TBackgroundFunctor, TFactorSeq>
   (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
@@ -217,7 +217,7 @@ RETURN_AUTO(dilate<repeat_dimseq_t<TFactor, non_trivial_dimensions_num_v<TOtherT
 template <typename TDummy = void, typename TFactorVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_tensor_v<TFactorVector>::value && std::is_same<TDummy, void>::value)>
 __host__ __device__
 auto dilate(TOtherTensorType&& tensor, TFactorVector&& factor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(DynamicDilatedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TFactorVector&&>>
+RETURN_AUTO(DynamicDilatedTensor<TOtherTensorType, TBackgroundFunctor, TFactorVector>
   (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TFactorVector>(factor))
 )
 

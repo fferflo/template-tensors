@@ -149,7 +149,7 @@ template <typename TTensorType, typename TMaskIterator,
 __host__ __device__
 auto mask(TTensorType&& tensor, TMaskIterator&& mask)
 RETURN_AUTO(
-  IteratorMaskedTensor<util::store_member_t<TTensorType&&>, util::store_member_t<TMaskIterator&&>>
+  IteratorMaskedTensor<TTensorType, TMaskIterator>
   (std::forward<TTensorType>(tensor), std::forward<TMaskIterator>(mask))
 )
 

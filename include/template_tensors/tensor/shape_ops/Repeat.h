@@ -184,7 +184,7 @@ public:
 template <typename TRepetitionsSeq, typename TOtherTensorType, ENABLE_IF(is_dimseq_v<TRepetitionsSeq>::value)>
 __host__ __device__
 auto repeat(TOtherTensorType&& tensor)
-RETURN_AUTO(StaticRepeatTensor<util::store_member_t<TOtherTensorType&&>, TRepetitionsSeq>
+RETURN_AUTO(StaticRepeatTensor<TOtherTensorType, TRepetitionsSeq>
   (std::forward<TOtherTensorType>(tensor))
 )
 
@@ -192,7 +192,7 @@ RETURN_AUTO(StaticRepeatTensor<util::store_member_t<TOtherTensorType&&>, TRepeti
 template <typename TDummy = void, typename TRepetitionsVector, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TRepetitionsVector>::value && std::is_same<TDummy, void>::value)>
 __host__ __device__
 auto repeat(TOtherTensorType&& tensor, TRepetitionsVector&& factor)
-RETURN_AUTO(DynamicRepeatTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TRepetitionsVector&&>>
+RETURN_AUTO(DynamicRepeatTensor<TOtherTensorType, TRepetitionsVector>
   (std::forward<TOtherTensorType>(tensor), std::forward<TRepetitionsVector>(factor))
 )
 

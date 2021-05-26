@@ -166,7 +166,7 @@ template <typename TMatrixType1, typename TMatrixType2, typename... TMatrixTypeR
 __host__ __device__
 auto matmul(TMatrixType1&& m1, TMatrixType2&& m2, TMatrixTypeRest&&... rest)
 RETURN_AUTO(template_tensors::matmul(
-  MatrixProduct<util::store_member_t<TMatrixType1&&>, util::store_member_t<TMatrixType2&&>>(std::forward<TMatrixType1>(m1), std::forward<TMatrixType2>(m2)),
+  MatrixProduct<TMatrixType1, TMatrixType2>(std::forward<TMatrixType1>(m1), std::forward<TMatrixType2>(m2)),
   std::forward<TMatrixTypeRest>(rest)...
 ))
 

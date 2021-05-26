@@ -101,17 +101,17 @@ public:
 template <metal::int_... TDims, typename TOperation>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, sizeof...(TDims), DimSeq<TDims...>>(std::forward<TOperation>(supplier)));
+RETURN_AUTO(ElementSupplierTensor<TOperation, sizeof...(TDims), DimSeq<TDims...>>(std::forward<TOperation>(supplier)));
 
 template <typename TOperation, typename... TDimArgTypes, ENABLE_IF(sizeof...(TDimArgTypes) != 0)>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier, TDimArgTypes&&... dim_args)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, dimension_num_v<TDimArgTypes...>::value, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>(std::forward<TOperation>(supplier), std::forward<TDimArgTypes>(dim_args)...));
+RETURN_AUTO(ElementSupplierTensor<TOperation, dimension_num_v<TDimArgTypes...>::value, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>(std::forward<TOperation>(supplier), std::forward<TDimArgTypes>(dim_args)...));
 
 template <typename TDimSeq, metal::int_ TSupplierDims = non_trivial_dimensions_num_v<TDimSeq>::value, typename TOperation>
 __host__ __device__
 auto fromSupplier(TOperation&& supplier)
-RETURN_AUTO(ElementSupplierTensor<util::store_member_t<TOperation&&>, TSupplierDims, TDimSeq>(std::forward<TOperation>(supplier)));
+RETURN_AUTO(ElementSupplierTensor<TOperation, TSupplierDims, TDimSeq>(std::forward<TOperation>(supplier)));
 
 template <metal::int_... TDims>
 __host__ __device__

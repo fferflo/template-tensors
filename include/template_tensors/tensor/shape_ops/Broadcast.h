@@ -75,21 +75,21 @@ public:
 template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) != 0)>
 __host__ __device__
 auto broadcast(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<TBroadcastedDims...>>
+RETURN_AUTO(BroadcastingTensor<TOtherTensorType, DimSeq<TBroadcastedDims...>>
   (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
 template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value && sizeof...(TBroadcastedDims) == 0)>
 __host__ __device__
 auto broadcast(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
+RETURN_AUTO(BroadcastingTensor<TOtherTensorType, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
   (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
 template <typename TBroadcastedDimSeq, typename... TDimArgTypes, typename TOtherTensorType, ENABLE_IF(is_tensor_v<TOtherTensorType>::value)>
 __host__ __device__
 auto broadcast(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, TBroadcastedDimSeq>
+RETURN_AUTO(BroadcastingTensor<TOtherTensorType, TBroadcastedDimSeq>
   (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 )
 
@@ -104,21 +104,21 @@ RETURN_AUTO(BroadcastingTensor<util::store_member_t<TOtherTensorType&&>, TBroadc
 template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) != 0)>
 __host__ __device__
 auto broadcast(TSingletonType&& singleton, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<SingletonT<typename std::decay<TSingletonType>::type>&&>, DimSeq<TBroadcastedDims...>>
+RETURN_AUTO(BroadcastingTensor<SingletonT<typename std::decay<TSingletonType>::type>, DimSeq<TBroadcastedDims...>>
   (SingletonT<typename std::decay<TSingletonType>::type>(std::forward<TSingletonType>(singleton)), std::forward<TDimArgTypes>(dim_args)...)
 )
 
 template <metal::int_... TBroadcastedDims, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value && sizeof...(TBroadcastedDims) == 0)>
 __host__ __device__
 auto broadcast(TSingletonType&& singleton, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<SingletonT<typename std::decay<TSingletonType>::type>&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
+RETURN_AUTO(BroadcastingTensor<SingletonT<typename std::decay<TSingletonType>::type>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
   (SingletonT<typename std::decay<TSingletonType>::type>(std::forward<TSingletonType>(singleton)), std::forward<TDimArgTypes>(dim_args)...)
 )
 
 template <typename TBroadcastedDimSeq, typename... TDimArgTypes, typename TSingletonType, ENABLE_IF(!is_tensor_v<TSingletonType>::value)>
 __host__ __device__
 auto broadcast(TSingletonType&& singleton, TDimArgTypes&&... dim_args)
-RETURN_AUTO(BroadcastingTensor<util::store_member_t<SingletonT<typename std::decay<TSingletonType>::type>&&>, TBroadcastedDimSeq>
+RETURN_AUTO(BroadcastingTensor<SingletonT<typename std::decay<TSingletonType>::type>, TBroadcastedDimSeq>
   (SingletonT<typename std::decay<TSingletonType>::type>(std::forward<TSingletonType>(singleton)), std::forward<TDimArgTypes>(dim_args)...)
 )
 // TODO: singletons are decayed everywhere in this file, this shouldnt be the case

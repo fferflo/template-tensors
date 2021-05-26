@@ -50,6 +50,6 @@ public:
 template <typename... TAggregators>
 __host__ __device__
 auto multi(TAggregators&&... aggregators)
-RETURN_AUTO(detail::multi<util::store_member_t<TAggregators&&>...>(std::forward<TAggregators>(aggregators)...))
+RETURN_AUTO(detail::multi<TAggregators...>(std::forward<TAggregators>(aggregators)...))
 
 } // end of ns aggregator

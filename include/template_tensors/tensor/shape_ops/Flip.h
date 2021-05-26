@@ -94,7 +94,7 @@ public:
 template <metal::int_ TFlipDim, typename TOtherTensorType>
 __host__ __device__
 auto flip(TOtherTensorType&& tensor)
-RETURN_AUTO(FlipTensor<util::store_member_t<TOtherTensorType&&>, TFlipDim>
+RETURN_AUTO(FlipTensor<TOtherTensorType, TFlipDim>
   (std::forward<TOtherTensorType>(tensor))
 );
 

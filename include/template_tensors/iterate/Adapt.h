@@ -31,7 +31,7 @@ template <typename TIterable, typename TAdaptor>
 __host__ __device__
 auto adapt(TIterable&& in, TAdaptor&& adaptor)
 RETURN_AUTO(
-  Adapt<util::store_member_t<TIterable&&>, util::store_member_t<TAdaptor&&>>
+  Adapt<TIterable, TAdaptor>
     (std::forward<TIterable>(in), std::forward<TAdaptor>(adaptor))
 )
 

@@ -108,14 +108,14 @@ struct First
 
   template <typename TFunctor>
   auto operator()(TFunctor&& functor)
-  RETURN_AUTO(jtuple::tuple_apply(Dispatch<util::store_member_t<TFunctor&&>>(std::forward<TFunctor>(functor)), dispatchers))
+  RETURN_AUTO(jtuple::tuple_apply(Dispatch<TFunctor>(std::forward<TFunctor>(functor)), dispatchers))
 };
 
 } // end of ns detail
 
 template <typename... TDispatchers>
 auto first(TDispatchers&&... dispatchers)
-RETURN_AUTO(detail::First<util::store_member_t<TDispatchers&&>...>(std::forward<TDispatchers>(dispatchers)...))
+RETURN_AUTO(detail::First<TDispatchers...>(std::forward<TDispatchers>(dispatchers)...))
 
 
 
@@ -285,7 +285,7 @@ struct id
 
 template <typename T>
 auto id(T&& t)
-RETURN_AUTO(detail::id<util::store_member_t<T&&>>(std::forward<T>(t)))
+RETURN_AUTO(detail::id<T>(std::forward<T>(t)))
 
 
 
@@ -298,7 +298,7 @@ struct ForwardAll;
 
 template <size_t I, typename TResult, typename TFunctor, typename TInputTuple, typename TOutputTuple>
 auto makeForwardAll(TResult& result, TFunctor&& functor, TInputTuple&& input, TOutputTuple&& output)
-RETURN_AUTO(ForwardAll<I, TResult, util::store_member_t<TFunctor&&>, util::store_member_t<TInputTuple&&>, util::store_member_t<TOutputTuple&&>>
+RETURN_AUTO(ForwardAll<I, TResult, TFunctor, TInputTuple, TOutputTuple>
   (result, std::forward<TFunctor>(functor), std::forward<TInputTuple>(input), std::forward<TOutputTuple>(output)))
 
 template <size_t I, typename TResult, typename TFunctor, typename TInputTuple, typename TOutputTuple>
@@ -463,7 +463,7 @@ struct All
 template <typename... TDispatchers>
 auto all(TDispatchers&&... dispatchers)
 RETURN_AUTO(
-  detail::All<util::store_member_t<TDispatchers&&>...>(std::forward<TDispatchers>(dispatchers)...)
+  detail::All<TDispatchers...>(std::forward<TDispatchers>(dispatchers)...)
 )
 
 

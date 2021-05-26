@@ -268,7 +268,7 @@ template <typename TIterable, typename TVectorType>
 __host__ __device__
 auto offset(TIterable&& object, TVectorType&& offset)
 RETURN_AUTO(
-  iterable::transform(std::forward<TIterable>(object), detail::add<util::store_member_t<TVectorType&&>>(std::forward<TVectorType>(offset)))
+  iterable::transform(std::forward<TIterable>(object), detail::add<TVectorType>(std::forward<TVectorType>(offset)))
 )
 
 
@@ -318,7 +318,7 @@ template <typename TIndexStrategy = template_tensors::ColMajor, typename TVector
 __host__ __device__
 auto origin_box(TVectorType&& size, TIndexStrategy&& index_strategy = TIndexStrategy())
 RETURN_AUTO(
-  OriginBox<rows_v<TVectorType>::value, util::store_member_t<TIndexStrategy&&>>(
+  OriginBox<rows_v<TVectorType>::value, TIndexStrategy>(
     std::forward<TVectorType>(size), std::forward<TIndexStrategy>(index_strategy)
   )
 )
@@ -330,12 +330,12 @@ RETURN_AUTO(
   discrete::offset(
     discrete::origin_box(
       template_tensors::static_cast_to<TInteger>(
-        template_tensors::ceil(std::forward<TVectorType2&&>(end)) - template_tensors::floor(static_cast<util::store_member_t<TVectorType1&&>>(start))
+        template_tensors::ceil(std::forward<TVectorType2&&>(end)) - template_tensors::floor(static_cast<TVectorType1>(start))
       ),
       std::forward<TIndexStrategy>(index_strategy)
     ),
     template_tensors::static_cast_to<TInteger>(
-      template_tensors::floor(static_cast<util::store_member_t<TVectorType1&&>>(start))
+      template_tensors::floor(static_cast<TVectorType1>(start))
     )
   )
 )
@@ -381,7 +381,7 @@ RETURN_AUTO(
       TVectorType(center) + radius,
       std::forward<TIndexStrategy>(index_strategy)
     ),
-    detail::sphere_helper<TScalar, decltype(template_tensors::eval(center - static_cast<TScalar>(0.5))), util::store_member_t<TDistanceFunctor&&>>(radius, template_tensors::eval(center - static_cast<TScalar>(0.5)), std::forward<TDistanceFunctor>(distance))
+    detail::sphere_helper<TScalar, decltype(template_tensors::eval(center - static_cast<TScalar>(0.5))), TDistanceFunctor>(radius, template_tensors::eval(center - static_cast<TScalar>(0.5)), std::forward<TDistanceFunctor>(distance))
   )
 )
 

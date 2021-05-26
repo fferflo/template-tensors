@@ -31,6 +31,6 @@ public:
 template <metal::int_ TRank, typename TSupplier>
 __host__ __device__
 auto fromSupplier(TSupplier&& supplier)
-RETURN_AUTO(FromSupplierField<TRank, util::store_member_t<TSupplier&&>>(std::forward<TSupplier>(supplier)))
+RETURN_AUTO(FromSupplierField<TRank, TSupplier>(std::forward<TSupplier>(supplier)))
 
 } // end of ns field

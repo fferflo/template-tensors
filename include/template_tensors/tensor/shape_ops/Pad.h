@@ -349,7 +349,7 @@ public:
 template <typename TPadFrontSeq, typename TPadBackSeq, bool TDummy = true, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(is_coordseq_v<TPadFrontSeq>::value && is_coordseq_v<TPadBackSeq>::value)>
 __host__ __device__
 auto pad(TOtherTensorType&& tensor, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(StaticPaddedTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, TPadFrontSeq, TPadBackSeq>
+RETURN_AUTO(StaticPaddedTensor<TOtherTensorType, TBackgroundFunctor, TPadFrontSeq, TPadBackSeq>
   (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background))
 )
 
@@ -396,14 +396,14 @@ RETURN_AUTO(pad_back<repeat_dimseq_t<TPadding, non_trivial_dimensions_num_v<TOth
 template <typename TDummy = void, typename TPaddingVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(std::is_same<TDummy, void>::value && is_tensor_v<TPaddingVector>::value)>
 __host__ __device__
 auto pad_front(TOtherTensorType&& tensor, TPaddingVector&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(DynamicPadFrontTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TPaddingVector&&>>
+RETURN_AUTO(DynamicPadFrontTensor<TOtherTensorType, TBackgroundFunctor, TPaddingVector>
   (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TPaddingVector>(padding))
 )
 
 template <typename TDummy = void, typename TPaddingVector, typename TOtherTensorType, typename TBackgroundFunctor = util::functor::zero<decay_elementtype_t<TOtherTensorType>>, ENABLE_IF(std::is_same<TDummy, void>::value && is_tensor_v<TPaddingVector>::value)>
 __host__ __device__
 auto pad_back(TOtherTensorType&& tensor, TPaddingVector&& padding, TBackgroundFunctor&& background = TBackgroundFunctor())
-RETURN_AUTO(DynamicPadBackTensor<util::store_member_t<TOtherTensorType&&>, util::store_member_t<TBackgroundFunctor&&>, util::store_member_t<TPaddingVector&&>>
+RETURN_AUTO(DynamicPadBackTensor<TOtherTensorType, TBackgroundFunctor, TPaddingVector>
   (std::forward<TOtherTensorType>(tensor), std::forward<TBackgroundFunctor>(background), std::forward<TPaddingVector>(padding))
 )
 

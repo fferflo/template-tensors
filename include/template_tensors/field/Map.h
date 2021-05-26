@@ -33,6 +33,6 @@ public:
 template <typename TField, typename TMapper>
 __host__ __device__
 auto map(TField&& field, TMapper&& mapper)
-RETURN_AUTO(MapField<util::store_member_t<TField&&>, util::store_member_t<TMapper&&>>(std::forward<TField>(field), std::forward<TMapper>(mapper)))
+RETURN_AUTO(MapField<TField, TMapper>(std::forward<TField>(field), std::forward<TMapper>(mapper)))
 
 } // end of ns field

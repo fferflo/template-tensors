@@ -45,7 +45,7 @@ struct Transform
 template <typename TFunctor>
 __host__ __device__
 auto transform(TFunctor&& functor)
-RETURN_AUTO(Transform<util::store_member_t<TFunctor&&>>(std::forward<TFunctor>(functor)))
+RETURN_AUTO(Transform<TFunctor>(std::forward<TFunctor>(functor)))
 
 } // end of ns functor
 

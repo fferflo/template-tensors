@@ -148,7 +148,7 @@ template <typename TElementType, typename TCvMat>
 __host__
 auto fromCv(TCvMat&& mat)
 RETURN_AUTO(
-  FromOpenCv<util::store_member_t<TCvMat>, TElementType>(std::forward<TCvMat>(mat))
+  FromOpenCv<TCvMat, TElementType>(std::forward<TCvMat>(mat))
 )
 
 

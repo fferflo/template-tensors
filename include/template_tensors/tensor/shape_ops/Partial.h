@@ -310,7 +310,7 @@ template <typename TDropSeq, typename TOtherTensorType, typename TKeepSeq = deta
 TDropSeq>>
 __host__ __device__
 auto partial(TOtherTensorType&& tensor)
-RETURN_AUTO(PartialTensor<util::store_member_t<TOtherTensorType&&>, TKeepSeq>
+RETURN_AUTO(PartialTensor<TOtherTensorType, TKeepSeq>
   (std::forward<TOtherTensorType>(tensor))
 );
 

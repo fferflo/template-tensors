@@ -26,7 +26,7 @@ struct SeparableInterpolatorHelper
   RETURN_AUTO(
     SeparableInterpolatorHelper<I + 1, N>::get(
       std::forward<TMonoInterpolator>(mono_interpolator),
-      template_tensors::elwise(Functor<util::store_member_t<TMonoInterpolator&&>, template_tensors::decay_elementtype_t<TWeightsVector&&>>{std::forward<TMonoInterpolator>(mono_interpolator), t(N - 1 - I)}, template_tensors::partial<N - 1 - I>(std::forward<TTensorType>(values))),
+      template_tensors::elwise(Functor<TMonoInterpolator, template_tensors::decay_elementtype_t<TWeightsVector&&>>{std::forward<TMonoInterpolator>(mono_interpolator), t(N - 1 - I)}, template_tensors::partial<N - 1 - I>(std::forward<TTensorType>(values))),
       std::forward<TWeightsVector>(t)
     )
   )
@@ -159,6 +159,6 @@ struct InterpolateRank<template_tensors::DYN, TDiscreteField>
 template <typename TDiscreteField, typename TInterpolator>
 __host__ __device__
 auto interpolate(TDiscreteField&& discrete_field, TInterpolator&& interpolator)
-RETURN_AUTO(InterpolatedField<util::store_member_t<TDiscreteField&&>, util::store_member_t<TInterpolator&&>>(std::forward<TDiscreteField>(discrete_field), std::forward<TInterpolator>(interpolator)))
+RETURN_AUTO(InterpolatedField<TDiscreteField, TInterpolator>(std::forward<TDiscreteField>(discrete_field), std::forward<TInterpolator>(interpolator)))
 
 } // end of ns field

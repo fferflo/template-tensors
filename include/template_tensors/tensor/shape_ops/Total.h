@@ -250,7 +250,7 @@ template <typename TDropSeq, typename TOtherTensorType, typename TKeepSeq = deta
 TDropSeq>>
 __host__ __device__
 auto total(TOtherTensorType&& tensor)
-RETURN_AUTO(TotalTensor<util::store_member_t<TOtherTensorType&&>, TKeepSeq>
+RETURN_AUTO(TotalTensor<TOtherTensorType, TKeepSeq>
   (std::forward<TOtherTensorType>(tensor))
 );
 

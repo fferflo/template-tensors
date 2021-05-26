@@ -70,13 +70,13 @@ struct map_output_applier
 template <typename TFunctor, typename TAggregator>
 __host__ __device__
 auto map_output(TFunctor&& functor, TAggregator&& aggregator)
-RETURN_AUTO(detail::map_output<util::store_member_t<TFunctor&&>, util::store_member_t<TAggregator&&>>(std::forward<TFunctor>(functor), std::forward<TAggregator>(aggregator)))
+RETURN_AUTO(detail::map_output<TFunctor, TAggregator>(std::forward<TFunctor>(functor), std::forward<TAggregator>(aggregator)))
 
 template <typename TFunctor, typename TAggregator1, typename TAggregator2, typename... TAggregatorRest>
 __host__ __device__
 auto map_output(TFunctor&& functor, TAggregator1&& aggregator1, TAggregator2&& aggregator2, TAggregatorRest&&... rest)
 RETURN_AUTO(map_output(
-  detail::map_output_applier<util::store_member_t<TFunctor&&>>(std::forward<TFunctor>(functor)),
+  detail::map_output_applier<TFunctor>(std::forward<TFunctor>(functor)),
   multi(std::forward<TAggregator1>(aggregator1), std::forward<TAggregator2>(aggregator2), std::forward<TAggregatorRest>(rest)...)
 ))
 

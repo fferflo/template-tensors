@@ -30,6 +30,6 @@ public:
 template <typename TField, typename TCoordFunctor>
 __host__ __device__
 auto transform(TField&& field, TCoordFunctor&& coord_functor)
-RETURN_AUTO(CoordinateTransformedField<util::store_member_t<TField&&>, util::store_member_t<TCoordFunctor&&>>(std::forward<TField>(field), std::forward<TCoordFunctor>(coord_functor)))
+RETURN_AUTO(CoordinateTransformedField<TField, TCoordFunctor>(std::forward<TField>(field), std::forward<TCoordFunctor>(coord_functor)))
 
 } // end of ns field

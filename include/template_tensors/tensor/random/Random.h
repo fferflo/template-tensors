@@ -56,19 +56,19 @@ private:
 template <metal::int_... TDims, typename TGenerator, typename TDistribution>
 __host__ __device__
 auto random(TGenerator&& generator, TDistribution&& distribution)
-RETURN_AUTO(RandomTensor<util::store_member_t<TGenerator&&>, util::store_member_t<TDistribution&&>, DimSeq<TDims...>>
+RETURN_AUTO(RandomTensor<TGenerator, TDistribution, DimSeq<TDims...>>
   (std::forward<TGenerator>(generator), std::forward<TDistribution>(distribution)));
 
 template <typename TGenerator, typename TDistribution, typename... TDimArgTypes, ENABLE_IF(sizeof...(TDimArgTypes) != 0 && are_dim_args_v<TDimArgTypes...>::value)>
 __host__ __device__
 auto random(TGenerator&& generator, TDistribution&& distribution, TDimArgTypes&&... dim_args)
-RETURN_AUTO(RandomTensor<util::store_member_t<TGenerator&&>, util::store_member_t<TDistribution&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
+RETURN_AUTO(RandomTensor<TGenerator, TDistribution, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
   (std::forward<TGenerator>(generator), std::forward<TDistribution>(distribution), std::forward<TDimArgTypes>(dim_args)...));
 
 template <typename TDimSeq, typename TGenerator, typename TDistribution>
 __host__ __device__
 auto random(TGenerator&& generator, TDistribution&& distribution)
-RETURN_AUTO(RandomTensor<util::store_member_t<TGenerator&&>, util::store_member_t<TDistribution&&>, TDimSeq>
+RETURN_AUTO(RandomTensor<TGenerator, TDistribution, TDimSeq>
   (std::forward<TGenerator>(generator), std::forward<TDistribution>(distribution)));
 
 } // end of ns template_tensors

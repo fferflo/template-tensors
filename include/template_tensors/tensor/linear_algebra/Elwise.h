@@ -37,6 +37,17 @@ struct ElwiseOperationTensorElementAccess<DYN>
                               >
 
 template <metal::int_ TCoordsRank, typename TOperation, typename... TTensorTypesIn>
+class ElwiseOperationTensor;
+
+HD_WARNING_DISABLE
+template <metal::int_ TCoordsRank = DYN, typename TOperation, typename... TTensorTypesIn>
+__host__ __device__
+auto elwise(TOperation&& op, TTensorTypesIn&&... tensors)
+RETURN_AUTO(
+  ElwiseOperationTensor<TCoordsRank, TOperation, TTensorTypesIn...>(std::forward<TOperation>(op), std::forward<TTensorTypesIn>(tensors)...)
+)
+
+template <metal::int_ TCoordsRank, typename TOperation, typename... TTensorTypesIn>
 class ElwiseOperationTensor : public SuperType
 {
 public:
@@ -93,18 +104,16 @@ private:
   template <typename TTransform, metal::int_... TIndices>
   __host__ __device__
   auto map(TTransform transform, metal::numbers<TIndices...>)
-  RETURN_AUTO(ElwiseOperationTensor
-    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(jtuple::get<TIndices>(m_tensors)))>...>
-    (transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
+  RETURN_AUTO(
+    template_tensors::elwise(transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
   )
 
   HD_WARNING_DISABLE
   template <typename TTransform, metal::int_... TIndices>
   __host__ __device__
   auto map(TTransform transform, metal::numbers<TIndices...>) const
-  RETURN_AUTO(ElwiseOperationTensor
-    <TCoordsRank, util::store_member_t<decltype(transform(m_op))>, util::store_member_t<decltype(transform(jtuple::get<TIndices>(m_tensors)))>...>
-    (transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
+  RETURN_AUTO(
+    template_tensors::elwise(transform(m_op), transform(jtuple::get<TIndices>(m_tensors))...)
   )
 
 public:
@@ -122,29 +131,6 @@ public:
 #undef ThisType
 
 
-
-/*!
- * \defgroup ElwiseOperationTensor Element-wise Operations
- * \ingroup TensorOperations
- * \brief Perform element-wise operations on tensors
- *
- * @{
- */
-
-/*!
- * \brief Performs the given operation on the tuple of elements at every location of the given tensors
- *
- * @param op a functor that represents the element operation
- * @param tensors... the input tensors
- * @return the resulting tensor of the element-wise operation
- */
-HD_WARNING_DISABLE
-template <metal::int_ TCoordsRank = DYN, typename TOperation, typename... TTensorTypesIn>
-__host__ __device__
-auto elwise(TOperation&& op, TTensorTypesIn&&... tensors)
-RETURN_AUTO(
-  ElwiseOperationTensor<TCoordsRank, util::store_member_t<TOperation&&>, util::store_member_t<TTensorTypesIn&&>...>(std::forward<TOperation>(op), std::forward<TTensorTypesIn>(tensors)...)
-);
 
 namespace functor {
 
@@ -173,7 +159,7 @@ struct elwise
 template <metal::int_ TCoordsRank = DYN, typename TOperation>
 __host__ __device__
 auto elwise(TOperation&& op)
-RETURN_AUTO(detail::elwise<TCoordsRank, util::store_member_t<TOperation&&>>(std::forward<TOperation>(op)))
+RETURN_AUTO(detail::elwise<TCoordsRank, TOperation>(std::forward<TOperation>(op)))
 
 } // end of ns functor
 
@@ -931,7 +917,7 @@ template <typename TLow, typename THigh>
 __host__ __device__
 auto clamp(TLow&& low, THigh&& high)
 RETURN_AUTO(
-  detail::clamp<util::store_member_t<TLow&&>, util::store_member_t<THigh&&>>(std::forward<TLow>(low), std::forward<THigh>(high))
+  detail::clamp<TLow, THigh>(std::forward<TLow>(low), std::forward<THigh>(high))
 )
 
 } // end of ns functor

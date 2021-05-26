@@ -109,7 +109,7 @@ void sort_by_key(TKeyIterator keys_begin, TKeyIterator keys_end, TValueIterator 
   std::sort(
     detail::SortPairIterator<TKeyIterator, TValueIterator>(keys_begin, values_begin),
     detail::SortPairIterator<TKeyIterator, TValueIterator>(keys_end, values_begin + std::distance(keys_begin, keys_end)),
-    detail::SortPairCompare<util::store_member_t<TCompareKey&&>>(std::forward<TCompareKey>(compare_key))
+    detail::SortPairCompare<TCompareKey>(std::forward<TCompareKey>(compare_key))
   );
 }
 

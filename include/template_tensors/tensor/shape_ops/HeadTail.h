@@ -330,7 +330,7 @@ using OffsetTensor = typename std::conditional<is_static_v<TOffsetCoordSeq>::val
 template <metal::int_... THeadDimSeq, typename TOtherTensorType>
 __host__ __device__
 auto head(TOtherTensorType&& tensor)
-RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<THeadDimSeq...>>
+RETURN_AUTO(HeadTensor<TOtherTensorType, DimSeq<THeadDimSeq...>>
   (std::forward<TOtherTensorType>(tensor))
 );
 
@@ -344,14 +344,14 @@ RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, DimSeq<THeadDim
 template <typename TOtherTensorType, typename... TDimArgTypes, ENABLE_IF(sizeof...(TDimArgTypes) != 0)>
 __host__ __device__
 auto head(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
-RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
+RETURN_AUTO(HeadTensor<TOtherTensorType, dyn_dimseq_t<dimension_num_v<TDimArgTypes...>::value>>
   (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
 template <typename THeadDimSeq, typename TOtherTensorType, typename... TDimArgTypes>
 __host__ __device__
 auto headEx(TOtherTensorType&& tensor, TDimArgTypes&&... dim_args)
-RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, THeadDimSeq>
+RETURN_AUTO(HeadTensor<TOtherTensorType, THeadDimSeq>
   (std::forward<TOtherTensorType>(tensor), std::forward<TDimArgTypes>(dim_args)...)
 );
 
@@ -365,7 +365,7 @@ RETURN_AUTO(HeadTensor<util::store_member_t<TOtherTensorType&&>, THeadDimSeq>
 template <metal::int_... TOffsetCoordSeq, ENABLE_IF(is_static_v<CoordSeq<TOffsetCoordSeq...>>::value), typename TOtherTensorType>
 __host__ __device__
 auto offset(TOtherTensorType&& tensor)
-RETURN_AUTO(StaticOffsetTensor<util::store_member_t<TOtherTensorType&&>, CoordSeq<TOffsetCoordSeq...>>
+RETURN_AUTO(StaticOffsetTensor<TOtherTensorType, CoordSeq<TOffsetCoordSeq...>>
   (std::forward<TOtherTensorType>(tensor))
 );
 
@@ -379,14 +379,14 @@ RETURN_AUTO(StaticOffsetTensor<util::store_member_t<TOtherTensorType&&>, CoordSe
 template <typename TOtherTensorType, typename... TOffsetArgTypes, ENABLE_IF(sizeof...(TOffsetArgTypes) != 0)>
 __host__ __device__
 auto offset(TOtherTensorType&& tensor, TOffsetArgTypes&&... offset_args)
-RETURN_AUTO(DynamicOffsetTensor<util::store_member_t<TOtherTensorType&&>, coordinate_num_v<TOffsetArgTypes...>::value>
+RETURN_AUTO(DynamicOffsetTensor<TOtherTensorType, coordinate_num_v<TOffsetArgTypes...>::value>
   (std::forward<TOtherTensorType>(tensor), std::forward<TOffsetArgTypes>(offset_args)...)
 );
 
 template <typename TOffsetCoordSeq, typename TOtherTensorType, typename... TOffsetArgTypes>
 __host__ __device__
 auto offsetEx(TOtherTensorType&& tensor, TOffsetArgTypes&&... offset_args)
-RETURN_AUTO(OffsetTensor<util::store_member_t<TOtherTensorType&&>, TOffsetCoordSeq>
+RETURN_AUTO(OffsetTensor<TOtherTensorType, TOffsetCoordSeq>
   (std::forward<TOtherTensorType>(tensor), std::forward<TOffsetArgTypes>(offset_args)...)
 );
 
@@ -400,7 +400,7 @@ RETURN_AUTO(OffsetTensor<util::store_member_t<TOtherTensorType&&>, TOffsetCoordS
  * @return the sub-tensor
  */
 template <metal::int_... TTailDimSeq, typename TOtherTensorType, metal::int_ TMaxRank = math::max(metal::size<dimseq_t<TOtherTensorType>>::value, (metal::int_) sizeof...(TTailDimSeq)), ENABLE_IF(is_static_v<DimSeq<TTailDimSeq...>>::value),
-  typename TResultTensor = OffsetTensor<util::store_member_t<TOtherTensorType&&>,
+  typename TResultTensor = OffsetTensor<TOtherTensorType,
     metal::transform<
       metal::lambda<detail::OffsetDimHelper>,
       dimseq_make_length_t<dimseq_t<TOtherTensorType>, math::max(metal::size<dimseq_t<TOtherTensorType>>::value, (metal::int_) sizeof...(TTailDimSeq))>,
