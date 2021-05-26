@@ -196,7 +196,7 @@ __host__
 auto toHost(TType&& t)
 RETURN_AUTO(typename std::decay<TType&&>::type(std::forward<TType>(t)))
 FUNCTOR(toHost, mem::toHost)
-// TODO: replace decay constructors with util::decay_rvalue
+
 #ifdef __CUDACC__
 
 template <typename TType, ENABLE_IF(has_memorytype_v<TType>::value)>

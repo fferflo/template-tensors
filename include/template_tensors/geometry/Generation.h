@@ -217,7 +217,7 @@ public:
   __host__ __device__
   static auto begin1(TThisType&& self)
   RETURN_AUTO(
-    ::iterator::transform(::iterator::counting_iterator<size_t>(0), util::decay(self))
+    ::iterator::transform(::iterator::counting_iterator<size_t>(0), typename std::decay<TThisType>::type(self))
   )
   FORWARD_LVALUE_QUALIFIERS(begin, begin1)
 
@@ -225,7 +225,7 @@ public:
   __host__ __device__
   static auto end1(TThisType&& self)
   RETURN_AUTO(
-    ::iterator::transform(::iterator::counting_iterator<size_t>(self.m_num), util::decay(self))
+    ::iterator::transform(::iterator::counting_iterator<size_t>(self.m_num), typename std::decay<TThisType>::type(self))
   )
   FORWARD_LVALUE_QUALIFIERS(end, end1)
 };
@@ -301,7 +301,7 @@ public:
   __host__ __device__
   static auto begin1(TThisType&& self)
   RETURN_AUTO(
-    ::iterator::transform(::iterator::count<size_t>(0), util::decay(self))
+    ::iterator::transform(::iterator::count<size_t>(0), typename std::decay<TThisType>::type(self))
   )
   FORWARD_LVALUE_QUALIFIERS(begin, begin1)
 
@@ -309,7 +309,7 @@ public:
   __host__ __device__
   static auto end1(TThisType&& self)
   RETURN_AUTO(
-    ::iterator::transform(::iterator::count<size_t>(self.m_index_strategy.getSize(self.m_size)), util::decay(self))
+    ::iterator::transform(::iterator::count<size_t>(self.m_index_strategy.getSize(self.m_size)), typename std::decay<TThisType>::type(self))
   )
   FORWARD_LVALUE_QUALIFIERS(end, end1)
 };

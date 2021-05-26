@@ -180,38 +180,6 @@ T constant()
   return TConstant;
 }
 
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-typename std::decay<T&&>::type decay(T&& t)
-{
-  return typename std::decay<T&&>::type(std::forward<T>(t));
-}
-
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto copy_rvalue(T&& t)
-RETURN_AUTO(
-  typename std::conditional<
-    std::is_rvalue_reference<T&&>::value,
-    typename std::decay<T>::type,
-    T&&
-  >::type(t)
-)
-
-HD_WARNING_DISABLE
-template <typename T>
-__host__ __device__
-auto decay_rvalue(T&& t)
-RETURN_AUTO(
-  typename std::conditional<
-    std::is_rvalue_reference<T&&>::value,
-    typename std::decay<T>::type,
-    T&&
-  >::type(std::forward<T>(t))
-)
-
 template <typename T>
 __host__ __device__
 void swap(T& first, T& second)
@@ -387,7 +355,7 @@ struct StoreMemberHelper
 
 template <typename TType>
 using store_member_t = decltype(detail::StoreMemberHelper::deduce(std::declval<TType>()));
-// TODO: rename this to decay_rvalue
+
 
 
 
