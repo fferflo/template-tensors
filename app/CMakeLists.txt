@@ -1,7 +1,7 @@
 option(BUILD_APPS "Build apps" OFF)
 
 if(BUILD_APPS)
-  find_package(nanobench)
+  find_package(nanobench QUIET)
   find_package(Boost REQUIRED program_options filesystem)
 
   if(CMAKE_CUDA_COMPILER)
