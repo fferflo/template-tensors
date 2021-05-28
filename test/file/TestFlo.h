@@ -3,6 +3,7 @@
 
 #ifdef OPENCV_INCLUDED
 #include <opencv2/video.hpp>
+#include <opencv2/optflow.hpp>
 #endif
 
 #define DATA_NAME "Venus"
@@ -13,7 +14,12 @@ BOOST_AUTO_TEST_CASE(load_flo)
   auto flow = tt::readFlo(file);
 
 #ifdef OPENCV_INCLUDED
-  auto cv_flow = tt::fromCv<tt::Vector2f>(cv::readOpticalFlow(file.string()));
+#if CV_VERSION_MAJOR <= 3
+  #define CV_READ_FLO cv::optflow::readOpticalFlow
+#else
+#define CV_READ_FLO cv::readOpticalFlow
+#endif
+  auto cv_flow = tt::fromCv<tt::Vector2f>(CV_READ_FLO(file.string()));
   BOOST_CHECK(tt::eq(flow, cv_flow));
 #endif
 }
