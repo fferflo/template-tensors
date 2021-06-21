@@ -36,16 +36,12 @@ else()
   find_package(Metal REQUIRED)
 endif()
 
-# tuple and tuple_utility
-git_submodule("tuple")
-git_submodule("tuple_utility")
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_SOURCE_DIR}/extern/tuple/include ${PROJECT_SOURCE_DIR}/extern/tuple/include/jtuple)
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${PROJECT_SOURCE_DIR}/extern/tuple_utility ${PROJECT_SOURCE_DIR}/extern/tuple_utility/jtuple)
+# jtuple
+git_submodule("jtuple")
 add_library(jtuple INTERFACE)
 target_include_directories(jtuple
   INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/extern/tuple/include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/extern/tuple_utility>
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/extern/jtuple/include>
     $<INSTALL_INTERFACE:include>
 )
 set(JTUPLE_NAMESPACE_VALUE "jtuple")
@@ -66,5 +62,5 @@ install(
   TARGETS jtuple
   EXPORT install_targets
 )
-install(FILES extern/tuple_utility/tuple_utility.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jtuple)
-install(FILES extern/tuple/include/tuple.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jtuple)
+install(FILES extern/jtuple/include/jtuple/tuple_utility.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jtuple)
+install(FILES extern/jtuple/include/jtuple/tuple.hpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/jtuple)
