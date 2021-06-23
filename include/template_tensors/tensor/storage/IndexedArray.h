@@ -91,7 +91,7 @@ public:
     && is_static_v<TDimSeq>::value)>
   __host__ __device__
   IndexedArrayTensor(TTensorType2&& other)
-    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, TDimSeq())
+    : IndexedArrayTensor(TT_EXPLICIT_CONSTRUCT_WITH_DYN_DIMS, other.dims())
   {
     *this = std::forward<TTensorType2>(other);
   }
