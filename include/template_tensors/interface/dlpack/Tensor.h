@@ -233,6 +233,10 @@ struct DLManagedTensorContext
     template_tensors::fromStdVector(strides) = this->ptr->getIndexStrategy().template toStride<RANK>(this->ptr->dims());
   }
 
+  ~DLManagedTensorContext()
+  {
+  }
+
   TTensorPtr ptr;
   DLManagedTensor dl;
   std::vector<int64_t> shape;
