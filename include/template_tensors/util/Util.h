@@ -96,6 +96,12 @@ struct TT_CONCAT(instantiator_helper_, __LINE__) \
   FORWARD_QUALIFIER(NAME1, NAME2, volatile &) \
   FORWARD_QUALIFIER(NAME1, NAME2, const volatile &)
 
+#define FORWARD_NONVOLATILE_QUALIFIERS(NAME1, NAME2) \
+  FORWARD_QUALIFIER(NAME1, NAME2, &) \
+  FORWARD_QUALIFIER_MOVE(NAME1, NAME2, &&) \
+  FORWARD_QUALIFIER(NAME1, NAME2, const &) \
+  FORWARD_QUALIFIER_MOVE(NAME1, NAME2, const &&)
+
 #define DECLARE_MEMBER_FUNCTOR(NAME) \
   namespace member { \
   template <typename TObject> \
