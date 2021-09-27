@@ -30,7 +30,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -54,7 +54,7 @@ public:
       return static_cast<TElementType>(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
   template <typename TTransform>
   __host__ __device__
@@ -100,7 +100,7 @@ public:
     ASSERT(TAxis2 < rows_cols, "Axis out of range");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -124,7 +124,7 @@ public:
       return static_cast<TElementType>(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
   template <metal::int_ TIndex>
   __host__ __device__

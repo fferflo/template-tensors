@@ -183,7 +183,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <typename TThisType, typename... TCoordArgTypes>
   __host__ __device__
@@ -203,7 +203,7 @@ public:
           );
     return aggregator.get();
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   template <metal::int_ TIndex>
   __host__ __device__

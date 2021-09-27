@@ -181,7 +181,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -208,7 +208,7 @@ public:
   RETURN_AUTO(
     util::move_if<TRValue>(self.m_tensor)(detail::PartialCoordinateHelper<TIndices, 0, 0, TDropSeq>::coord(self.m_keep_coords, std::forward<TCoordArgTypes>(coords)...)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<TTensorTypeIn>::value)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<TTensorTypeIn>::value)
 
   HD_WARNING_DISABLE
   template <typename TTransform>
@@ -251,7 +251,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -264,7 +264,7 @@ public:
       std::is_rvalue_reference<TThisType&&>::value && !std::is_reference<TTensorTypeIn>::value
     >(self.m_tensor, std::forward<TCoordArgTypes>(coords)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
   // TODO: self is not properly forwarded as rvalue
 
   template <metal::int_ TIndex>

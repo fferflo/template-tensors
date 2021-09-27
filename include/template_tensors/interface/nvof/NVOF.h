@@ -113,7 +113,7 @@ public:
 
   Matrix<TElementType, TBufferUsage>& operator=(const Matrix<TElementType, TBufferUsage>& other) = delete;
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <typename TThisType2>
   __host__ __device__

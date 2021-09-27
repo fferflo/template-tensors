@@ -23,7 +23,7 @@ public:
     ASSERT(TRowsCols == DYN || TRowsCols == rows_cols, "Static and dynamic dimensions must be equal");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType) // TODO: this is not an array subclass
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -32,7 +32,7 @@ public:
   RETURN_AUTO(
     row == col ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
   template <typename TTransform>
   __host__ __device__
@@ -71,7 +71,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -80,7 +80,7 @@ public:
   RETURN_AUTO(
     row == col ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
   template <metal::int_ TIndex>
   __host__ __device__

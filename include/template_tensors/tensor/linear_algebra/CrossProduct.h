@@ -23,7 +23,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType,
@@ -39,7 +39,7 @@ public:
       default: return 0;
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -117,7 +117,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename TElementType = typename std::decay<decltype(std::declval<TThisType&&>().m_vector())>::type>
@@ -142,7 +142,7 @@ public:
       return row > col ? self.m_vector(0) : -self.m_vector(0);
     }
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
 
   template <metal::int_ TIndex>
   __host__ __device__

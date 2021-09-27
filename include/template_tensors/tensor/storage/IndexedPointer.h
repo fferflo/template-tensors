@@ -120,7 +120,7 @@ public:
     return *this;
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(TThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(TThisType)
 
   template <typename TThisType2>
   __host__ __device__
@@ -128,7 +128,7 @@ public:
   RETURN_AUTO(static_cast<util::copy_qualifiers_t<TThisType, TThisType2&&>>(self).data())
   FORWARD_ALL_QUALIFIERS(data, data2)
 
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::IndexedStorageElementAccess<is_static_v<TDimSeq>::value>::getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::IndexedStorageElementAccess<is_static_v<TDimSeq>::value>::getElement)
 
   __host__ __device__
   TIndexStrategy& getIndexStrategy()

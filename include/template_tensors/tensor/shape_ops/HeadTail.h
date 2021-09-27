@@ -72,7 +72,7 @@ public:
     ASSERT(areCompatibleDimensions<TNewDimSeq>(std::forward<TDimArgTypes>(dim_args)...), "Incompatible run-time and compile-time dimensions");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes>
@@ -81,7 +81,7 @@ public:
   RETURN_AUTO(
     self.m_tensor(std::forward<TCoordArgTypes>(coords)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
 private:
   TTensorTypeIn m_tensor;
@@ -173,7 +173,7 @@ public:
     ASSERT(areCompatibleCoordinates<TOffsetCoordSeq>(std::forward<TOffsetArgTypes>(offset_args)...), "Incompatible run-time and compile-time offset");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -199,7 +199,7 @@ public:
   RETURN_AUTO(
     std::forward<TThisType>(self).m_tensor((getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...) + nth_coordinate_v<TIndices, TOffsetCoordSeq>::value)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
   HD_WARNING_DISABLE
   template <typename TTransform>
@@ -246,7 +246,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -275,7 +275,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...) + getNthCoordinate<TIndices>(self.m_offset))...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ_N(getElement, non_trivial_dimensions_num_v<dimseq_t<TTensorTypeIn>>::value)
 
   HD_WARNING_DISABLE
   template <typename TTransform>

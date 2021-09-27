@@ -22,7 +22,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
@@ -31,7 +31,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((getNthCoordinate<TIndices>(std::forward<TCoordArgTypes>(coords)...) % self.m_tensor.template dim<TIndices>())...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
 private:
   TTensorTypeIn m_tensor;

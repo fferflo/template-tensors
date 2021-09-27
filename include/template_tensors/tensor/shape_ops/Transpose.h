@@ -21,7 +21,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -54,7 +54,7 @@ public:
   RETURN_AUTO(
     getHelper(std::forward<TThisType>(self), metal::iota<metal::number<0>, metal::number<TTransposeDims>>(), std::forward<TCoordArgTypes>(coords)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 
   HD_WARNING_DISABLE
   template <typename TTransform>

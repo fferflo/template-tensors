@@ -59,7 +59,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
@@ -68,7 +68,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((coords / util::constant<metal::int_, nth_dimension_v<TIndices, TRepetitionsSeq>::value>())...)
   ) // TODO: std::forward coords
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <metal::int_ TIndex>
   __host__ __device__
@@ -130,7 +130,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TCoordArgTypes, metal::int_... TIndices>
@@ -139,7 +139,7 @@ public:
   RETURN_AUTO(
     self.m_tensor((coords / getNthDimension<TIndices>(self.m_repetitions))...)
   ) // TODO: std::forward coords?
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_SEQ(getElement)
 
   template <metal::int_ TIndex>
   __host__ __device__

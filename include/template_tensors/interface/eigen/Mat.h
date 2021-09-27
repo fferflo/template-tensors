@@ -65,7 +65,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType, typename... TSizeTCoords>
@@ -74,7 +74,7 @@ public:
   RETURN_AUTO(
     self.m_eigen_matrix(rows, cols)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2) // TODO: overhead for eigen vectors
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2) // TODO: overhead for eigen vectors
 
   template <metal::int_ TIndex>
   __host__ __device__

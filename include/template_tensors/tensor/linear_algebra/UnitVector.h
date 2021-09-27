@@ -20,7 +20,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -29,7 +29,7 @@ public:
   RETURN_AUTO(
     row == TDirection ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -69,7 +69,7 @@ public:
     ASSERT(direction < TRows, "Direction out of range");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -78,7 +78,7 @@ public:
   RETURN_AUTO(
     row == self.m_direction ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -120,7 +120,7 @@ public:
     ASSERT(TDirection < this->rows(), "Direction out of range");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -129,7 +129,7 @@ public:
   RETURN_AUTO(
     row == TDirection ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -169,7 +169,7 @@ public:
     ASSERT(direction < this->rows(), "Direction out of range");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -178,7 +178,7 @@ public:
   RETURN_AUTO(
     row == self.m_direction ? 1 : 0
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__
@@ -223,7 +223,7 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType>
@@ -232,7 +232,7 @@ public:
   RETURN_AUTO(
     UnitVector<TElementType, TRows>(row, self.rows())
   )
- TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
+ TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 1)
 
   template <typename TTransform>
   __host__ __device__

@@ -94,7 +94,7 @@ public:
     ASSERT(left.template dim<1>() == right.template dim<0>(), "Incompatible dimensions");
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   HD_WARNING_DISABLE
   template <typename TThisType,
@@ -109,7 +109,7 @@ public:
     }
     return sum;
   }
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS_DIM_T_N(getElement, 2)
   // TODO: replace this with dotproduct between template_tensors::row and template_tensors::col call?
   // TODO: all self.member should be rvalue if self is rvalue?
 

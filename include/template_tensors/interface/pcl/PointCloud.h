@@ -58,9 +58,9 @@ public:
   {
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::PclElementAccess<TOrganized>::getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(detail::PclElementAccess<TOrganized>::getElement)
 
   template <metal::int_ TIndex>
   __host__

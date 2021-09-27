@@ -152,7 +152,7 @@ public:
     return *this;
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
   __host__ __device__
   TArrayType& getArray()

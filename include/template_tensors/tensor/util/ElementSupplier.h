@@ -67,7 +67,7 @@ public:
     return ThisType(*this);
   }
 
-  TT_ARRAY_SUBCLASS_ASSIGN(ThisType)
+  TT_TENSOR_SUBCLASS_ASSIGN(ThisType)
 
 private:
   TOperation m_supplier;
@@ -79,7 +79,7 @@ public:
   RETURN_AUTO(
     detail::apply_supplier<TSupplierDims>(self.m_supplier, std::forward<TCoordArgTypes>(coords)...)
   )
-  TT_ARRAY_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
+  TT_TENSOR_SUBCLASS_FORWARD_ELEMENT_ACCESS(getElement)
 };
 #undef SuperType
 #undef ThisType
