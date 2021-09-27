@@ -100,21 +100,31 @@ file(MAKE_DIRECTORY ${TEST_DIR})
 
 ######################## ACQUIRE TEST DATA ########################
 
-set(AIRPLANE_PNG "${CMAKE_BINARY_DIR}/data/airplane.png")
-set(AIRPLANE_PNG_WIDTH 512)
-set(AIRPLANE_PNG_HEIGHT 512)
+set(AIRPLANE_TIFF "${CMAKE_BINARY_DIR}/data/airplane.tiff")
+set(AIRPLANE_TIFF_WIDTH 512)
+set(AIRPLANE_TIFF_HEIGHT 512)
 ExternalProject_Add(
-    airplane_png
+    airplane_tiff
     PREFIX "tmp"
-    DOWNLOAD_NAME "airplane.png"
+    DOWNLOAD_NAME "airplane.tiff"
     DOWNLOAD_NO_EXTRACT ON
     DOWNLOAD_DIR "${CMAKE_BINARY_DIR}/data"
-    URL https://homepages.cae.wisc.edu/~ece533/images/airplane.png
+    URL http://sipi.usc.edu/database/download.php?vol=misc&img=4.2.05
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
     EXCLUDE_FROM_ALL 1
 )
+
+set(AIRPLANE_PNG "${CMAKE_BINARY_DIR}/data/airplane.png")
+set(AIRPLANE_PNG_WIDTH 512)
+set(AIRPLANE_PNG_HEIGHT 512)
+add_custom_target(airplane_png
+  COMMAND convert ${AIRPLANE_TIFF} ${AIRPLANE_PNG}
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+  VERBATIM
+)
+add_dependencies(airplane_png airplane_tiff)
 
 set(AIRPLANE_HALF_PNG "${CMAKE_BINARY_DIR}/data/airplane_half.png")
 set(AIRPLANE_HALF_PNG_WIDTH 512)
