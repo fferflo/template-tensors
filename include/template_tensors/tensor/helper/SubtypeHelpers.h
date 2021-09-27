@@ -15,22 +15,19 @@ template <typename TTensorType, typename TElementType>
 __host__ __device__
 void fill(TTensorType&& tensor, TElementType&& fill);
 
-// "using Copier" hack accomplishes that Copier is dependent of template paramters, and op::AutoCopier (which is only defined later) is not directly required here
 #define TT_TENSOR_SUBCLASS_ASSIGN_ALL(...) \
-  template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value)> \
+  template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value), LAZY_TYPE(TCopier, template_tensors::op::AutoCopier<>)> \
   __host__ __device__ \
   __VA_ARGS__& operator=(TTensorType2&& other) \
   { \
-    using Copier = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoCopier<>>::type; \
-    Copier::copy(static_cast<__VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
+    TCopier::copy(static_cast<__VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
     return static_cast<__VA_ARGS__&>(*this); \
   } \
-  template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value)> \
+  template <typename TTensorType2, ENABLE_IF(template_tensors::is_tensor_v<TTensorType2>::value), LAZY_TYPE(TCopier, template_tensors::op::AutoCopier<>)> \
   __host__ __device__ \
   void operator=(TTensorType2&& other) volatile \
   { \
-    using Copier = typename std::conditional<std::is_same<TTensorType2, void>::value, void, template_tensors::op::AutoCopier<>>::type; \
-    Copier::copy(static_cast<volatile __VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
+    TCopier::copy(static_cast<volatile __VA_ARGS__&>(*this), std::forward<TTensorType2>(other)); \
   } \
   template <typename TNonTensorType, bool TDummy = true, ENABLE_IF(!template_tensors::is_tensor_v<TNonTensorType>::value)> \
   __host__ __device__ \
