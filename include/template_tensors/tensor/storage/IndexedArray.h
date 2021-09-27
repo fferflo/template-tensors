@@ -21,11 +21,13 @@ IndexedArrayTensor : public SuperType,
                      public IsIndexedArrayTensor,
                      public StoreDimensions<TDimSeq>
 {
+private:
+  TArrayType m_array;
+
 public:
   // TODO: static_assert(TIndexStrategy().getSize(TDimSeq()) == TArrayType::SIZE, "Invalid storage size"); or storage size or index strategy is dynamic
   static_assert(std::is_same<TElementType, ::array::elementtype_t<TArrayType>>::value, "Invalid storage type");
 
-  using ArrayType = TArrayType; // TODO: remove this
   using IndexStrategy = TIndexStrategy;
 
   template <typename... TDimArgTypes, typename TIndexStrategy2, ENABLE_IF(are_dim_args_v<TDimArgTypes...>::value && std::is_constructible<TIndexStrategy, TIndexStrategy2&&>::value)>
@@ -176,21 +178,33 @@ public:
     return m_array;
   }
 
+  template <LAZY_TYPE(TArrayTypeLazy, TArrayType), typename TResultType = decltype(std::declval<TArrayTypeLazy>().data())>
   __host__ __device__
-  auto data()
-  RETURN_AUTO(getArray().data())
+  TResultType data()
+  {
+    return m_array.data();
+  }
 
+  template <LAZY_TYPE(TArrayTypeLazy, TArrayType), typename TResultType = decltype(std::declval<const TArrayTypeLazy>().data())>
   __host__ __device__
-  auto data() const
-  RETURN_AUTO(getArray().data())
+  TResultType data() const
+  {
+    return m_array.data();
+  }
 
+  template <LAZY_TYPE(TArrayTypeLazy, TArrayType), typename TResultType = decltype(std::declval<volatile TArrayTypeLazy>().data())>
   __host__ __device__
-  auto data() volatile
-  RETURN_AUTO(getArray().data())
+  TResultType data() volatile
+  {
+    return m_array.data();
+  }
 
+  template <LAZY_TYPE(TArrayTypeLazy, TArrayType), typename TResultType = decltype(std::declval<const volatile TArrayTypeLazy>().data())>
   __host__ __device__
-  auto data() const volatile
-  RETURN_AUTO(getArray().data())
+  TResultType data() const volatile
+  {
+    return m_array.data();
+  }
 
   __host__ __device__
   auto begin()
@@ -233,9 +247,6 @@ public:
   static auto toKernel(TTensorType&& tensor)
   RETURN_AUTO(SuperType::toKernel(std::forward<TTensorType>(tensor)))
 #endif
-
-private:
-  TArrayType m_array;
 };
 #undef SuperType
 #undef ThisType
