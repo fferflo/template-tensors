@@ -1,20 +1,11 @@
-#ifdef DLPACK_INCLUDED
-#ifdef BOOST_PYTHON_INCLUDED
+#if defined(DLPACK_INCLUDED) && defined(BOOST_PYTHON_INCLUDED)
 
-#include <boost/algorithm/string/join.hpp>
-
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
-
-namespace dispatch {
+namespace template_tensors::python::boost::dispatch {
 
 template <typename TElementTypes, typename TRanks, typename TMemoryTypes>
 struct FromTensorflow
 {
-  using InnerDispatcher = template_tensors::boost::python::dispatch::FromDlPack<TElementTypes, TRanks, TMemoryTypes>;
+  using InnerDispatcher = template_tensors::python::boost::dispatch::FromDlPack<TElementTypes, TRanks, TMemoryTypes>;
 
   ::boost::python::object& object;
 
@@ -50,12 +41,12 @@ struct FromTensorflow
   Result operator()(TFunctor&& functor)
   {
     Result result;
-    std::string class_name = template_tensors::boost::python::getClassName(object);
+    std::string class_name = template_tensors::python::boost::getClassName(object);
     if (class_name == "EagerTensor")
     {
       ::boost::python::object dlpack;
       {
-        template_tensors::boost::python::with_gil guard;
+        template_tensors::python::with_gil guard;
         ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
         dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(object);
       }
@@ -69,13 +60,6 @@ struct FromTensorflow
   }
 };
 
-} // end of ns dispatch
+} // end of ns template_tensors::python::boost::dispatch
 
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
-
-#endif
 #endif

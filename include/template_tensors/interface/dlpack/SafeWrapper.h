@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef DLPACK_INCLUDED
 
 #include <dlpack/dlpack.h>

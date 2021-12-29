@@ -5,15 +5,9 @@
 #define BOOST_PP_SEQ_ENUM_0
 #include <boost/preprocessor.hpp>
 
-namespace template_tensors {
+namespace template_tensors::python::boost::dispatch {
 
-namespace boost {
-
-namespace python {
-
-namespace dispatch {
-
-#if defined(DLPACK_INCLUDED) && defined(BOOST_PYTHON_INCLUDED)
+#if defined(DLPACK_INCLUDED)
 #define DLPACK ((FromDlPack<TElementTypes, TRanks, TMemoryTypes>(object)))
 #else
 #define DLPACK
@@ -26,7 +20,7 @@ namespace dispatch {
 #define NUMPY
 #endif
 
-#if defined(DLPACK_INCLUDED) && defined(BOOST_PYTHON_INCLUDED)
+#if defined(DLPACK_INCLUDED)
 #define TENSORFLOW ((FromTensorflow<TElementTypes, TRanks, TMemoryTypes>(object)))
 #else
 #define TENSORFLOW
@@ -42,12 +36,6 @@ RETURN_AUTO(
 #undef NUMPY
 #undef TENSORFLOW
 
-} // end of ns dispatch
-
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
+} // end of ns template_tensors::python::boost::dispatch
 
 #endif

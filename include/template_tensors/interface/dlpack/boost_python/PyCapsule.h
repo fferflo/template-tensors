@@ -1,19 +1,14 @@
-#ifdef DLPACK_INCLUDED
-#ifdef BOOST_PYTHON_INCLUDED
+#if defined(DLPACK_INCLUDED) && defined(BOOST_PYTHON_INCLUDED)
 
 #include <boost/python.hpp>
 
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
+namespace template_tensors::python::boost {
 
 namespace detail {
 
 inline void deleteDlPackCapsuleObject(PyObject* capsule)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   DLManagedTensor* dl = reinterpret_cast<DLManagedTensor*>(PyCapsule_GetPointer(capsule, PyCapsule_GetName(capsule)));
   ASSERT_(dl != nullptr, "Capsule object is null"); // TODO: assertion levels
   if (dl->deleter != nullptr)
@@ -25,9 +20,9 @@ inline void deleteDlPackCapsuleObject(PyObject* capsule)
 
 } // end of ns detail
 
-inline ::boost::python::object fromDlPack(SafeDLManagedTensor&& dl, const char* name)
+inline ::boost::python::object fromDlPack(template_tensors::SafeDLManagedTensor&& dl, const char* name)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   void* dl_ptr = reinterpret_cast<void*>(dl.use());
   ASSERT_(dl_ptr != nullptr, "Cannot create capsule with nullptr ptr"); // TODO: assertion levels
   PyObject* capsule = ::PyCapsule_New(dl_ptr, name, (PyCapsule_Destructor) &detail::deleteDlPackCapsuleObject);
@@ -36,21 +31,16 @@ inline ::boost::python::object fromDlPack(SafeDLManagedTensor&& dl, const char* 
   return capsule_object;
 }
 
-inline SafeDLManagedTensor toDlPack(::boost::python::object capsule, const char* name)
+inline template_tensors::SafeDLManagedTensor toDlPack(::boost::python::object capsule, const char* name)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   DLManagedTensor* dl = reinterpret_cast<DLManagedTensor*>(PyCapsule_GetPointer(capsule.ptr(), name));
   ASSERT_(dl != nullptr, "Capsule object is null"); // TODO: assertion levels
   PyCapsule_SetName(capsule.ptr(), "tensor_pycapsule_used");
   PyCapsule_SetDestructor(capsule.ptr(), nullptr);
-  return SafeDLManagedTensor(dl);
+  return template_tensors::SafeDLManagedTensor(dl);
 }
 
-} // end of ns python
+} // end of ns template_tensors::python::boost
 
-} // end of ns boost
-
-} // end of ns template_tensors
-
-#endif
 #endif

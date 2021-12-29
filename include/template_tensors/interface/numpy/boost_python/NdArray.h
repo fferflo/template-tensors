@@ -6,53 +6,7 @@
 #include <boost/python/list.hpp>
 #include <boost/python/numpy.hpp>
 
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
-
-class InvalidNumpyShapeException : public std::exception
-{
-public:
-  InvalidNumpyShapeException(size_t got, size_t expected)
-    : m_message(std::string("Invalid numpy shape. Got rank ") + std::to_string(got) + " expected rank " + std::to_string(expected))
-  {
-  }
-
-  template <typename TVector1, typename TVector2>
-  InvalidNumpyShapeException(TVector1&& got, TVector2&& expected)
-    : m_message(std::string("Invalid numpy shape. Got dimensions ") + util::to_string(got) + " expected dimensions " + util::to_string(expected))
-  {
-  }
-
-  virtual const char* what() const throw ()
-  {
-    return m_message.c_str();
-  }
-
-private:
-  std::string m_message;
-};
-
-class InvalidNumpyElementTypeException : public std::exception
-{
-public:
-  InvalidNumpyElementTypeException(size_t got, size_t expected)
-    : m_message(std::string("Invalid numpy elementtype. Got size ") + std::to_string(got) + " expected size " + std::to_string(expected))
-  {
-  }
-
-  virtual const char* what() const throw ()
-  {
-    return m_message.c_str();
-  }
-
-private:
-  std::string m_message;
-};
-
-
+namespace template_tensors::python::boost {
 
 #define ThisType FromPythonNumpyWrapper<TElementType, TRank, TNumpyArray>
 #define SuperType IndexedPointerTensor< \
@@ -84,7 +38,7 @@ public:
 
   static ::boost::python::numpy::ndarray make(template_tensors::VectorXT<size_t, TRank> dims)
   {
-    template_tensors::boost::python::with_gil guard;
+    template_tensors::python::with_gil guard;
     return ::boost::python::numpy::empty(jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(dims)), ::boost::python::numpy::dtype::get_builtin<TElementType>());
   }
 
@@ -137,14 +91,14 @@ __host__
 FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::ndarray arr)
 {
   {
-    template_tensors::boost::python::with_gil guard;
+    template_tensors::python::with_gil guard;
     if (arr.get_nd() != TRank)
     {
-      throw InvalidNumpyShapeException(arr.get_nd(), TRank);
+      throw template_tensors::python::InvalidNumpyShapeException(arr.get_nd(), TRank);
     }
     if (arr.get_dtype() != ::boost::python::numpy::dtype::get_builtin<TElementType>())
     {
-      throw InvalidNumpyElementTypeException(arr.get_dtype().get_itemsize(), sizeof(TElementType));
+      throw template_tensors::python::InvalidNumpyElementTypeException(arr.get_dtype().get_itemsize(), sizeof(TElementType));
     }
   }
 
@@ -158,7 +112,7 @@ FromPythonNumpyWrapper<TElementType, TRank> fromNumpy(::boost::python::numpy::nd
   FromPythonNumpyWrapper<TElementType, TRank> result = fromNumpy<TElementType, TRank>(arr);
   if (!template_tensors::eq(result.template dims<TRank>(), dims))
   {
-    throw InvalidNumpyShapeException(result.template dims<TRank>(), dims);
+    throw template_tensors::python::InvalidNumpyShapeException(result.template dims<TRank>(), dims);
   }
   return FromPythonNumpyWrapper<TElementType, TRank>(arr);
 }
@@ -172,10 +126,6 @@ __host__
   return std::move(result_as_tensor.getNumpyArray());
 }
 
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
+} // end of ns template_tensors::python::boost
 
 #endif

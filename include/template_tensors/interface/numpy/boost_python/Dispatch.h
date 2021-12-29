@@ -1,12 +1,8 @@
+#pragma once
+
 #ifdef BOOST_NUMPY_INCLUDED
 
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
-
-namespace dispatch {
+namespace template_tensors::python::boost::dispatch {
 
 template <typename TElementTypes, typename TRanks>
 struct FromNumpy
@@ -18,7 +14,7 @@ struct FromNumpy
     template <typename TElementType>
     bool operator()()
     {
-      template_tensors::boost::python::with_gil guard;
+      template_tensors::python::with_gil guard;
       return array.get_dtype() == ::boost::python::numpy::dtype::get_builtin<TElementType>();
     }
   };
@@ -30,7 +26,7 @@ struct FromNumpy
     template <metal::int_ TRank>
     bool operator()()
     {
-      template_tensors::boost::python::with_gil guard;
+      template_tensors::python::with_gil guard;
       return array.get_nd() == TRank;
     }
   };
@@ -87,7 +83,7 @@ struct FromNumpy
     template <typename TElementType, metal::int_ TRank>
     void operator()(metal::value<TElementType>, std::integral_constant<metal::int_, TRank>)
     {
-      functor(template_tensors::boost::python::fromNumpy<TElementType, TRank>(ndarray));
+      functor(template_tensors::python::boost::fromNumpy<TElementType, TRank>(ndarray));
     }
   };
 
@@ -95,7 +91,7 @@ struct FromNumpy
   Result operator()(TFunctor&& functor)
   {
     Result result;
-    std::string class_name = template_tensors::boost::python::getClassName(object);
+    std::string class_name = template_tensors::python::boost::getClassName(object);
     if (class_name == "ndarray")
     {
       ::boost::python::numpy::ndarray& ndarray = static_cast<::boost::python::numpy::ndarray&>(object);
@@ -109,12 +105,6 @@ struct FromNumpy
   }
 };
 
-} // end of ns dispatch
-
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
+} // end of ns template_tensors::python::boost::dispatch
 
 #endif

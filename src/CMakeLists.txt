@@ -6,7 +6,7 @@ target_include_directories(base
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_compile_features(base INTERFACE cxx_std_11)
+target_compile_features(base INTERFACE cxx_std_14)
 target_link_libraries(base INTERFACE Boost::filesystem Metal jtuple)
 target_compile_definitions(base INTERFACE
   COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES=${COPY_BY_ASSIGN_BELOW_NUMBER_OF_BYTES}
@@ -21,6 +21,8 @@ install(
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
+
+# TODO: move all interfaces cmake code to interfaces folders?
 
 
 if(CMAKE_CUDA_COMPILER)
@@ -237,21 +239,21 @@ if(TARGET interface.python)
     endif()
   endif()
   if(DEP_NAME)
-    add_library(interface.boost.python INTERFACE)
-    target_link_libraries(interface.boost.python INTERFACE interface.python base Boost::${DEP_NAME})
-    target_compile_definitions(interface.boost.python INTERFACE
+    add_library(interface.python.boost INTERFACE)
+    target_link_libraries(interface.python.boost INTERFACE interface.python base Boost::${DEP_NAME})
+    target_compile_definitions(interface.python.boost INTERFACE
       BOOST_PYTHON_INCLUDED
       BOOST_BIND_GLOBAL_PLACEHOLDERS # Avoid deprecation warning for code in boost/python.hpp
     )
     install(
-      TARGETS interface.boost.python
+      TARGETS interface.python.boost
       EXPORT install_targets
     )
   endif()
 endif()
 
 
-if(TARGET interface.boost.python)
+if(TARGET interface.python.boost)
   set(DEP_NAME)
   find_package(Boost COMPONENTS numpy${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR} QUIET)
   if(Boost_numpy${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}_FOUND)
@@ -265,11 +267,11 @@ if(TARGET interface.boost.python)
     endif()
   endif()
   if(DEP_NAME)
-    add_library(interface.boost.numpy INTERFACE)
-    target_link_libraries(interface.boost.numpy INTERFACE interface.boost.python Boost::${DEP_NAME} base)
-    target_compile_definitions(interface.boost.numpy INTERFACE BOOST_NUMPY_INCLUDED)
+    add_library(interface.python.boost_numpy INTERFACE)
+    target_link_libraries(interface.python.boost_numpy INTERFACE interface.python.boost Boost::${DEP_NAME} base)
+    target_compile_definitions(interface.python.boost_numpy INTERFACE BOOST_NUMPY_INCLUDED)
     install(
-      TARGETS interface.boost.numpy
+      TARGETS interface.python.boost_numpy
       EXPORT install_targets
     )
   endif()
@@ -393,10 +395,10 @@ endif()
 if(TARGET interface.cnpy)
   message(STATUS "  cnpy")
 endif()
-if(TARGET interface.boost.python)
+if(TARGET interface.python.boost)
   message(STATUS "  boost.python")
 endif()
-if(TARGET interface.boost.numpy)
+if(TARGET interface.python.boost_numpy)
   message(STATUS "  boost.numpy")
 endif()
 if(TARGET interface.soil)

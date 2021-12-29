@@ -5,117 +5,6 @@
 
 namespace template_tensors {
 
-class InvalidDlPackShapeException : public std::exception
-{
-public:
-  InvalidDlPackShapeException(size_t got, size_t expected)
-    : m_message(std::string("Invalid DlPack shape. Got rank ") + util::to_string(got) + " expected rank " + util::to_string(expected))
-  {
-  }
-
-  template <typename TVector1, typename TVector2>
-  InvalidDlPackShapeException(TVector1&& got, TVector2&& expected)
-    : m_message(std::string("Invalid DlPack shape. Got dimensions ") + util::to_string(got) + " expected dimensions " + util::to_string(expected))
-  {
-  }
-
-  virtual const char* what() const throw ()
-  {
-    return m_message.c_str();
-  }
-
-private:
-  std::string m_message;
-};
-
-class InvalidDlPackElementTypeException : public std::exception
-{
-public:
-  InvalidDlPackElementTypeException(
-      DLDataTypeCode expected_code, uint8_t expected_bits, uint16_t expected_lanes,
-      DLDataTypeCode got_code, uint8_t got_bits, uint16_t got_lanes)
-    : m_message(
-      std::string("Invalid DlPack elementtype. Got {code=") + util::to_string(got_code) + ", bits=" + util::to_string(got_bits) + ", lanes=" + util::to_string(got_lanes) + "}"
-      " Expected {code=" + util::to_string(expected_code) + ", bits=" + util::to_string(expected_bits) + ", lanes=" + util::to_string(expected_lanes) + "}"
-    )
-  {
-  }
-
-  virtual const char* what() const throw ()
-  {
-    return m_message.c_str();
-  }
-
-private:
-  std::string m_message;
-};
-
-class InvalidDlPackMemoryType : public std::exception
-{
-public:
-  InvalidDlPackMemoryType(DLDeviceType got, DLDeviceType expected)
-    : m_message(std::string("Invalid DlPack memory type. Got type ") + util::to_string(got) + " expected type " + util::to_string(expected))
-  {
-  }
-
-  virtual const char* what() const throw ()
-  {
-    return m_message.c_str();
-  }
-
-private:
-  std::string m_message;
-};
-
-template <typename TElementType>
-struct dlpack_elementtype;
-
-#define DLPACK_ELEMENTTYPE(TYPENAME, CODE, BITS, LANES) \
-  template <> \
-  struct dlpack_elementtype<TYPENAME> \
-  { \
-    static DLDataTypeCode getCode() \
-    { \
-      return CODE; \
-    } \
-    static uint8_t getBits() \
-    { \
-      return BITS; \
-    } \
-    static uint16_t getLanes() \
-    { \
-      return LANES; \
-    } \
-  }
-
-DLPACK_ELEMENTTYPE(float, kDLFloat, 32, 1);
-DLPACK_ELEMENTTYPE(double, kDLFloat, 64, 1);
-DLPACK_ELEMENTTYPE(uint8_t, kDLUInt, 8, 1);
-DLPACK_ELEMENTTYPE(uint16_t, kDLUInt, 16, 1);
-DLPACK_ELEMENTTYPE(uint32_t, kDLUInt, 32, 1);
-DLPACK_ELEMENTTYPE(uint64_t, kDLUInt, 64, 1);
-DLPACK_ELEMENTTYPE(int8_t, kDLInt, 8, 1);
-DLPACK_ELEMENTTYPE(int16_t, kDLInt, 16, 1);
-DLPACK_ELEMENTTYPE(int32_t, kDLInt, 32, 1);
-DLPACK_ELEMENTTYPE(int64_t, kDLInt, 64, 1);
-
-#undef DLPACK_ELEMENTTYPE
-
-template <mem::MemoryType TMemoryType>
-struct dlpack_devicetype;
-
-template <>
-struct dlpack_devicetype<mem::HOST>
-{
-  static const DLDeviceType value = kDLCPU;
-};
-
-template <>
-struct dlpack_devicetype<mem::DEVICE>
-{
-  static const DLDeviceType value = kDLCUDA;
-};
-
 #define ThisType FromDlPack<TElementType, TRank, TMemoryType>
 #define SuperType IndexedPointerTensor< \
                                         ThisType, \
@@ -192,20 +81,20 @@ FromDlPack<TElementType, TRank, TMemoryType> fromDlPack(SafeDLManagedTensor&& dl
 {
   if (dl->dl_tensor.ndim != TRank)
   {
-    throw InvalidDlPackShapeException(dl->dl_tensor.ndim, TRank);
+    throw template_tensors::InvalidDlPackShapeException(dl->dl_tensor.ndim, TRank);
   }
-  if (dlpack_elementtype<TElementType>::getCode() != dl->dl_tensor.dtype.code
-   || dlpack_elementtype<TElementType>::getBits() != dl->dl_tensor.dtype.bits
-   || dlpack_elementtype<TElementType>::getLanes() != dl->dl_tensor.dtype.lanes)
+  if (template_tensors::dlpack_elementtype<TElementType>::getCode() != dl->dl_tensor.dtype.code
+   || template_tensors::dlpack_elementtype<TElementType>::getBits() != dl->dl_tensor.dtype.bits
+   || template_tensors::dlpack_elementtype<TElementType>::getLanes() != dl->dl_tensor.dtype.lanes)
   {
-    throw InvalidDlPackElementTypeException(
-      dlpack_elementtype<TElementType>::getCode(), dlpack_elementtype<TElementType>::getBits(), dlpack_elementtype<TElementType>::getLanes(),
+    throw template_tensors::InvalidDlPackElementTypeException(
+      template_tensors::dlpack_elementtype<TElementType>::getCode(), dlpack_elementtype<TElementType>::getBits(), template_tensors::dlpack_elementtype<TElementType>::getLanes(),
       static_cast<DLDataTypeCode>(dl->dl_tensor.dtype.code), dl->dl_tensor.dtype.bits, dl->dl_tensor.dtype.lanes
     );
   }
-  if (dlpack_devicetype<TMemoryType>::value != dl->dl_tensor.device.device_type)
+  if (template_tensors::dlpack_devicetype<TMemoryType>::value != dl->dl_tensor.device.device_type)
   {
-    throw InvalidDlPackMemoryType(dl->dl_tensor.device.device_type, dlpack_devicetype<TMemoryType>::value);
+    throw InvalidDlPackMemoryType(dl->dl_tensor.device.device_type, template_tensors::dlpack_devicetype<TMemoryType>::value);
   }
 
   return FromDlPack<TElementType, TRank, TMemoryType>(std::move(dl));
@@ -259,12 +148,12 @@ SafeDLManagedTensor toDlPack(TTensorPtr&& tensor)
   manager_ctx->dl.deleter = &ManagerContext::deleter;
   manager_ctx->dl.manager_ctx = manager_ctx;
   manager_ctx->dl.dl_tensor.data = manager_ctx->ptr->data();
-  manager_ctx->dl.dl_tensor.device.device_type = dlpack_devicetype<MEMORY_TYPE>::value;
+  manager_ctx->dl.dl_tensor.device.device_type = template_tensors::dlpack_devicetype<MEMORY_TYPE>::value;
   manager_ctx->dl.dl_tensor.device.device_id = 0; // TODO: get different device ids (compare https://github.com/tensorflow/tensorflow/blob/22e07fb204386768e5bcbea563641ea11f96ceb8/tensorflow/c/eager/dlpack.cc#L110)
   manager_ctx->dl.dl_tensor.ndim = manager_ctx->shape.size();
-  manager_ctx->dl.dl_tensor.dtype.code = dlpack_elementtype<ElementType>::getCode();
-  manager_ctx->dl.dl_tensor.dtype.bits = dlpack_elementtype<ElementType>::getBits();
-  manager_ctx->dl.dl_tensor.dtype.lanes = dlpack_elementtype<ElementType>::getLanes();
+  manager_ctx->dl.dl_tensor.dtype.code = template_tensors::dlpack_elementtype<ElementType>::getCode();
+  manager_ctx->dl.dl_tensor.dtype.bits = template_tensors::dlpack_elementtype<ElementType>::getBits();
+  manager_ctx->dl.dl_tensor.dtype.lanes = template_tensors::dlpack_elementtype<ElementType>::getLanes();
   manager_ctx->dl.dl_tensor.shape = manager_ctx->shape.data();
   manager_ctx->dl.dl_tensor.strides = manager_ctx->strides.data();
   manager_ctx->dl.dl_tensor.byte_offset = 0;

@@ -1,15 +1,6 @@
-#ifdef DLPACK_INCLUDED
-#ifdef BOOST_PYTHON_INCLUDED
+#if defined(DLPACK_INCLUDED) && defined(BOOST_PYTHON_INCLUDED)
 
-#include <boost/algorithm/string/join.hpp>
-
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
-
-namespace dispatch {
+namespace template_tensors::python::boost::dispatch {
 
 template <typename TElementTypes, typename TRanks, typename TMemoryTypes>
 struct FromDlPack
@@ -120,17 +111,17 @@ struct FromDlPack
   Result operator()(TFunctor&& functor)
   {
     Result result;
-    std::string class_name = template_tensors::boost::python::getClassName(object);
+    std::string class_name = template_tensors::python::boost::getClassName(object);
     if (class_name == "PyCapsule")
     {
       std::string name;
       {
-        template_tensors::boost::python::with_gil guard;
+        template_tensors::python::with_gil guard;
         name = std::string(PyCapsule_GetName(object.ptr()));
       }
       if (names.empty() || std::find(names.begin(), names.end(), name) != names.end())
       {
-        template_tensors::SafeDLManagedTensor dl = template_tensors::boost::python::toDlPack(object, name.c_str());
+        template_tensors::SafeDLManagedTensor dl = template_tensors::python::boost::toDlPack(object, name.c_str());
         result.inner_result = inner_dispatcher(dl)(Forward<TFunctor&&>{dl, std::forward<TFunctor>(functor)});
       }
       else
@@ -147,13 +138,6 @@ struct FromDlPack
   }
 };
 
-} // end of ns dispatch
+} // end of ns template_tensors::python::boost::dispatch
 
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
-
-#endif
 #endif

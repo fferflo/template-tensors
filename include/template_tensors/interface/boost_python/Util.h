@@ -1,55 +1,11 @@
 #pragma once
 
-#ifdef BOOST_PYTHON_INCLUDED
+#ifdef BOOST_PYTHON_INCLUDED // TODO: dont check this inside interface headers, add autoinclude switch in cmake and include with check in TemplateTensors.h
 
 #include <boost/python.hpp>
 #include <boost/python/extract.hpp>
 
-namespace template_tensors {
-
-namespace boost {
-
-namespace python {
-
-class with_gil
-{
-public:
-  with_gil()
-  {
-    state = PyGILState_Ensure();
-  }
-
-  ~with_gil()
-  {
-    PyGILState_Release(state);
-  }
-
-  with_gil(const with_gil&) = delete;
-  with_gil& operator=(const with_gil&) = delete;
-
-private:
-  PyGILState_STATE state;
-};
-
-class without_gil
-{
-public:
-  without_gil()
-  {
-    state = PyEval_SaveThread();
-  }
-
-  ~without_gil()
-  {
-    PyEval_RestoreThread(state);
-  }
-
-  without_gil(const without_gil&) = delete;
-  without_gil& operator=(const without_gil&) = delete;
-
-private:
-  PyThreadState* state;
-};
+namespace template_tensors::python::boost {
 
 namespace functor {
 
@@ -59,7 +15,7 @@ struct make_tuple
   __host__
   ::boost::python::tuple operator()(TArgs&&... args)
   {
-    template_tensors::boost::python::with_gil guard;
+    template_tensors::python::with_gil guard;
     return ::boost::python::make_tuple((static_cast<size_t>(std::forward<TArgs>(args)))...);
   }
 };
@@ -68,26 +24,26 @@ struct make_tuple
 
 ::boost::python::object dir(::boost::python::object object)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   ::boost::python::handle<> handle(PyObject_Dir(object.ptr()));
   return ::boost::python::object(handle);
 }
 
 bool callable(::boost::python::object object)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   return 1 == PyCallable_Check(object.ptr());
 }
 
 std::string getClassName(::boost::python::object object)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   return ::boost::python::extract<std::string>(object.attr("__class__").attr("__name__"));
 }
 
 std::vector<std::string> getAttributes(::boost::python::object object)
 {
-  template_tensors::boost::python::with_gil guard;
+  template_tensors::python::with_gil guard;
   std::vector<std::string> result;
   for (::boost::python::stl_input_iterator<::boost::python::str> name(dir(object)), end; name != end; ++name)
   {
@@ -99,10 +55,6 @@ std::vector<std::string> getAttributes(::boost::python::object object)
   return result;
 }
 
-} // end of ns python
-
-} // end of ns boost
-
-} // end of ns template_tensors
+} // end of ns template_tensors::python::boost
 
 #endif
