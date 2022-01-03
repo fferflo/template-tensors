@@ -278,6 +278,20 @@ if(TARGET interface.python.boost)
 endif()
 
 
+if(TARGET interface.python)
+  find_package(pybind11 QUIET)
+  if(pybind11_FOUND)
+    add_library(interface.python.pybind11 INTERFACE)
+    target_link_libraries(interface.python.pybind11 INTERFACE interface.python base)
+    target_compile_definitions(interface.python.pybind11 INTERFACE PYBIND11_INCLUDED)
+    install(
+      TARGETS interface.python.pybind11
+      EXPORT install_targets
+    )
+  endif()
+endif()
+
+
 find_package(SOIL QUIET)
 find_package(OpenGL QUIET)
 if(SOIL_FOUND AND OpenGL_FOUND)
