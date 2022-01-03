@@ -8,7 +8,6 @@ namespace detail {
 
 inline void deleteDlPackCapsuleObject(PyObject* capsule)
 {
-  template_tensors::python::with_gil guard;
   DLManagedTensor* dl = reinterpret_cast<DLManagedTensor*>(PyCapsule_GetPointer(capsule, PyCapsule_GetName(capsule)));
   ASSERT_(dl != nullptr, "Capsule object is null"); // TODO: assertion levels
   if (dl->deleter != nullptr)
@@ -22,7 +21,6 @@ inline void deleteDlPackCapsuleObject(PyObject* capsule)
 
 inline ::boost::python::object fromDlPack(template_tensors::SafeDLManagedTensor&& dl, const char* name)
 {
-  template_tensors::python::with_gil guard;
   void* dl_ptr = reinterpret_cast<void*>(dl.use());
   ASSERT_(dl_ptr != nullptr, "Cannot create capsule with nullptr ptr"); // TODO: assertion levels
   PyObject* capsule = ::PyCapsule_New(dl_ptr, name, (PyCapsule_Destructor) &detail::deleteDlPackCapsuleObject);
@@ -33,7 +31,6 @@ inline ::boost::python::object fromDlPack(template_tensors::SafeDLManagedTensor&
 
 inline template_tensors::SafeDLManagedTensor toDlPack(::boost::python::object capsule, const char* name)
 {
-  template_tensors::python::with_gil guard;
   DLManagedTensor* dl = reinterpret_cast<DLManagedTensor*>(PyCapsule_GetPointer(capsule.ptr(), name));
   ASSERT_(dl != nullptr, "Capsule object is null"); // TODO: assertion levels
   PyCapsule_SetName(capsule.ptr(), "tensor_pycapsule_used");

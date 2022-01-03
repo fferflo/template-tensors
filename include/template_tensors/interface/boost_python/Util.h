@@ -15,7 +15,6 @@ struct make_tuple
   __host__
   ::boost::python::tuple operator()(TArgs&&... args)
   {
-    template_tensors::python::with_gil guard;
     return ::boost::python::make_tuple((static_cast<size_t>(std::forward<TArgs>(args)))...);
   }
 };
@@ -24,26 +23,22 @@ struct make_tuple
 
 ::boost::python::object dir(::boost::python::object object)
 {
-  template_tensors::python::with_gil guard;
   ::boost::python::handle<> handle(PyObject_Dir(object.ptr()));
   return ::boost::python::object(handle);
 }
 
 bool callable(::boost::python::object object)
 {
-  template_tensors::python::with_gil guard;
   return 1 == PyCallable_Check(object.ptr());
 }
 
 std::string getClassName(::boost::python::object object)
 {
-  template_tensors::python::with_gil guard;
   return ::boost::python::extract<std::string>(object.attr("__class__").attr("__name__"));
 }
 
 std::vector<std::string> getAttributes(::boost::python::object object)
 {
-  template_tensors::python::with_gil guard;
   std::vector<std::string> result;
   for (::boost::python::stl_input_iterator<::boost::python::str> name(dir(object)), end; name != end; ++name)
   {

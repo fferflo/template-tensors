@@ -44,12 +44,8 @@ struct FromTensorflow
     std::string class_name = template_tensors::python::boost::getClassName(object);
     if (class_name == "EagerTensor")
     {
-      ::boost::python::object dlpack;
-      {
-        template_tensors::python::with_gil guard;
-        ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
-        dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(object);
-      }
+      ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
+      ::boost::python::object dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(object);
       result.inner_result = InnerDispatcher(dlpack, "dltensor")(std::forward<TFunctor>(functor));
     }
     else

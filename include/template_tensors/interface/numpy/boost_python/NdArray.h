@@ -24,13 +24,13 @@ class FromNdArray : public SuperType
 private:
   static_assert(std::is_arithmetic<TElementType>::value, "Elementtype is not a valid numpy type");
 
-  ::boost::python::numpy::ndarray m_numpy;
+  std::shared_ptr<::boost::python::numpy::ndarray> m_numpy;
 
   __host__
-  FromNdArray(::boost::python::numpy::ndarray numpy, VectorXT<size_t, TRank> strides, VectorXT<size_t, TRank> dims)
+  FromNdArray(const ::boost::python::numpy::ndarray& numpy, VectorXT<size_t, TRank> strides, VectorXT<size_t, TRank> dims)
     : SuperType(strides, dims)
     , StoreDimensions<dyn_dimseq_t<TRank>>(dims)
-    , m_numpy(numpy)
+    , m_numpy(std::make_shared<::boost::python::numpy::ndarray>(numpy))
   {
   }
 
@@ -41,19 +41,19 @@ public:
   template <typename TThisType2>
   __host__ __device__
   static auto data2(TThisType2&& self)
-  RETURN_AUTO(reinterpret_cast<typename std::remove_reference<util::copy_qualifiers_t<TElementType, TThisType2>>::type*>(self.m_numpy.get_data()))
+  RETURN_AUTO(reinterpret_cast<typename std::remove_reference<util::copy_qualifiers_t<TElementType, TThisType2>>::type*>(self.m_numpy->get_data()))
   FORWARD_ALL_QUALIFIERS(data, data2)
 
   __host__
   ::boost::python::numpy::ndarray& getNumpyArray()
   {
-    return m_numpy;
+    return *m_numpy;
   }
 
   __host__
   const ::boost::python::numpy::ndarray& getNumpyArray() const
   {
-    return m_numpy;
+    return *m_numpy;
   }
 
   template <typename TElementType2, metal::int_ TRank2>
@@ -68,20 +68,16 @@ template <typename TElementType, metal::int_ TRank>
 __host__
 FromNdArray<TElementType, TRank> fromNumpy(::boost::python::numpy::ndarray arr)
 {
-  VectorXT<size_t, TRank> strides, dims;
+  if (arr.get_nd() != TRank)
   {
-    template_tensors::python::with_gil guard;
-    if (arr.get_nd() != TRank)
-    {
-      throw template_tensors::python::InvalidNumpyShapeException(arr.get_nd(), TRank);
-    }
-    if (arr.get_dtype() != ::boost::python::numpy::dtype::get_builtin<TElementType>())
-    {
-      throw template_tensors::python::InvalidNumpyElementTypeException(arr.get_dtype().get_itemsize(), sizeof(TElementType));
-    }
-    strides = template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(arr.get_strides()) / sizeof(TElementType);
-    dims = template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(arr.get_shape());
+    throw template_tensors::python::InvalidNumpyShapeException(arr.get_nd(), TRank);
   }
+  if (arr.get_dtype() != ::boost::python::numpy::dtype::get_builtin<TElementType>())
+  {
+    throw template_tensors::python::InvalidNumpyElementTypeException(arr.get_dtype().get_itemsize(), sizeof(TElementType));
+  }
+  VectorXT<size_t, TRank> strides = template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(arr.get_strides()) / sizeof(TElementType);
+  VectorXT<size_t, TRank> dims = template_tensors::ref<template_tensors::ColMajor, mem::HOST, TRank>(arr.get_shape());
 
   return FromNdArray<TElementType, TRank>(arr, strides, dims);
 }
@@ -102,17 +98,13 @@ template <metal::int_ TRank2 = DYN, typename TTensorType, metal::int_ TRank = TR
 __host__
 ::boost::python::numpy::ndarray toNumpy(TTensorType&& tensor)
 {
-  std::unique_ptr<::boost::python::numpy::ndarray> arr;
-  {
-    template_tensors::python::with_gil guard;
-    arr = std::make_unique<::boost::python::numpy::ndarray>(::boost::python::numpy::empty(
-      jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
-      ::boost::python::numpy::dtype::get_builtin<decay_elementtype_t<TTensorType>>()
-    ));
-  }
+  ::boost::python::numpy::ndarray arr(::boost::python::numpy::empty(
+    jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
+    ::boost::python::numpy::dtype::get_builtin<decay_elementtype_t<TTensorType>>()
+  ));
+  fromNumpy<decay_elementtype_t<TTensorType>, TRank>(arr) = std::forward<TTensorType>(tensor);
 
-  fromNumpy<decay_elementtype_t<TTensorType>, TRank>(*arr) = std::forward<TTensorType>(tensor);
-  return *arr;
+  return arr;
 }
 
 } // end of ns template_tensors::python::boost

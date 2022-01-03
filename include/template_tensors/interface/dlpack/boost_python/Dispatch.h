@@ -114,11 +114,7 @@ struct FromDlPack
     std::string class_name = template_tensors::python::boost::getClassName(object);
     if (class_name == "PyCapsule")
     {
-      std::string name;
-      {
-        template_tensors::python::with_gil guard;
-        name = std::string(PyCapsule_GetName(object.ptr()));
-      }
+      std::string name = std::string(PyCapsule_GetName(object.ptr()));
       if (names.empty() || std::find(names.begin(), names.end(), name) != names.end())
       {
         template_tensors::SafeDLManagedTensor dl = template_tensors::python::boost::toDlPack(object, name.c_str());

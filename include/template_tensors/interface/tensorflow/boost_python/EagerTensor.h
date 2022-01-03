@@ -9,12 +9,8 @@ __host__
 auto fromTensorflow(::boost::python::object tensorflow)
 -> decltype(template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(std::declval<SafeDLManagedTensor>()))
 {
-  ::boost::python::object dlpack;
-  {
-    template_tensors::python::with_gil guard;
-    ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
-    dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(tensorflow);
-  }
+  ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
+  ::boost::python::object dlpack = tensorflow_module.attr("experimental").attr("dlpack").attr("to_dlpack")(tensorflow);
   return template_tensors::fromDlPack<TElementType, TRank, TMemoryType>(template_tensors::python::boost::toDlPack(dlpack, "dltensor"));
 }
 
@@ -23,12 +19,8 @@ __host__
 ::boost::python::object toTensorflow(TTensorType&& tensor)
 {
   ::boost::python::object dlpack = template_tensors::python::boost::fromDlPack(template_tensors::toDlPack(std::forward<TTensorType>(tensor)), "dltensor");
-  ::boost::python::object tensorflow;
-  {
-    template_tensors::python::with_gil guard;
-    ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
-    tensorflow = tensorflow_module.attr("experimental").attr("dlpack").attr("from_dlpack")(dlpack);
-  }
+  ::boost::python::object tensorflow_module = ::boost::python::import("tensorflow");
+  ::boost::python::object tensorflow = tensorflow_module.attr("experimental").attr("dlpack").attr("from_dlpack")(dlpack);
   return tensorflow;
 }
 

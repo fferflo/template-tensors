@@ -7,6 +7,8 @@
 
 namespace template_tensors::python::boost {
 
+// TODO: should return a class that holds a reference to the python object, so that it is not destructed
+
 template <typename TElementType, metal::int_ TRank>
 __host__
 auto fromCupy(::boost::python::object arr) -> decltype(template_tensors::ref<mem::DEVICE>(std::declval<TElementType*>(),
@@ -44,17 +46,12 @@ __host__
 {
   using ElementType = template_tensors::decay_elementtype_t<TTensorType>;
 
-  ::boost::python::object cupy_array;
-  {
-    template_tensors::python::with_gil guard;
-    ::boost::python::object cupy_module = ::boost::python::import("cupy");
-
-    cupy_array = cupy_module.attr("empty")(
-      jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
-      template_tensors::python::cupy_elementtype_name<ElementType>::get(),
-      "C"
-    );
-  }
+  ::boost::python::object cupy_module = ::boost::python::import("cupy");
+  ::boost::python::object cupy_array = cupy_module.attr("empty")(
+    jtuple::tuple_apply(functor::make_tuple(), template_tensors::toTuple(tensor.template dims<TRank>())),
+    template_tensors::python::cupy_elementtype_name<ElementType>::get(),
+    "C"
+  );
 
   fromCupy<ElementType, TRank>(cupy_array) = std::forward<TTensorType>(tensor);
 

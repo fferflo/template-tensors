@@ -14,7 +14,6 @@ struct FromNumpy
     template <typename TElementType>
     bool operator()()
     {
-      template_tensors::python::with_gil guard;
       return array.get_dtype() == ::boost::python::numpy::dtype::get_builtin<TElementType>();
     }
   };
@@ -26,7 +25,6 @@ struct FromNumpy
     template <metal::int_ TRank>
     bool operator()()
     {
-      template_tensors::python::with_gil guard;
       return array.get_nd() == TRank;
     }
   };
